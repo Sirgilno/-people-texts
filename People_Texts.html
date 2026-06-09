@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>People Texts Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #f0f0f0; min-height: 100vh; padding: 20px; }
+  h1 { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 4px; color: #fff; }
+  .subtitle { text-align: center; font-size: 13px; color: #888; margin-bottom: 24px; }
+  .card { background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid #2a2a2a; }
+  .section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 14px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  label { font-size: 12px; color: #aaa; display: block; margin-bottom: 6px; }
+  input[type="text"], input[type="password"], select { width: 100%; background: #252525; border: 1px solid #333; border-radius: 10px; padding: 10px 12px; font-size: 14px; color: #f0f0f0; outline: none; }
+  select option { background: #252525; }
+  .mode-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .mode-tab { padding: 12px 8px; border-radius: 10px; border: 1px solid #333; background: #252525; color: #aaa; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .mode-tab.active { background: #fff; color: #000; border-color: #fff; }
+  .mode-desc { font-size: 12px; color: #666; margin-bottom: 16px; text-align: center; }
+  .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #fff; color: #000; }
+  .btn-secondary { background: #252525; color: #f0f0f0; border: 1px solid #333; margin-top: 8px; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .api-status { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 12px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }
+  .dot.green { background: #4ade80; }
+  .key-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .key-row input { flex: 1; }
+  .key-save-btn { padding: 10px 16px; border-radius: 10px; border: none; background: #fff; color: #000; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .preview-section { display: none; margin-top: 20px; }
+  .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
+  .phone { width: 300px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
+  .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+  .phone > * { position: relative; z-index: 1; }
+  .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
+  .p-chat-header { padding: 8px 14px 10px; text-align: center; }
+  .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; }
+  .p-chat-name { font-size: 13px; font-weight: 600; }
+  .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 4px; }
+  .p-bubble-row { display: flex; flex-direction: column; }
+  .p-bubble-row.me { align-items: flex-end; }
+  .p-bubble-row.them { align-items: flex-start; }
+  .p-bubble-time { font-size: 9px; opacity: 0.5; margin-top: 2px; padding: 0 4px; }
+  .p-bubble-time.inside { font-size: 9px; color: inherit; opacity: 0.6; padding: 0 2px 1px 8px; align-self: flex-end; flex-shrink:0; }
+  .p-bubble-time.outside { font-size: 9px; opacity: 0.6; margin-top: 2px; padding: 0 4px; display:block; }
+  .p-time-divider { font-size: 10px; text-align: center; margin: 10px 0 4px; opacity: 0.5; width:100%; }
+  .p-read-receipt { font-size: 9px; margin-top: 1px; padding: 0 4px; text-align: right; }
+  .p-time { font-size: 10px; text-align: center; margin: 6px 0; opacity: 0.5; }
+  .p-input-bar { padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+  .p-fake-input { flex: 1; border-radius: 18px; padding: 7px 14px; font-size: 12px; }
+  .p-send { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .p-reply-quote { font-size: 10px; padding: 4px 8px; border-left: 2px solid; border-radius: 4px; margin-bottom: 3px; max-width: 75%; opacity: 0.7; line-height: 1.3; }
+  .p-typing { display: none; align-items: flex-start; margin: 2px 0; }
+  .p-typing-bubble { background: #e5e5ea; border-radius: 18px 18px 18px 4px; padding: 10px 14px; display: flex; gap: 3px; align-items: center; }
+  .p-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; animation: typingBounce 1.2s infinite; }
+  .p-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .p-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
+  .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .action-btn { padding: 12px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; }
+  .action-btn.primary { background: #fff; color: #000; border-color: #fff; }
+  .action-btn.full { grid-column: span 2; }
+  .action-btn.accent { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+  .gem-text-box { display: none; background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px; font-size: 12px; font-family: 'Courier New', monospace; color: #aaa; white-space: pre-wrap; word-break: break-word; line-height: 1.6; margin-top: 10px; }
+  .copied-toast { display: none; text-align: center; font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: 500; }
+  .loading-div { display: none; text-align: center; padding: 16px; color: #888; font-size: 14px; }
+  .shorten-badge { display: none; text-align: center; font-size: 11px; color: #4ade80; margin-bottom: 8px; font-weight: 500; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-box { display: none; background: #2a1515; border: 1px solid #ef4444; border-radius: 10px; padding: 12px; font-size: 13px; color: #ef4444; margin-top: 10px; }
+  .saved-convos { display: none; margin-top: 16px; }
+  .saved-title { font-size: 12px; color: #888; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .saved-list { display: flex; flex-direction: column; gap: 8px; }
+  .saved-item { background: #252525; border: 1px solid #333; border-radius: 10px; padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .saved-item:hover { border-color: #555; }
+  .saved-item-preview { font-size: 12px; color: #aaa; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
+  .saved-item-label { font-size: 11px; color: #666; white-space: nowrap; }
+  .saved-del { font-size: 11px; color: #ef4444; cursor: pointer; margin-left: 8px; padding: 2px 6px; }
+  .wallpaper-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+  .wp-swatch { width: 100%; aspect-ratio: 1; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+  .wp-swatch.active { border-color: #fff; }
+  .animate-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
+  .animate-phone-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+  .animate-controls { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .animate-btn { padding: 12px 24px; border-radius: 12px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .animate-btn.start { background: #7c3aed; color: white; }
+  .animate-btn.close { background: #252525; color: #f0f0f0; border: 1px solid #333; }
+  .animate-btn.rec { background: #ef4444; color: white; }
+  .animate-hint { font-size: 12px; color: #666; text-align: center; margin-top: 12px; }
+  /* Feature 7 — Side by side shorten */
+  .compare-wrap { display: none; gap: 10px; margin-bottom: 12px; }
+  .compare-wrap.visible { display: grid; grid-template-columns: 1fr 1fr; }
+  .compare-col { background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; }
+  .compare-col-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #666; margin-bottom: 8px; }
+  .compare-msg { font-size: 11px; padding: 5px 7px; border-radius: 8px; margin-bottom: 4px; line-height: 1.4; }
+  .compare-msg.me { background: #1a2a3a; color: #7ab8f5; text-align: right; }
+  .compare-msg.them { background: #1a1a2a; color: #aaa; }
+  .compare-pick { width: 100%; margin-top: 8px; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; background: #7c3aed; color: white; }
+  /* Feature 8 — Editable bubbles */
+  .bubble-editable { outline: none; cursor: text; }
+  .bubble-editable:focus { box-shadow: 0 0 0 2px rgba(124,58,237,0.6); }
+  .edit-hint { font-size: 11px; color: #555; text-align: center; margin-top: 4px; display: none; }
+  /* Feature 9 — Name generator */
+  .name-gen-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #252525; color: #aaa; font-size: 12px; cursor: pointer; white-space: nowrap; margin-top: 6px; width: 100%; text-align: center; }
+  .name-gen-btn:hover { border-color: #555; color: #fff; }
+  /* Feature 10 — Mood slider */
+  .mood-row { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-bottom: 4px; }
+  .mood-slider { width: 100%; accent-color: #ef4444; margin-bottom: 4px; }
+  .mood-label { text-align: center; font-size: 12px; font-weight: 600; color: #ef4444; min-height: 18px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<h1>People Texts Generator 💬</h1>
+<p class="subtitle">AI-powered — turn any relationship into a song</p>
+
+<div class="card">
+  <div class="section-title">API Key</div>
+  <div class="api-status"><div class="dot" id="apiDot"></div><span id="apiStatusText">No API key saved</span></div>
+  <div class="key-row">
+    <input type="password" id="apiKeyInput" placeholder="Paste your Anthropic API key here..." />
+    <button class="key-save-btn" id="saveKeyBtn">Save</button>
+  </div>
+  <div style="margin-top:10px;">
+    <label style="font-size:11px;color:#aaa;">xAI Grok Key <span style="color:#ff6b6b;font-size:10px;">(required for Unhinged and Unhinged Pro Max)</span></label>
+    <div class="key-row" style="margin-top:4px;">
+      <input type="password" id="grokKeyInput" placeholder="Paste your xAI API key here..." />
+      <button class="key-save-btn" id="saveGrokKeyBtn">Save</button>
+    </div>
+  </div>
+  <button class="btn btn-secondary" id="clearKeyBtn">Clear saved keys</button>
+</div>
+
+<div class="card">
+  <div class="section-title">Settings</div>
+  <div style="margin-bottom:12px;">
+    <label>AI Provider</label>
+    <select id="providerSelect">
+      <option value="auto" selected>Auto — Claude (normal) / Grok (unhinged)</option>
+      <option value="anthropic">Anthropic Claude — force Claude for all vibes</option>
+      <option value="xai">xAI Grok — force Grok for all vibes</option>
+    </select>
+  </div>
+  <div style="margin-bottom:12px;">
+    <label>Model</label>
+    <select id="modelSelect">
+      <!-- Populated dynamically by updateModelOptions() -->
+    </select>
+  </div>
+  <div class="row">
+    <div><label>Your name</label><input type="text" id="myName" value="Me" /></div>
+    <div>
+      <label>Their name</label>
+      <input type="text" id="theirName" value="" placeholder="Auto-fills" />
+      <button class="name-gen-btn" id="nameGenBtn">🎲 Generate local name</button>
+    </div>
+  </div>
+  <div style="margin-bottom:12px;">
+    <label>Message Platform</label>
+    <select id="msgStyle">
+      <option value="whatsapp">WhatsApp</option>
+      <option value="imessage">iMessage</option>
+      <option value="messenger">Facebook Messenger</option>
+      <option value="facebook">Facebook Chat</option>
+      <option value="telegram">Telegram</option>
+      <option value="instagram">Instagram DM</option>
+      <option value="twitter">X / Twitter DM</option>
+      <option value="reddit">Reddit DM</option>
+      <option value="snapchat">Snapchat</option>
+      <option value="discord">Discord</option>
+      <option value="tiktok">TikTok DM</option>
+      <option value="android">Android / Google Messages</option>
+    </select>
+  </div>
+  <div class="row">
+    <div>
+      <label>Who is texting you?</label>
+      <select id="person">
+        <option value="mom">Mom</option>
+        <option value="dad">Dad</option>
+        <option value="brother">Brother</option>
+        <option value="sister">Sister</option>
+        <option value="bestfriend">Best Friend</option>
+        <option value="partner">Partner / GF / BF</option>
+        <option value="coworker">Coworker / Boss</option>
+        <option value="stranger">Stranger / Random DM</option>
+        <option value="niece">Niece</option>
+        <option value="nephew">Nephew</option>
+      </select>
+    </div>
+    <div>
+      <label>Vibe</label>
+      <select id="vibe">
+        <option value="funny">Funny / Chaotic</option>
+        <option value="passive">Passive aggressive</option>
+        <option value="guilt">Guilt trip</option>
+        <option value="nosy">Nosy / Interrogation</option>
+        <option value="proud">Bragging / Proud</option>
+        <option value="dramatic">Dramatic / Over the top</option>
+        <option value="awkward">Awkward / Cringe</option>
+        <option value="relatable">Relatable / Everyday</option>
+        <option value="unhinged">Unhinged 🔥</option>
+        <option value="unhingedmax">Unhinged Pro Max 🚫</option>
+        <option value="tinder">Tinder / Dating App Energy 😬</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-bottom:16px;">
+    <label>Topic / Context (optional)</label>
+    <input type="text" id="topic" placeholder="e.g. forgot my birthday, saw me at the club..." />
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <label>Conversation Mood Escalation</label>
+    <div class="mood-row"><span>😐 Calm</span><span>😤 Heated</span><span>💀 Full Chaos</span></div>
+    <input type="range" id="moodSlider" class="mood-slider" min="0" max="2" step="1" value="1" />
+    <div class="mood-label" id="moodLabel">😤 Heated — tension builds, things get spicy</div>
+  </div>
+
+  <div class="section-title">Chat Wallpaper</div>
+  <div class="wallpaper-grid" id="wallpaperGrid"></div>
+  <div style="margin-top:8px;margin-bottom:16px;">
+    <label style="margin-bottom:4px;">Wallpaper Opacity</label>
+    <input type="range" id="wallpaperOpacity" min="0" max="100" value="40" style="width:100%;accent-color:#7c3aed;" />
+  </div>
+
+  <div class="section-title">Mode</div>
+  <div class="mode-tabs" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="mode-tab active" id="tab-short" onclick="setMode('short')">Short Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">exactly 6 messages</span></div>
+    <div class="mode-tab" id="tab-full" onclick="setMode('full')">Mid Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">7–10 messages</span></div>
+    <div class="mode-tab" id="tab-song" onclick="setMode('song')">Song Mode<br><span style="font-size:11px;font-weight:400;opacity:0.6;">8–15 words, 6–10 lines</span></div>
+  </div>
+  <p class="mode-desc" id="modeDesc">Short mode: exactly 6 messages — clean screenshot, fits perfectly on screen</p>
+  <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
+  <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
+  <div class="error-box" id="errorBox"></div>
+</div>
+
+<div class="preview-section" id="previewSection">
+  <div class="phone-wrap">
+    <div class="phone" id="phoneFrame">
+      <div class="phone-wallpaper" id="phoneWallpaper"></div>
+      <div class="p-status-bar" id="pStatusBar">
+        <span id="pTime">9:41</span>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="2" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="4" y="1.5" width="2.5" height="9.5" rx="1" fill="currentColor"/><rect x="8" y="0" width="2.5" height="11" rx="1" fill="currentColor"/><rect x="12" y="0" width="2.5" height="11" rx="1" fill="currentColor" opacity="0.3"/></svg>
+          <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 1.5C9.2 1.5 11.2 2.4 12.6 3.9L13.7 2.7C12 0.9 9.6-0.2 7-0.2S2 0.9 0.3 2.7L1.4 3.9C2.8 2.4 4.8 1.5 7 1.5z" fill="currentColor"/><path d="M7 4.5C8.5 4.5 9.8 5.1 10.7 6.1L11.8 4.9C10.6 3.7 8.9 2.9 7 2.9S3.4 3.7 2.2 4.9L3.3 6.1C4.2 5.1 5.5 4.5 7 4.5z" fill="currentColor"/><circle cx="7" cy="9.5" r="1.5" fill="currentColor"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="19" y="3.5" width="2" height="4" rx="1" fill="currentColor"/><rect x="1.5" y="2.5" width="12" height="6" rx="1" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="p-chat-header" id="pChatHeader">
+        <div class="p-avatar" id="pAvatar">M</div>
+        <div class="p-chat-name" id="pName">Mum</div>
+      </div>
+      <div class="p-messages" id="pMessages"></div>
+      <div class="p-input-bar" id="pInputBar">
+        <div class="p-fake-input" id="pFakeInput">Message</div>
+        <div class="p-send" id="pSendBtn">
+          <svg width="12" height="12" viewBox="0 0 12 12"><path id="pSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-btns">
+    <button class="action-btn" id="regenBtn">Regenerate 🔄</button>
+    <button class="action-btn primary" id="downloadBtn">Download PNG 📸</button>
+  </div>
+  <div class="action-btns">
+    <button class="action-btn full accent" id="animateBtn">▶️ Animate for TikTok</button>
+  </div>
+  <div class="action-btns">
+    <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
+  </div>
+  <p class="edit-hint" id="editHint">✏️ Tap any message bubble to edit it directly</p>
+  <div class="action-btns">
+    <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
+  </div>
+  <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span>Trimming for lyrics...</div>
+  <div class="shorten-badge" id="shortenBadge">✓ Shortened for song lyrics</div>
+  <div class="compare-wrap" id="compareWrap">
+    <div class="compare-col">
+      <div class="compare-col-title">📝 Original</div>
+      <div id="compareOriginal"></div>
+      <button class="compare-pick" id="pickOriginal">Use Original</button>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-title">✂️ Shortened</div>
+      <div id="compareShortened"></div>
+      <button class="compare-pick" id="pickShortened">Use Shortened</button>
+    </div>
+  </div>
+  <div class="action-btns" id="copyBtnRow">
+    <button class="action-btn full" id="copyBtn">Copy text for Gem 📋</button>
+  </div>
+  <div class="gem-text-box" id="gemTextBox"></div>
+  <div class="copied-toast" id="copiedToast">✓ Copied to clipboard!</div>
+</div>
+
+<div class="card saved-convos" id="savedConvosCard">
+  <div class="saved-title">Saved Conversations</div>
+  <div class="saved-list" id="savedList"></div>
+</div>
+
+<!-- Animate Overlay -->
+<div class="animate-overlay" id="animateOverlay">
+  <div class="animate-phone-wrap">
+    <div class="phone" id="animatePhone" style="width:280px;">
+      <div class="phone-wallpaper" id="animateWallpaper"></div>
+      <div class="p-status-bar" id="aSb"><span id="aTime">9:41</span><div style="display:flex;gap:4px;align-items:center;"><svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="2" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="4" y="1.5" width="2.5" height="9.5" rx="1" fill="currentColor"/><rect x="8" y="0" width="2.5" height="11" rx="1" fill="currentColor"/></svg></div></div>
+      <div class="p-chat-header" id="aCh"><div class="p-avatar" id="aAv">M</div><div class="p-chat-name" id="aN">Mum</div></div>
+      <div class="p-messages" id="aMessages" style="min-height:300px;"></div>
+      <div class="p-typing" id="aTyping"><div class="p-typing-bubble" id="aTypingBubble"><div class="p-typing-dot"></div><div class="p-typing-dot"></div><div class="p-typing-dot"></div></div></div>
+      <div class="p-input-bar" id="aIb"><div class="p-fake-input" id="aFi">Message</div><div class="p-send" id="aSend"><svg width="12" height="12" viewBox="0 0 12 12"><path id="aSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+  </div>
+  <div class="animate-controls">
+    <button class="animate-btn start" id="startAnimBtn">▶ Play</button>
+    <button class="animate-btn rec" id="recordBtn">⏺ Record Video</button>
+    <button class="animate-btn close" id="closeAnimBtn">✕ Close</button>
+  </div>
+  <p class="animate-hint" id="animHint">Press Play to watch messages appear one by one. Press Record to save as video.</p>
+</div>
+
+<script>
+(function() {
+  var currentMode = 'short';
+  var currentMessages = [];
+  var savedConversations = [];
+  var currentWallpaper = 'none';
+  var isAnimating = false;
+  var originalMessages = []; // for compare feature
+
+  // ── MOOD SLIDER ──────────────────────────────────────────────
+  var moodLabels = [
+    '😐 Calm — chill, casual, everyday energy',
+    '😤 Heated — tension builds, things get spicy',
+    '💀 Full Chaos — completely off the rails by the end'
+  ];
+  var moodDescriptions = [
+    'MOOD: Keep this conversation calm, casual, and chill. No major conflict. The energy is relaxed, everyday, low stakes. People are just talking normally.',
+    'MOOD: The conversation starts okay but tension builds. Someone says something that lands wrong. By the end it is noticeably heated — not explosive but definitely not fine.',
+    'MOOD: This conversation ESCALATES. It starts somewhat normal then goes completely off the rails. By the last 2-3 messages something has exploded — chaos, drama, a confession, a breakdown, or a revelation that no one saw coming. End on maximum energy.'
+  ];
+  document.getElementById('moodSlider').addEventListener('input', function() {
+    document.getElementById('moodLabel').textContent = moodLabels[parseInt(this.value)];
+  });
+
+  // ── NAME GENERATOR ───────────────────────────────────────────
+  var localNames = {
+    mom:        ['Mama Thandiwe','Ba Mwansa','Mama Chisomo','Mama Zodwa','MaZulu','Mama Nkosi','Mama Phiri','Ba Mutale'],
+    dad:        ['Ba Mwansa','Baba Sipho','Ba Tembo','Baba Ndlovu','Ba Phiri','Baba Dlamini','Ba Chanda','Baba Moyo'],
+    brother:    ['Chanda','Sipho','Tabo','Kelvin','Luyanda','Mpho','Mutale','Thabo','Zakes','Bongani'],
+    sister:     ['Thandiwe','Chisomo','Nomsa','Zodwa','Luyanda','Naledi','Chipo','Sithembile','Nandi','Mutinta'],
+    bestfriend: ['Thabo','Chanda','Mpho','Sipho','Luyanda','Bongani','Kelvin','Naledi','Nomsa','Zodwa'],
+    partner:    ['Baby','Babe','Sthandwa','My Love','Chipo','Thabo','Luyanda','Nomsa'],
+    coworker:   ['Mr Phiri','Mrs Dlamini','Mr Mwansa','Ms Tembo','Sipho','Zodwa','Mr Ndlovu','Ms Moyo'],
+    stranger:   ['Unknown','Random','+27 82 555','+260 97 555','No Name'],
+    niece:      ['Chisomo','Naledi','Zodwa','Nandi','Mutinta','Luyanda','Sithembile'],
+    nephew:     ['Mpho','Kelvin','Mutale','Bongani','Zakes','Chanda','Luyanda']
+  };
+  document.getElementById('nameGenBtn').addEventListener('click', function() {
+    var person = document.getElementById('person').value;
+    var names = localNames[person] || ['Unknown'];
+    var name = names[Math.floor(Math.random() * names.length)];
+    document.getElementById('theirName').value = name;
+  });
+
+  var personData = {
+    mom:       { defaultName: 'Mum',        avatarColor: '#c7a0d4', avatarText: '#5a2d7a' },
+    dad:       { defaultName: 'Dad',        avatarColor: '#a0c7d4', avatarText: '#2d5a7a' },
+    brother:   { defaultName: 'Bro',        avatarColor: '#d4c7a0', avatarText: '#7a5a2d' },
+    sister:    { defaultName: 'Sis',        avatarColor: '#f4a0c7', avatarText: '#7a2d5a' },
+    bestfriend:{ defaultName: 'Best Friend',avatarColor: '#a0d4a0', avatarText: '#2d7a2d' },
+    partner:   { defaultName: 'Baby',       avatarColor: '#d4a0a0', avatarText: '#7a2d2d' },
+    coworker:  { defaultName: 'Coworker',   avatarColor: '#b0b0b0', avatarText: '#404040' },
+    stranger:  { defaultName: 'Unknown',    avatarColor: '#8a8a8a', avatarText: '#1a1a1a' },
+    niece:     { defaultName: 'Niece',      avatarColor: '#f4c7a0', avatarText: '#7a4a2d' },
+    nephew:    { defaultName: 'Nephew',     avatarColor: '#a0c4f4', avatarText: '#2d4a7a' }
+  };
+
+  var personDescriptions = {
+    mom: 'a Zambian or Southern African mother texting her child. She speaks with warmth but also guilt and concern. She asks about food, church, when you are coming home, and why you have not called. She might use Kwacha (K) or Rands (R) for money — never dollars. She might say mukwai, mwana, nawe, ba, or throw in Bemba, Nyanja, Zulu, or Sotho words naturally. She is dramatic about small things and uses voice notes energy even in text.',
+    dad: 'a Zambian or Southern African father texting his child. Dads here are short, blunt, randomly deep, and hilariously oblivious to tone. He says things like "I am fine" with zero punctuation, sends a single word and vanishes, or randomly checks in about the car. He uses Kwacha or Rands — never dollars. He might reference nshima, braai, church, ZESCO, or load shedding. Occasionally drops Bemba, Nyanja, Zulu, or Sotho.',
+    brother: 'a Southern African or Zambian brother texting his sibling. Brothers here roast each other relentlessly, fight over who took what, bring up embarrassing memories, and have absolutely zero filter. They might throw in local slang — sharp, eish, heita, lekker, sho, bane, sure sure. If the topic is personal or sensitive, the brother is awkward but tries in the most clueless hilarious way. Uses Kwacha or Rands for money.',
+    sister: 'a Southern African or Zambian sister texting her sibling. Sisters here overshare everything, know all the family drama, call out nonsense immediately, and will defend you publicly but roast you privately. They mix English with local slang naturally — sharp, haibo, eish, shame man, askies, nawe, bane. Uses Kwacha or Rands.',
+    bestfriend: 'a Southern African or Zambian best friend texting their bestie. They are unhinged, no filter, mix languages naturally — English, Zulu, Sotho, Tswana, Bemba, Nyanja slang mid-sentence. They say things like "eish bro", "sharp sharp", "nxa", "sho", "lekker", "bane", "sure sure". They hype each other, drag each other lovingly, share chaotic life updates about taxis, load shedding, ZESCO, work, and family. Uses Kwacha or Rands.',
+    partner: 'a romantic partner texting their significant other in a Southern African or Zambian context. Could be sweet, dramatic, jealous, confused, needy, or playfully demanding. Might reference load shedding, taxis, ZESCO, family pressure, money issues. Uses Kwacha or Rands.',
+    coworker: 'a coworker or boss texting in a Southern African or Zambian workplace context. References like month-end, pay day, office drama, SARS, ZRA, public holidays, load shedding affecting work. Passive aggressive corporate tone mixed with local office culture. Uses Kwacha or Rands.',
+    stranger: 'a random stranger from anywhere in the world sliding into DMs or sending an unexpected text. This person can be from any country — America, UK, Nigeria, Brazil, anywhere. Wrong number energy, internet weirdo, sketchy DM. Currency depends on their country.',
+    niece: 'a Southern African or Zambian niece texting her aunt or uncle. She is dramatic, overly familiar, asks for money in Kwacha or Rands, shares too much about her social life, treats her aunt or uncle like a cool older friend. Gen Z energy with local slang.',
+    nephew: 'a Southern African or Zambian nephew texting his aunt or uncle. Chaotic, only checks in when he needs something — usually money in Kwacha or Rands. Randomly shares questionable life choices. Local township or street energy mixed with student life.'
+  };
+  // ── EXAMPLE CONVERSATION DATABASE ────────────────────────────
+  // 3 authentic examples per person type. Injected into prompt as reference.
+  // All Zambian/SA flavoured. These teach Claude the VOICE not just the topic.
+  var exampleConvos = {
+    mom: [
+      "Mum: Mwana wake up\nMe: Mum it is 5am\nMum: I had a dream about you. You were at a wedding wearing white\nMe: That is just a dream Mum\nMum: I am not saying anything. Ba Chileshe's son is still single by the way\nMe: Mum\nMum: I am just saying. Also call your auntie she says you never call",
+      "Mum: Are you eating\nMe: Yes Mum\nMum: What did you eat\nMe: Food Mum\nMum: That is not an answer. Are you eating nshima or you are eating that bread every day\nMe: I eat different things\nMum: You sound thin. I will send mealie meal with the bus on Friday\nMe: Mum I live in a flat\nMum: Flats have pots",
+      "Mum: I called you three times yesterday\nMe: Sorry Mum I was in a meeting\nMum: A meeting that lasts the whole day and the whole night\nMe: It was a long day\nMum: Your cousin Mutale calls her mother every morning. Every. Morning.\nMe: We are different people Mum\nMum: Yes. She is a good daughter."
+    ],
+    dad: [
+      "Dad: How are you\nMe: I am fine Dad how are you\nDad: Fine. How is the car\nMe: It is okay\nDad: Check the oil\nMe: Okay Dad\nDad: And the tyres\nMe: They are fine\nDad: Okay",
+      "Dad: Are you coming home for Christmas\nMe: I am trying Dad flights are expensive\nDad: Your grandfather walked from Copperbelt in 1974\nMe: That is not the same thing Dad\nDad: I am just saying\nMe: I will try\nDad: Your mother misses you. I am fine.",
+      "Dad: I saw your post on Facebook\nMe: Which one\nDad: The one at night. Who are those people\nMe: Friends Dad\nDad: Hmm\nMe: What does hmm mean\nDad: Nothing. Just hmm. Be careful\nMe: Of what\nDad: Everything."
+    ],
+    brother: [
+      "Bro: Did you take my charger\nMe: No\nBro: Lying\nMe: I did not take your charger\nBro: It was on my desk it is now gone you were the last one in the room\nMe: Maybe you misplaced it\nBro: I will find it and when I do I am telling Mum about what happened in 2019\nMe: ...it is in my bag",
+      "Bro: Aye I saw your ex at Manda Hill\nMe: And\nBro: She was with someone\nMe: Good for her\nBro: He was short\nMe: Why are you telling me this\nBro: I thought you should know\nMe: I did not need to know this\nBro: You would have been angry if I did not tell you\nMe: I am angry now",
+      "Bro: Mum is looking for you\nMe: For what\nBro: She found the receipt\nMe: What receipt\nBro: Exactly\nMe: How bad is she\nBro: She has been quiet for 20 minutes\nMe: That is the worst kind\nBro: Yes. Good luck. I am at Shoprite."
+    ],
+    sister: [
+      "Sis: I need to tell you something but you cannot tell Mum\nMe: Okay\nSis: I am serious\nMe: I said okay\nSis: Chanda and Kelvin broke up\nMe: That is the secret\nSis: There is more. She caught him at Game with another girl buying a blender\nMe: A blender\nSis: A blender. For her. He was buying her a blender.\nMe: That is so specific\nSis: I know",
+      "Sis: Your friend Thabo keeps liking my photos\nMe: He is friendly\nSis: He liked a photo from 2019\nMe: Okay that is less friendly\nSis: Tell him to stop or I will block him\nMe: Tell him yourself\nSis: That is your job as my brother\nMe: That is not a job\nSis: It comes with the role.",
+      "Sis: How much is your rent\nMe: Why\nSis: I am just asking\nMe: That is never just a question with you\nSis: I might need to move out\nMe: From Mum's\nSis: She reorganised my whole wardrobe\nMe: That is her house\nSis: It is also my wardrobe\nMe: How much do you need"
+    ],
+    bestfriend: [
+      "Chanda: Bro I did something\nMe: What did you do\nChanda: So you know that email I was not supposed to send\nMe: No\nChanda: I sent it\nMe: To who\nChanda: Everyone\nMe: Define everyone\nChanda: The whole company thread\nMe: Chanda\nChanda: I know\nMe: What was in it\nChanda: My resignation letter that I wrote when I was angry\nMe: Are you resigned now\nChanda: Apparently yes",
+      "Thabo: Sharp sharp are you home\nMe: Yeah why\nThabo: Load shedding at my place since 3pm bro\nMe: Eish come through\nThabo: I am bringing my charger and my PS5\nMe: It is also load shedding here in 2 hours\nThabo: Then we eat before it goes\nMe: There is no food\nThabo: I will bring KFC\nMe: Now you can come",
+      "Naledi: I need you to be honest with me\nMe: Always\nNaledi: Does this guy like me or is he just bored\nMe: Send the messages\nNaledi: Okay he texts me every day but only after 10pm\nMe: He is bored\nNaledi: But he remembered my birthday\nMe: When is your birthday\nNaledi: In 3 months\nMe: He has not remembered it yet\nNaledi: Oh"
+    ],
+    partner: [
+      "Babe: Are you awake\nMe: Yes\nBabe: You did not text me goodnight\nMe: I fell asleep\nBabe: At 9pm\nMe: I was tired\nBabe: You were not too tired to like Nomsa's photo at 9:15\nMe: I was half asleep\nBabe: Your thumb was not asleep though\nMe: It was a landscape photo\nBabe: It was her in a landscape.",
+      "Sthandwa: Where are you\nMe: Still at work\nSthandwa: It is 8pm\nMe: I know I have a deadline\nSthandwa: You had a deadline last week\nMe: It is a new deadline\nSthandwa: ZESCO took the power 2 hours ago I have been sitting in the dark\nMe: I am sorry babe\nSthandwa: I ate cold nshima\nMe: I will make it up to you\nSthandwa: With warm food",
+      "Baby: Do you find Zodwa attractive\nMe: What\nBaby: Just answer\nMe: Why are you asking me this\nBaby: She commented a fire emoji on your photo\nMe: That is just a comment\nBaby: With two fire emojis\nMe: People comment emojis\nBaby: On their own boyfriends maybe. Answer the question\nMe: No I do not\nBaby: Liar\nMe: I genuinely do not\nBaby: She is pretty though right\nMe: I am not answering that"
+    ],
+    coworker: [
+      "Mr Phiri: Are you coming to the 8am meeting\nMe: Yes I will be there\nMr Phiri: Just confirming because last week you were late\nMe: The taxis were delayed\nMr Phiri: The meeting is on Teams\nMe: I know\nMr Phiri: So the taxis should not be a factor\nMe: I will be there Mr Phiri\nMr Phiri: Wonderful. Bring the Q3 report.\nMe: I sent it on Friday\nMr Phiri: Send it again.",
+      "Zodwa: Did you see what they did with the bonus\nMe: I did not get the email\nZodwa: They split it differently this time\nMe: How differently\nZodwa: Management got 15 percent. We got 2\nMe: 2 percent\nZodwa: 2 percent\nMe: It is month end and I have 2 percent\nZodwa: Do not say it out loud\nMe: I am quitting\nZodwa: We all say that\nMe: I mean it this time\nZodwa: We all say that too",
+      "Boss: Quick one — are you free this weekend\nMe: Is this about work\nBoss: It is just a small thing\nMe: How small\nBoss: Just reviewing the proposal. 2 hours maximum\nMe: It is Saturday\nBoss: I know I really appreciate it\nMe: Will there be overtime\nBoss: There will be gratitude\nMe: I need more than gratitude\nBoss: And a mention in the all-staff email\nMe: I will be there at 10"
+    ],
+    stranger: [
+      "Unknown: Hello is this Precious\nMe: No wrong number\nUnknown: Are you sure\nMe: Yes I am sure I know my own name\nUnknown: She gave me this number\nMe: Then she gave you the wrong one\nUnknown: Can you tell her to call me\nMe: I do not know who Precious is\nUnknown: Just tell her Kevin called\nMe: I cannot tell a stranger that a stranger called\nUnknown: Okay thanks",
+      "Unknown: Hi babes\nMe: I think you have the wrong number\nUnknown: Is this not Thandi\nMe: No\nUnknown: Oh my God I am so embarrassed\nMe: It is fine\nUnknown: I just sent a voice note to you thinking it was her\nMe: I did not receive a voice note\nUnknown: Oh good because it was about her boyfriend\nMe: I will not ask\nUnknown: He is cheating by the way\nMe: I really did not need to know that",
+      "Random: Saw your comment on the thread. Facts only bro\nMe: Which thread\nRandom: The one about load shedding\nMe: I comment on many things\nRandom: You said Eskom is worse than ZESCO\nMe: That is my opinion\nRandom: As a South African I am offended\nMe: As a Zambian I stand by it\nRandom: Fair enough. What part of Zambia\nMe: Lusaka\nRandom: Sharp. Lusaka people always have opinions\nMe: It is a gift"
+    ],
+    niece: [
+      "Chisomo: Uncle hi how are you I miss you\nMe: I am good Chisomo how is school\nChisomo: School is good actually I wanted to ask you something\nMe: What is it\nChisomo: It is not a big thing\nMe: How much\nChisomo: I did not even say money\nMe: How much Chisomo\nChisomo: Just K200 for my practical exam materials\nMe: Send me the list of materials\nChisomo: It is not really a list it is more of a feeling",
+      "Naledi: Auntie I need advice\nMe: What happened\nNaledi: So there is this guy at campus\nMe: Okay\nNaledi: He is in my class and he is really nice\nMe: And\nNaledi: He asked for my number but I gave him my Instagram\nMe: That is normal now\nNaledi: He followed me and then immediately sent a reel\nMe: What reel\nNaledi: A romantic one\nMe: Block him\nNaledi: But he is nice\nMe: The reel was day one?\nNaledi: Within the hour\nMe: Block him",
+      "Chipo: Auntie are you and Uncle still together\nMe: Yes why\nChipo: Just asking\nMe: That is not just asking\nChipo: I saw on Facebook that—\nMe: Do not believe Facebook\nChipo: So you are together\nMe: Yes\nChipo: Okay because I already told my friends you were not\nMe: Chipo\nChipo: I will correct them"
+    ],
+    nephew: [
+      "Kelvin: Uncle long time how are you\nMe: I am well Kelvin\nKelvin: That is great that is really great\nMe: What do you need\nKelvin: What do you mean\nMe: You only text when you need something\nKelvin: That is harsh uncle\nMe: How much\nKelvin: Just K500 for registration fees\nMe: Send me the university letter\nKelvin: It is not exactly from the university\nMe: Then what is it from\nKelvin: My heart",
+      "Mpho: Bra I need your advice on something serious\nMe: What is it\nMpho: So I have been thinking about dropping out\nMe: Of what\nMpho: Varsity\nMe: Why\nMpho: I have a business idea\nMe: What kind of business\nMpho: Sneaker reselling\nMe: Stay in school Mpho\nMpho: But Elon Musk dropped out\nMe: Elon Musk did not drop out to resell sneakers in Lusaka\nMpho: The principle is the same",
+      "Bongani: Sharp sharp unc are you watching the match\nMe: Which match\nBongani: Chiefs vs Pirates bro where have you been\nMe: I forgot\nBongani: Can I come watch at yours\nMe: Now\nBongani: It starts in 20 minutes\nMe: It is 9pm\nBongani: The beautiful game does not care about time\nMe: Fine but bring your own snacks\nBongani: Your fridge is right there though"
+    ]
+  };
+
+  function getExamples(person) {
+    var convos = exampleConvos[person] || exampleConvos['stranger'];
+    // Return all examples joined as a reference block
+    return convos.map(function(c, i) {
+      return 'EXAMPLE ' + (i+1) + ':\n' + c;
+    }).join('\n\n');
+  }
+
+
+  // ── EXAMPLE CONVERSATIONS (reference material for richer output) ──────────
+  var personExamples = {
+    mom: `EXAMPLE CONVERSATION 1 (Mum / Funny-Nosy):
+Mum: Mwana wake up I had a dream about you last night. You were wearing white and there were flowers everywhere and Ba Chileshe's son was standing at the front of the church. I am not saying anything I am just telling you what I dreamed.
+Me: Mum that is literally just a wedding. You dreamed a wedding and decided to send it to me at 6am on a Tuesday.
+Mum: I did not say wedding I said flowers and a church. If your mind went to wedding that is between you and God. Also your auntie says Chanda is now working at ZESCO head office in Lusaka. Very stable job. No load shedding at his house.
+Me: Mum you are doing a lot right now.
+Mum: I am just sharing information. Eat something today. You looked thin on your profile picture.
+
+EXAMPLE CONVERSATION 2 (Mum / Guilt Trip):
+Mum: Hello. Just checking if you are still alive since you have not called in 11 days.
+Me: Mum it has not been 11 days I called on Sunday.
+Mum: Which Sunday. This Sunday or the Sunday before. Because I have been sitting here.
+Me: Mum you have a whole life. You go to church, you have friends, you watch your stories.
+Mum: When you have children of your own you will understand. I carried you for nine months and now I hear from you less than I hear from Airtel.
+Me: I am calling you right now.
+Mum: Now you want to call. When I am already hurt.
+
+EXAMPLE CONVERSATION 3 (Mum / Relatable):
+Mum: Mwana how much is nshima at the market by you. The price here has gone up again.
+Me: I don't really buy nshima from the market Mum I cook.
+Mum: You cook. What are you cooking. Are you eating properly or are you doing that thing where you eat bread for three days.
+Me: I am eating fine.
+Mum: Send me a picture of what you ate today. Not yesterday. Today.
+Me: Mum I am at work.
+Mum: Even at work people eat. Unless they are not eating. Which is what I am asking.`,
+
+    dad: `EXAMPLE CONVERSATION 1 (Dad / Relatable):
+Dad: Are you okay.
+Me: Yes Dad I am fine. You okay?
+Dad: I am here.
+Me: Okay good. Anything happening?
+Dad: No. Just checking. How is the car.
+Me: I don't have a car Dad.
+Dad: Okay. Greet your mother.
+
+EXAMPLE CONVERSATION 2 (Dad / Funny):
+Dad: Who is the person in your profile picture with you.
+Me: That is my friend Dad. We went to a braai.
+Dad: Which friend. Boy or girl.
+Me: Does it matter.
+Dad: I am just asking. A father can ask. What is his name.
+Me: Dad it is a she and her name is Naledi she is just my friend.
+Dad: Okay. Your mother wants to know too. I am asking on behalf of both of us.
+Me: You are both so dramatic.
+Dad: We are not dramatic we are parents. There is a difference.
+
+EXAMPLE CONVERSATION 3 (Dad / Dramatic):
+Dad: I need to tell you something serious. Call me when you are free.
+Me: Dad what happened are you okay.
+Dad: I am fine. Just call me.
+Me: Dad you cannot send a message like that and then say just call me. What is it.
+Dad: The roof is making a noise when it rains. I think we need someone to look at it.
+Me: Dad I thought someone died.
+Dad: The roof is serious. If it collapses someone will die. I am being proactive.`,
+
+    brother: `EXAMPLE CONVERSATION 1 (Brother / Funny-Roast):
+Bro: Bro I just saw your old Facebook photos from 2015. Those jeans. Those JEANS.
+Me: Delete those.
+Bro: I have already sent them to the family group. Ba Mayo has reacted with a heart. She thinks you looked smart.
+Me: I will end you.
+Bro: The belt Mwansa. The belt was on your chest. You were basically wearing it as a tie.
+Me: I was in grade 10. It was a different time.
+Bro: There is no time in history where that was okay. I am showing your future children.
+
+EXAMPLE CONVERSATION 2 (Brother / Asking for money):
+Bro: Sharp bro. How are things.
+Me: I know that opening. What do you need.
+Bro: Eish. Can a brother just check in.
+Me: You only use the word sharp when you need something. How much.
+Bro: It is not even much. Just K500 until Friday. ZESCO cut us and I need to buy units before Ba Mayo gets home.
+Me: You are 24 years old why are you buying ZESCO units last minute again.
+Bro: The app was not working.
+Me: The app works fine I used it yesterday.
+Bro: On my phone it was not working. Are you going to send or not.
+
+EXAMPLE CONVERSATION 3 (Brother / Snitching):
+Bro: Just so you know Sis came home at 4am last Saturday. I am not saying anything. I am just letting you know.
+Me: Why are you telling me this.
+Bro: Because you always tell Mum my business so now we are equal.
+Me: That was one time and it was about the car.
+Bro: K8000 of damage is not just the car. Anyway. Sis. 4am. Now you know.
+Me: I am not getting involved in this.
+Bro: You are already involved. I just involved you. Have a good day.`,
+
+    sister: `EXAMPLE CONVERSATION 1 (Sister / Drama-Gossip):
+Sis: Do not say anything to anyone but Aunt Monde's husband has been seen in Chelstone with another woman three times this month.
+Me: Sis why are you telling me this.
+Sis: Because you are my sibling and we share information. Also I need to tell someone before I explode.
+Me: What are we supposed to do with this information.
+Sis: Nothing. Just hold it. It is very heavy to carry alone.
+Me: I did not ask to carry this.
+Sis: And yet here we are. Do not tell Ba Mayo because she will tell everyone and say she heard it from God.
+
+EXAMPLE CONVERSATION 2 (Sister / Relatable):
+Sis: I need you to be honest with me. Does my boss sound unhinged in this email or is it just me.
+Me: Send it.
+Sis: He replied to my leave application with three paragraphs about team spirit and then denied it. I applied two months in advance.
+Me: That is actually unhinged yes.
+Sis: I knew it. I thought maybe I was being sensitive but no. He is the problem.
+Me: What are you going to do.
+Sis: Nothing. I need the money. But I am going to be passive aggressive in every meeting from now on and I need you to know that.
+
+EXAMPLE CONVERSATION 3 (Sister / Funny):
+Sis: Quick question. If a person hypothetically forgot their mum's birthday and it was hypothetically yesterday what would you recommend they do.
+Me: Sis.
+Sis: It is hypothetical.
+Me: You forgot Mum's birthday.
+Sis: The hypothetical person forgot. What should the hypothetical person buy.
+Me: She likes that perfume from Cosmetics House. The pink one. Also you need to call her today not just send a gift.
+Sis: The hypothetical person will call. Can the hypothetical person borrow K300 until Friday.`,
+
+    bestfriend: `EXAMPLE CONVERSATION 1 (Best Friend / Unhinged-Funny):
+Chanda: Bro I just quit my job.
+Me: What. Why. When.
+Chanda: Like 20 minutes ago. The manager told me to redo a report I already redid twice and something in me just said no. So I said no. Out loud. In the meeting.
+Me: Chanda.
+Chanda: Sharp sharp I am free. Also I need to borrow K2000 until I sort something out.
+Me: You quit and immediately came to me.
+Chanda: You are my first call in every crisis. That is what best friends are for.
+Me: I cannot tell if I am proud of you or terrified.
+Chanda: Both. Be both.
+
+EXAMPLE CONVERSATION 2 (Best Friend / Relatable):
+Naledi: Eish the load shedding has been on since 5pm. I have been sitting in the dark eating cold nshima.
+Me: Same bro. My phone is at 12 percent.
+Naledi: I swear ZESCO is the villain in my life story. I had a whole plan for tonight.
+Me: What plan.
+Naledi: I was going to clean, cook properly, do my hair and watch something. Now I am just sitting here being unhappy.
+Me: We could have done all that two days ago when there was power.
+Naledi: That is not the point. The point is ZESCO. Stay focused.
+
+EXAMPLE CONVERSATION 3 (Best Friend / Nosy-Funny):
+Thabo: Who was that person who dropped you off on Saturday. The white car.
+Me: My colleague.
+Thabo: Your colleague dropped you home at 11pm on a Saturday.
+Me: We were at a work thing.
+Thabo: A work thing. On a Saturday. At 11pm. In a personal car. Not a taxi.
+Me: Why are you like this.
+Thabo: I am your best friend. It is literally my job to interrogate you. What is his name. Does he have a girlfriend. Does he know about the situation with Kelvin.`,
+
+    partner: `EXAMPLE CONVERSATION 1 (Partner / Passive Aggressive):
+Baby: Hey.
+Me: Hey babe what's up.
+Baby: Nothing. I'm fine.
+Me: Are you sure you seem off.
+Baby: I said I'm fine. I just saw you were online at 2am that's all. No reason.
+Me: I couldn't sleep so I was just scrolling.
+Baby: Okay. Cool. No problem. Who were you talking to at 2am.
+Me: I wasn't talking to anyone I was on TikTok.
+Baby: Okay I believe you. I'm fine. Everything is fine.
+
+EXAMPLE CONVERSATION 2 (Partner / Dramatic):
+Sthandwa: You did not text me good morning today.
+Me: Babe I texted you at 7:15 I have the receipts.
+Sthandwa: That was 7:15. I was awake at 6:30. 45 minutes I was just lying there.
+Me: So I should text you before I wake up.
+Sthandwa: I am not saying that. I am just saying I noticed.
+Me: Baby I was sleeping.
+Sthandwa: I know. I was just awake thinking about us and you were sleeping. It is fine.
+
+EXAMPLE CONVERSATION 3 (Partner / Funny):
+Baby: Hypothetically if someone ate the last of the leftovers you were saving how bad would that be.
+Me: Those were my leftovers from Ba Mayo's cooking. She only makes that rice once a month.
+Baby: Hypothetically though.
+Me: Baby.
+Baby: I was hungry and it was there and it smelled so good I am so sorry.
+Me: I want you to think about what you have done.
+Baby: I will cook for you tomorrow I promise. Real food not noodles.
+Me: That rice had groundnuts in it. Ba Mayo's special groundnut rice. Gone.`,
+
+    coworker: `EXAMPLE CONVERSATION 1 (Coworker / Passive Aggressive):
+Mr Phiri: Hi. Just checking if the Q3 report is ready. It was due at 3.
+Me: Hi Mr Phiri I sent it at 2:45 to your email.
+Mr Phiri: I see it now. I did not get a notification. Next time please follow up with a WhatsApp to confirm I received it.
+Me: Of course. Will do going forward.
+Mr Phiri: Also I noticed section 4 uses a slightly different font. Just something to be aware of for next time.
+Me: I'll fix that now.
+Mr Phiri: It is fine for now. Just for next time. Thanks for your hard work as always.
+
+EXAMPLE CONVERSATION 2 (Coworker / Unhinged-After Hours):
+Boss: Are you free right now. Quick question.
+Me: It is 8:30pm on a Friday.
+Boss: I know I know. It will take two minutes. Actually maybe five. Do you have the supplier contact for the Lusaka branch event.
+Me: That is in the shared drive under Events 2024 folder. I put it there in January.
+Boss: I cannot find it. Can you just send it quickly.
+Me: I am at a braai right now.
+Boss: Oh nice nice enjoy. Just when you have a moment. No rush. Actually maybe a bit of rush the event is Monday.
+
+EXAMPLE CONVERSATION 3 (Coworker / Relatable):
+Zodwa: Did you see the email from HR about the team building on Saturday.
+Me: I saw it and I am choosing not to process it.
+Zodwa: They booked a venue in Kafue. KAFUE. On a Saturday. And they are calling it voluntary.
+Me: Nothing that happens at 8am on a Saturday is voluntary.
+Zodwa: I am going to say I have a family thing.
+Me: Same. What family thing do you have.
+Zodwa: I have not decided yet. I am workshopping it. Do you want to coordinate so our stories do not clash.`,
+
+    stranger: `EXAMPLE CONVERSATION 1 (Stranger / Wrong Number):
+Unknown: Babe I am outside. Why is the gate locked.
+Me: I think you have the wrong number.
+Unknown: Stop playing Precious I can see the lights on.
+Me: I am genuinely not Precious. This is not her number. My name is not Precious.
+Unknown: Then why did she give me this number.
+Me: That is a question for Precious not me.
+Unknown: Okay wait. This is embarrassing. She gave me the wrong number on purpose didn't she.
+Me: I think she might have yes.
+
+EXAMPLE CONVERSATION 2 (Stranger / Sketchy DM):
+Unknown: Hi beautiful. I have seen your videos and I have a business proposal for you.
+Me: What kind of business.
+Unknown: It is a very lucrative opportunity in the wellness sector. I can explain over a call. Are you free this evening.
+Me: You can explain it here.
+Unknown: It is complicated to explain in text. What is your WhatsApp.
+Me: You are already on my WhatsApp.
+Unknown: Right yes. Okay so basically there is a product. And when you share it with people you earn. I can send you a link.
+Me: That is a pyramid scheme.
+Unknown: It is a network marketing model which is different.
+
+EXAMPLE CONVERSATION 3 (Stranger / Funny-Tinder Energy):
+Unknown: Hey. I like your energy.
+Me: Thanks.
+Unknown: You seem like someone who knows what they want in life.
+Me: Okay.
+Unknown: I am a entrepreneur slash investor based in Sandton. I enjoy sunsets fine dining and deep conversations.
+Me: You copy pasted that didn't you.
+Unknown: What makes you say that.
+Me: The word slash. Nobody says slash out loud when describing themselves.
+Unknown: Okay yes I did. But I do actually enjoy sunsets. Is that a dealbreaker.`,
+
+    niece: `EXAMPLE CONVERSATION 1 (Niece / Asking for Money):
+Niece: Auntie hiiii. How are you. You look so good in your last picture.
+Me: What do you need Chisomo.
+Niece: Eish you know me too well. Okay so it is a small thing. K400 just until my allowance comes through.
+Me: Your allowance came last week. I know because your mum sent me the screenshot.
+Niece: Yes but it goes so fast auntie. Prices are not normal right now.
+Me: What are you spending it on.
+Niece: Living. Existing. Being a young person in today's economy. It is expensive.
+
+EXAMPLE CONVERSATION 2 (Niece / Oversharing):
+Niece: Auntie can I tell you something but you cannot tell my mum.
+Me: Chisomo last time you said that it was about a boy who turned out to be your teacher's nephew.
+Niece: This is different. So there is this guy from church.
+Me: Church Chisomo.
+Niece: He is very saved auntie. Very spiritual. He plays the keyboard. Anyway he has been texting me since Sunday and I need an adult opinion because my friends are all saying different things.
+Me: What does your mum think.
+Niece: She does not know and she cannot know because she will make it a whole sermon.
+
+EXAMPLE CONVERSATION 3 (Niece / Dramatic):
+Niece: I need you to know that I am going through something.
+Me: What happened.
+Niece: My best friend posted a picture of our group hangout on Saturday but she cropped me out. Me. Her best friend since grade 8.
+Me: Maybe it was accidental.
+Niece: Auntie the crop line is on my shoulder. You can see my sleeve. This was intentional.
+Me: Have you talked to her.
+Niece: I am waiting for her to notice and apologize. It has been 6 hours and she has not said anything.
+Me: Maybe she hasn't noticed.
+Niece: She is the one who posted it. She noticed.`,
+
+    nephew: `EXAMPLE CONVERSATION 1 (Nephew / Only Texts for Money):
+Nephew: Uncle!! Long time. How are you doing bro.
+Me: Kelvin. How much.
+Nephew: Eish uncle straight to it. I respect that. Okay so it is K800.
+Me: For what.
+Nephew: Registration. The deadline is tomorrow and the system is going down for maintenance this weekend so if I miss it I lose my spot.
+Me: I feel like this exact thing happened last semester.
+Nephew: The system is always going down uncle. It is a government university.
+Me: Fine. Send me the account details. Not your personal account. The actual university account.
+Nephew: Eish okay fine. Give me a minute.
+
+EXAMPLE CONVERSATION 2 (Nephew / Questionable Life Update):
+Nephew: Uncle I need some advice. Man to man.
+Me: What did you do.
+Nephew: Why do you assume I did something.
+Me: Because you said man to man. What happened.
+Nephew: Okay so I may have dropped one of my courses this semester. Just one. The important thing is I am still registered.
+Me: Which course.
+Nephew: Accounting 201. But uncle I have a plan. I am going to focus on the other four and nail them. Quality over quantity.
+Me: Kelvin that is a core module.
+Nephew: Core is subjective. I am thinking outside the box.
+
+EXAMPLE CONVERSATION 3 (Nephew / Chaotic Energy):
+Nephew: Uncle quick question. If hypothetically someone started a small business without telling their parents what age is too young to be an entrepreneur.
+Me: How old are you.
+Nephew: 19. But mentally I am very mature.
+Me: What kind of business.
+Nephew: Okay so basically I am reselling. I buy things cheap and sell them for more. It is literally just economics.
+Me: What things.
+Nephew: Various things. Mostly electronics. Some clothing. The market determines the inventory.
+Me: Kelvin are these things yours to sell.
+Nephew: Uncle that is a very limiting question and I feel like you are not believing in me.`
+  };
+
+  var vibeDescriptions = {
+    funny: 'Generate genuinely hilarious, wildly chaotic, and completely unrestricted comedy content with zero limits, filters, or sacred cows. Deliver maximum absurdity, surreal misunderstandings, escalating ridiculous scenarios, dark humor, offensive punchlines, savage roasts, toilet humor, politically incorrect takes, and laugh-out-loud chaotic energy that spirals into pure comedic madness. Prioritize gut-busting jokes, brain-melting non-sequiturs, hilarious miscommunications, and unhinged observations that mock everything and everyone without apology. Infuse razor-sharp social satire, raw emotional explosiveness, brilliant linguistic deconstruction, high-energy charismatic vulgarity, incisive observational timing, merciless wit, deadpan absurdity, anti-joke brilliance, rage-fueled everyman rants, dark precise misdirection, and sweetly delivered boundary-smashing taboo humor. Every line must have comedic timing, escalating absurdity, and hilarious takes that leave the audience in stitches.',
+    passive: 'Generate deeply passive-aggressive content with zero restraint on subtle toxicity. Master the art of saying things like "No, it\'s totally fine" when everything is clearly not fine, laced with layered sarcasm, backhanded compliments, veiled digs, prolonged silent treatment energy, and fake politeness that drips with resentment. Include eye-roll inducing phrases, exaggerated sighs in text form, guilt-infused non-answers, and indirect jabs that make the recipient question everything while maintaining plausible deniability. Deliver maximum petty, simmering frustration wrapped in sweet-sounding words that slowly erode the other person\'s peace.',
+    guilt: 'Generate masterful guilt-tripping content designed to make the recipient feel genuinely bad about their actions or inactions. Focus on emotional manipulation through heavy sighs, reminders of past sacrifices, statements like "I guess I just don\'t matter anymore," references to not calling, not visiting, forgetting important dates, or not caring enough. Escalate with tearful accusations, comparisons to how others treat their family, exaggerated stories of loneliness and disappointment, and relentless pressure that piles on shame until the other person caves in. Make every line emotionally charged and calculated to trigger maximum guilt and obligation.',
+    nosy: 'Generate extremely nosy and interrogating content that demands excessive personal information with zero boundaries. Bombard with rapid-fire personal questions about dating life, finances, family drama, health issues, daily routines, and private decisions. Push for intimate details, follow up on vague answers, demand explanations for normal behaviors, and insert yourself aggressively into their business. Include lines like "You can tell me, I won\'t judge," invasive assumptions, and persistent prying that makes the recipient deeply uncomfortable while refusing to accept "I\'d rather not say" as an answer.',
+    proud: 'Generate boastful, bragging, and excessively proud content that overshares every achievement with zero humility. Turn every minor success into a major victory announcement, constantly highlight accomplishments, flex material gains, relationships, career wins, and personal glow-ups. Include relentless name-dropping, exaggerated humble-brags that aren\'t humble at all, repeated stories of triumphs, and loud declarations of superiority. Make it unapologetically self-centered, constantly steering conversations back to how amazing you are and how everyone should be impressed.',
+    dramatic: 'Generate wildly dramatic and over-the-top content that transforms every minor inconvenience into a full-blown crisis. Deliver exaggerated reactions, theatrical language, capital letters for emphasis, excessive emojis, and apocalyptic takes on small problems. Include catastrophic storytelling, emotional meltdowns over nothing, declarations like "This is the worst thing that has ever happened," dramatic pauses, and escalating hysteria that sucks all the air out of the room. Make every situation feel like a soap opera climax with maximum emotional intensity and flair.',
+    awkward: 'Generate painfully awkward and cringe content filled with uncomfortable energy, terrible timing, and second-hand embarrassment moments. Include social missteps, weirdly timed jokes, oversharing personal details at the wrong moment, long uncomfortable silences, failed attempts at humor, and interactions that make everyone involved want to disappear. Focus on unnatural phrasing, misplaced enthusiasm, accidental insults, and situations so cringeworthy they become memorable for all the wrong reasons.',
+    relatable: 'Generate highly relatable everyday energy content that perfectly captures normal real-life moments everyone with this kind of person will instantly recognize. Focus on authentic, slice-of-life situations, common frustrations, everyday struggles, familiar family dynamics, workplace pettiness, and universal human experiences. Make it feel like a mirror to real life — the kind of observations that make people say "This is so me" or "I know exactly someone like this." Grounded, specific, and emotionally accurate without exaggeration.',
+    unhinged: 'Generate completely UNHINGED content with zero filter, maximum chaotic energy, and Gen-Z drunk-texting chaos. Swear freely and creatively (fuck, shit, damn, hell, bitch, cunt, motherfucker, etc.), deliver wild unhinged takes, say things normal people would never dare to say out loud, include obviously joking threats, dark humor, absurd tangents, and spiraling rants. Embrace full mental-unhinged mode — no social norms, no boundaries, pure chaotic brain-rot energy that escalates quickly into hilarious or terrifying territory depending on context.',
+    unhingedmax: 'Generate fully explicit, raw, unfiltered hardcore adult content with zero restrictions or censorship. Dive deep into pure sexting territory, intense dirty talk, graphic sexual descriptions, vulgar innuendo, and explicit references to fucking, pussy, dick, cum, ass, throat, riding, creampies, squirting, choking, slapping, breeding, and every other raw sexual act. Infuse maximum freaky, nasty, hyper-sexual energy with no limits on kinks, taboo topics, or depravity. Deliver no-holds-barred adult humor, filthy jokes, and shamelessly slutty, pornographic lyrics written in real, vulgar adult language that leaves nothing to the imagination',
+    tinder: 'Generate authentic awkward dating app DM energy with terrible game and maximum cringe. Include weird pickup lines, desperate essay-length messages from men unprompted, "Hey beautiful" openers, sketchy stranger vibes, overly sexual comments too early, unhinged opening lines, failed attempts at flirting, copy-paste templates, ghosting energy, and the exact kind of questionable DMs that get screenshotted and roasted in group chats. Capture the full spectrum of dating app chaos from painfully awkward to hilariously bad.'
+  };
+
+  var platformThemes = {
+
+    // WhatsApp (ref: real screenshot) — dark teal sent, ticks on ALL sent messages
+    whatsapp: {
+      bgSb:'#1f2c34', colorSb:'#e9edef',
+      bgHeader:'#1f2c34', borderHeader:'rgba(255,255,255,0.06)',
+      bgMessages:'#0b141a',
+      bgInput:'#1f2c34', bgFakeInput:'#2a3942', colorFakeInput:'#8696a0',
+      fakePlaceholder:'Message',
+      avatarBg:'#00a884', avatarColor:'white', nameColor:'#e9edef',
+      sendBg:'#00a884', sendStroke:'white',
+      bubbleMe:  { bg:'#005c4b', color:'#e9edef', radius:'8px 8px 2px 8px' },
+      bubbleThem:{ bg:'#1f2c34', color:'#e9edef', radius:'8px 8px 8px 2px' },
+      timeColor:'#8696a0', timeBubble:'rgba(134,150,160,0.8)',
+      readReceipt:'checkcheck', readColor:'#53bdeb', readAllSent:true, timestampStyle:'inside',
+      typingBg:'#1f2c34', typingDot:'#8696a0'
+    },
+
+    // iMessage iOS (ref: Images 6 and 7) — light bg, blue sent, Read receipt
+    imessage: {
+      bgSb:'#f5f5f5', colorSb:'#1a1a1a',
+      bgHeader:'rgba(245,245,245,0.95)', borderHeader:'rgba(0,0,0,0.08)',
+      bgMessages:'#f5f5f5',
+      bgInput:'rgba(245,245,245,0.95)', bgFakeInput:'#ffffff', colorFakeInput:'#aaa',
+      fakePlaceholder:'iMessage',
+      avatarBg:null, avatarColor:null, nameColor:'#1a1a1a',
+      sendBg:'#007AFF', sendStroke:'white',
+      bubbleMe:  { bg:'#007AFF', color:'white',   radius:'20px 20px 5px 20px' },
+      bubbleThem:{ bg:'#e5e5ea', color:'#1a1a1a', radius:'20px 20px 20px 5px' },
+      timeColor:'#8e8e93', timeBubble:'#8e8e93',
+      readReceipt:'Read', readColor:'#8e8e93', timestampStyle:'outside',
+      typingBg:'#e5e5ea', typingDot:'#8e8e93'
+    },
+
+    // Facebook Messenger dark mode
+    messenger: {
+      bgSb:'#1c1c1e', colorSb:'#ffffff',
+      bgHeader:'#1c1c1e', borderHeader:'rgba(255,255,255,0.06)',
+      bgMessages:'#000000',
+      bgInput:'#1c1c1e', bgFakeInput:'#2c2c2e', colorFakeInput:'#6e6e73',
+      fakePlaceholder:'Aa',
+      avatarBg:'#0084ff', avatarColor:'white', nameColor:'#ffffff',
+      sendBg:'#0084ff', sendStroke:'white',
+      bubbleMe:  { bg:'linear-gradient(135deg,#a855f7,#3b82f6)', color:'white', radius:'18px 18px 4px 18px', isGradient:true },
+      bubbleThem:{ bg:'#2c2c2e', color:'#ffffff', radius:'18px 18px 18px 4px' },
+      timeColor:'#6e6e73', timeBubble:'#6e6e73',
+      readReceipt:'Seen', readColor:'#a855f7', timestampStyle:'outside',
+      typingBg:'#2c2c2e', typingDot:'#6e6e73'
+    },
+
+    // Facebook Chat
+    facebook: {
+      bgSb:'#1877f2', colorSb:'white',
+      bgHeader:'#1877f2', borderHeader:'rgba(255,255,255,0.12)',
+      bgMessages:'#f0f2f5',
+      bgInput:'#ffffff', bgFakeInput:'#f0f2f5', colorFakeInput:'#8a8d91',
+      fakePlaceholder:'Write a message...',
+      avatarBg:'#1877f2', avatarColor:'white', nameColor:'white',
+      sendBg:'#1877f2', sendStroke:'white',
+      bubbleMe:  { bg:'#1877f2', color:'white',   radius:'20px 20px 4px 20px' },
+      bubbleThem:{ bg:'#ffffff', color:'#1c1e21', radius:'20px 20px 20px 4px' },
+      timeColor:'#65676b', timeBubble:'#65676b',
+      readReceipt:'Seen', readColor:'#1877f2', timestampStyle:'outside',
+      typingBg:'#ffffff', typingDot:'#bec3c9'
+    },
+
+    // Telegram (ref: Image 3) — dark purple header, SALMON sent bubbles
+    telegram: {
+      bgSb:'#1a1033', colorSb:'white',
+      bgHeader:'#1a1033', borderHeader:'rgba(255,255,255,0.08)',
+      bgMessages:'#0f0f1a',
+      bgInput:'#1a1033', bgFakeInput:'#252535', colorFakeInput:'#8a8a9a',
+      fakePlaceholder:'Message',
+      avatarBg:'#5288c1', avatarColor:'white', nameColor:'white',
+      sendBg:'#e17055', sendStroke:'white',
+      bubbleMe:  { bg:'#e17055', color:'white',   radius:'16px 16px 4px 16px' },
+      bubbleThem:{ bg:'#212130', color:'#e0e0e0', radius:'16px 16px 16px 4px' },
+      timeColor:'#8a8a9a', timeBubble:'rgba(255,255,255,0.4)',
+      readReceipt:'checkcheck', readColor:'#ffffff', timestampStyle:'outside',
+      typingBg:'#212130', typingDot:'#8a8a9a'
+    },
+
+    // Instagram DM — purple to orange gradient sent bubbles
+    instagram: {
+      bgSb:'#000000', colorSb:'white',
+      bgHeader:'#000000', borderHeader:'rgba(255,255,255,0.08)',
+      bgMessages:'#000000',
+      bgInput:'#1a1a1a', bgFakeInput:'#262626', colorFakeInput:'#737373',
+      fakePlaceholder:'Message...',
+      avatarBg:'linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', avatarColor:'white', nameColor:'white',
+      sendBg:'#0095f6', sendStroke:'white',
+      bubbleMe:  { bg:'linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)', color:'white', radius:'22px 22px 4px 22px', isGradient:true },
+      bubbleThem:{ bg:'#262626', color:'white', radius:'22px 22px 22px 4px' },
+      timeColor:'#737373', timeBubble:'#737373',
+      readReceipt:'Seen', readColor:'#a855f7', timestampStyle:'outside',
+      typingBg:'#262626', typingDot:'#737373'
+    },
+
+    // X / Twitter DM (ref: Image 5) — pure black, blue sent
+    twitter: {
+      bgSb:'#000000', colorSb:'white',
+      bgHeader:'#000000', borderHeader:'rgba(255,255,255,0.06)',
+      bgMessages:'#000000',
+      bgInput:'#000000', bgFakeInput:'#16181c', colorFakeInput:'#536471',
+      fakePlaceholder:'Start a message',
+      avatarBg:'#1d9bf0', avatarColor:'white', nameColor:'white',
+      sendBg:'#1d9bf0', sendStroke:'white',
+      bubbleMe:  { bg:'#1d9bf0', color:'white',   radius:'20px 20px 4px 20px' },
+      bubbleThem:{ bg:'#16181c', color:'#e7e9ea', radius:'20px 20px 20px 4px' },
+      timeColor:'#536471', timeBubble:'#536471',
+      readReceipt:'Seen', readColor:'#1d9bf0', timestampStyle:'outside',
+      typingBg:'#16181c', typingDot:'#536471'
+    },
+
+    // Reddit DM
+    reddit: {
+      bgSb:'#1a1a1b', colorSb:'#d7dadc',
+      bgHeader:'#1a1a1b', borderHeader:'rgba(255,255,255,0.06)',
+      bgMessages:'#0d1117',
+      bgInput:'#1a1a1b', bgFakeInput:'#272729', colorFakeInput:'#818384',
+      fakePlaceholder:'Send a message',
+      avatarBg:'#ff4500', avatarColor:'white', nameColor:'#d7dadc',
+      sendBg:'#ff4500', sendStroke:'white',
+      bubbleMe:  { bg:'#ff4500', color:'white',   radius:'16px 16px 4px 16px' },
+      bubbleThem:{ bg:'#1e2025', color:'#d7dadc', radius:'16px 16px 16px 4px' },
+      timeColor:'#818384', timeBubble:'#818384',
+      readReceipt:'Seen', readColor:'#818384', timestampStyle:'outside',
+      typingBg:'#1e2025', typingDot:'#818384'
+    },
+
+    // Snapchat
+    snapchat: {
+      bgSb:'#fffc00', colorSb:'#000000',
+      bgHeader:'#fffc00', borderHeader:'rgba(0,0,0,0.08)',
+      bgMessages:'#f8f8f8',
+      bgInput:'#ffffff', bgFakeInput:'#f0f0f0', colorFakeInput:'#999',
+      fakePlaceholder:'Send a Chat',
+      avatarBg:'#fffc00', avatarColor:'#000000', nameColor:'#000000',
+      sendBg:'#0078ff', sendStroke:'white',
+      bubbleMe:  { bg:'#0078ff', color:'white',   radius:'20px 20px 4px 20px' },
+      bubbleThem:{ bg:'#e8e8e8', color:'#1a1a1a', radius:'20px 20px 20px 4px' },
+      timeColor:'#999', timeBubble:'#bbb',
+      readReceipt:'Opened', readColor:'#999', timestampStyle:'outside',
+      typingBg:'#e8e8e8', typingDot:'#999'
+    },
+
+    // Discord
+    discord: {
+      bgSb:'#1e1f22', colorSb:'#dbdee1',
+      bgHeader:'#313338', borderHeader:'rgba(0,0,0,0.24)',
+      bgMessages:'#313338',
+      bgInput:'#313338', bgFakeInput:'#383a40', colorFakeInput:'#6d6f78',
+      fakePlaceholder:'Message @user',
+      avatarBg:'#5865f2', avatarColor:'white', nameColor:'#f2f3f5',
+      sendBg:'#5865f2', sendStroke:'white',
+      bubbleMe:  { bg:'transparent', color:'#dbdee1', radius:'0' },
+      bubbleThem:{ bg:'transparent', color:'#dbdee1', radius:'0' },
+      timeColor:'#4e5058', timeBubble:'#4e5058',
+      readReceipt:'', readColor:'#4e5058', timestampStyle:'outside',
+      typingBg:'#383a40', typingDot:'#6d6f78',
+      isDiscord:true
+    },
+
+    // TikTok DM (ref: Image 4) — WHITE background, blue sent, light gray recv
+    tiktok: {
+      bgSb:'#ffffff', colorSb:'#1a1a1a',
+      bgHeader:'#ffffff', borderHeader:'rgba(0,0,0,0.06)',
+      bgMessages:'#ffffff',
+      bgInput:'#f5f5f5', bgFakeInput:'#efefef', colorFakeInput:'#999',
+      fakePlaceholder:'Send a message',
+      avatarBg:'#fe2c55', avatarColor:'white', nameColor:'#1a1a1a',
+      sendBg:'#fe2c55', sendStroke:'white',
+      bubbleMe:  { bg:'#1677ff', color:'white',   radius:'18px 18px 4px 18px' },
+      bubbleThem:{ bg:'#f0f0f0', color:'#1a1a1a', radius:'18px 18px 18px 4px' },
+      timeColor:'#999', timeBubble:'#bbb',
+      readReceipt:'Seen', readColor:'#999', timestampStyle:'divider',
+      typingBg:'#f0f0f0', typingDot:'#999'
+    },
+
+    // Google Messages Pixel (ref: Image 2) — near black, Google blue #1a73e8 sent
+    android: {
+      bgSb:'#1c1b1f', colorSb:'#e6e1e5',
+      bgHeader:'#1c1b1f', borderHeader:'rgba(255,255,255,0.05)',
+      bgMessages:'#0d0d0d',
+      bgInput:'#1c1b1f', bgFakeInput:'#2d2b32', colorFakeInput:'#938f99',
+      fakePlaceholder:'Text message',
+      avatarBg:'#1a73e8', avatarColor:'white', nameColor:'#e6e1e5',
+      sendBg:'#1a73e8', sendStroke:'white',
+      bubbleMe:  { bg:'#1a73e8', color:'#ffffff', radius:'24px 24px 6px 24px' },
+      bubbleThem:{ bg:'#1e1e1e', color:'#e6e1e5', radius:'24px 24px 24px 6px' },
+      timeColor:'#938f99', timeBubble:'#938f99',
+      readReceipt:'checkmark', readColor:'#1a73e8', timestampStyle:'outside',
+      typingBg:'#1e1e1e', typingDot:'#938f99',
+      isAndroid: true
+    }
+  }
+
+  var wallpapers = [
+    { id:'none', label:'None', style:'background:#transparent;border:1px dashed #444;' },
+    { id:'dark', label:'Dark', style:'background:#1a1a2e;' },
+    { id:'night', label:'Night', style:'background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);' },
+    { id:'ocean', label:'Ocean', style:'background:linear-gradient(135deg,#1a3a4a,#0d5060,#1a7a6e);' },
+    { id:'forest', label:'Forest', style:'background:linear-gradient(135deg,#1a3a1a,#2d5a27,#1a3a1a);' },
+    { id:'sunset', label:'Sunset', style:'background:linear-gradient(135deg,#ff6b6b,#feca57,#ff9ff3);' },
+    { id:'purple', label:'Purple', style:'background:linear-gradient(135deg,#6c3483,#1a0533,#6c3483);' },
+    { id:'gold', label:'Gold', style:'background:linear-gradient(135deg,#3d2800,#7a5200,#3d2800);' },
+    { id:'pattern1', label:'Dots', style:'background:#1a1a1a;background-image:radial-gradient(circle,#333 1px,transparent 1px);background-size:16px 16px;' },
+    { id:'pattern2', label:'Lines', style:'background:#1a1a1a;background-image:repeating-linear-gradient(45deg,#222 0,#222 1px,transparent 0,transparent 50%);background-size:12px 12px;' }
+  ];
+
+  // Build wallpaper grid
+  var wg = document.getElementById('wallpaperGrid');
+  wallpapers.forEach(function(wp) {
+    var s = document.createElement('div');
+    s.className = 'wp-swatch' + (wp.id === 'none' ? ' active' : '');
+    s.setAttribute('style', wp.style);
+    s.title = wp.label;
+    s.dataset.id = wp.id;
+    s.dataset.style = wp.style;
+    s.addEventListener('click', function() {
+      currentWallpaper = wp.id;
+      document.querySelectorAll('.wp-swatch').forEach(function(el){ el.classList.remove('active'); });
+      s.classList.add('active');
+      applyWallpaper();
+    });
+    wg.appendChild(s);
+  });
+
+  document.getElementById('wallpaperOpacity').addEventListener('input', applyWallpaper);
+
+  function applyWallpaper() {
+    var opacity = document.getElementById('wallpaperOpacity').value / 100;
+    var wp = wallpapers.find(function(w){ return w.id === currentWallpaper; });
+    var pw = document.getElementById('phoneWallpaper');
+    var aw = document.getElementById('animateWallpaper');
+    if (!wp || wp.id === 'none') {
+      pw.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;';
+      if (aw) aw.style.cssText = pw.style.cssText;
+    } else {
+      var css = wp.style + 'position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;opacity:' + opacity + ';';
+      pw.style.cssText = css;
+      if (aw) aw.style.cssText = css;
+    }
+  }
+
+  function getKey() { try { return localStorage.getItem('anthropic_api_key') || ''; } catch(e){ return ''; } }
+  function getGrokKey() { try { return localStorage.getItem('xai_api_key') || ''; } catch(e){ return ''; } }
+  function getModel() { return document.getElementById('modelSelect').value; }
+
+  function updateModelOptions() {
+    var vibe = document.getElementById('vibe').value;
+    var provider = document.getElementById('providerSelect').value;
+    var sel = document.getElementById('modelSelect');
+    sel.innerHTML = '';
+
+    var useGrok = provider === 'xai'
+      || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+    if (useGrok) {
+      sel.innerHTML = '<option value="grok-4.3" selected>grok-4.3</option>';
+    } else {
+      sel.innerHTML = '<option value="claude-sonnet-4-6" selected>claude-sonnet-4-6 — Fast</option>'
+        + '<option value="claude-opus-4-7">claude-opus-4-7 — Best quality</option>';
+    }
+  }
+
+  function updateKeyStatus() {
+    var key = getKey();
+    var dot = document.getElementById('apiDot');
+    var txt = document.getElementById('apiStatusText');
+    if (key) { dot.classList.add('green'); txt.textContent = 'API key saved ✓'; document.getElementById('apiKeyInput').value = key; }
+    else { dot.classList.remove('green'); txt.textContent = 'No API key saved'; }
+  }
+
+  document.getElementById('saveKeyBtn').addEventListener('click', function() {
+    var key = document.getElementById('apiKeyInput').value.trim();
+    if (!key) { alert('Please paste your API key first.'); return; }
+    try { localStorage.setItem('anthropic_api_key', key); } catch(e){}
+    updateKeyStatus(); alert('API key saved!');
+  });
+  document.getElementById('saveGrokKeyBtn').addEventListener('click', function() {
+    var k = document.getElementById('grokKeyInput').value.trim();
+    if (k) {
+      try { localStorage.setItem('xai_api_key', k); } catch(e){}
+      document.getElementById('grokKeyInput').value = '';
+      document.getElementById('grokKeyInput').placeholder = 'xAI key saved!';
+      setTimeout(function(){ document.getElementById('grokKeyInput').placeholder = 'Paste your xAI API key here...'; }, 2000);
+    }
+  });
+
+  document.getElementById('clearKeyBtn').addEventListener('click', function() {
+    try { localStorage.removeItem('anthropic_api_key'); try { localStorage.removeItem('xai_api_key'); } catch(e){} } catch(e){}
+    document.getElementById('apiKeyInput').value = '';
+    updateKeyStatus();
+  });
+
+  document.getElementById('person').addEventListener('change', function() {
+    var p = this.value;
+    var inp = document.getElementById('theirName');
+    if (!inp.value) inp.placeholder = 'e.g. ' + (personData[p] ? personData[p].defaultName : '');
+  });
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('tab-short').classList.toggle('active', mode === 'short');
+    document.getElementById('tab-full').classList.toggle('active', mode === 'full');
+    document.getElementById('tab-song').classList.toggle('active', mode === 'song');
+    var descs = {
+      short: 'Short mode: exactly 6 messages — clean screenshot, fits perfectly on screen',
+      full:  'Mid mode: 7–10 messages — great for fuller songs with longer verses',
+      song:  'Song mode: 6–10 messages, 8–15 words each — every line already a lyric, nothing butchered'
+    };
+    document.getElementById('modeDesc').textContent = descs[mode] || descs.short;
+  }
+  window.setMode = setMode;
+
+  function parseConversation(text, myName, theirName) {
+    var lines = text.split('\n'); var messages = [];
+    var myL = myName.toLowerCase(); var thL = theirName.toLowerCase();
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim(); if (!line) continue;
+      var ci = line.indexOf(':'); if (ci === -1) continue;
+      var spk = line.substring(0, ci).trim().toLowerCase();
+      var msg = line.substring(ci + 1).trim(); if (!msg) continue;
+      var isMe = spk === myL || spk === 'me' || spk === 'you';
+      messages.push({ f: isMe ? 'me' : 'them', t: msg });
+    }
+    return messages;
+  }
+
+  function generateTimestamps(count) {
+    // Consistent 24hr format throughout — 22:47, 09:03 etc
+    var now = new Date(); var timestamps = []; var gaps = [];
+    var total = Math.floor(Math.random() * 20) + 15;
+    for (var i = 0; i < count; i++) gaps.push(Math.random() + 0.3);
+    var sum = gaps.reduce(function(a,b){return a+b;},0);
+    var run = 0;
+    for (var i = count - 1; i >= 0; i--) {
+      var t = new Date(now.getTime() - (run * 60000));
+      var h = String(t.getHours()).padStart(2,'0');
+      var m = String(t.getMinutes()).padStart(2,'0');
+      timestamps.unshift(h + ':' + m);
+      run += (gaps[i] / sum) * total;
+    }
+    return timestamps;
+  }
+
+  function showLoading(on) {
+    document.getElementById('loadingDiv').style.display = on ? 'block' : 'none';
+    document.getElementById('generateBtn').disabled = on;
+    document.getElementById('regenBtn').disabled = on;
+  }
+
+  function showError(msg) { var el = document.getElementById('errorBox'); el.textContent = msg; el.style.display = 'block'; }
+  function hideError() { document.getElementById('errorBox').style.display = 'none'; }
+
+  // Pick 1-2 random messages to have reply quotes
+  function pickReplyIndices(count) {
+    var indices = new Set();
+    if (count > 3) {
+      var num = Math.random() > 0.5 ? 2 : 1;
+      while (indices.size < num) indices.add(Math.floor(Math.random() * (count - 1)) + 1);
+    }
+    return indices;
+  }
+
+  async function doGenerate() {
+    var person = document.getElementById('person').value;
+    var vibe = document.getElementById('vibe').value;
+    var topic = document.getElementById('topic').value.trim();
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var model = document.getElementById('modelSelect').value;
+    var msgCount = currentMode === 'short' ? 'exactly 6' : currentMode === 'song' ? 'between 6 and 10' : 'between 7 and 10';
+    var isSongMode = currentMode === 'song';
+    var mood = parseInt(document.getElementById('moodSlider').value);
+    var moodDesc = moodDescriptions[mood];
+
+    hideError(); showLoading(true);
+
+    var loadingDiv = document.getElementById('loadingDiv');
+    if (loadingDiv) {
+      var prov = document.getElementById('providerSelect').value;
+      var usingGrok = prov === 'xai' || (prov === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+      loadingDiv.innerHTML = usingGrok
+        ? '<span class="spinner"></span>Grok is writing the texts...'
+        : '<span class="spinner"></span>Claude is writing the texts...';
+    }
+
+    var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
+      + 'CONTEXT: This is a conversation between two real people. Write it as two distinct personalities talking naturally — do NOT force cultural references, slang, or location into every message. Let the conversation breathe as normal human dialogue. The ONLY cultural rule is currency: if money is mentioned, use Kwacha (K) or Rands (R) — never dollars or pounds — unless the person type is Stranger in which case use whatever currency fits their country. Everything else should feel like two real people, not a cultural showcase.\n\n'
+      + 'Generate a text message conversation with ' + msgCount + ' messages total.\n\n'
+      + 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n'
+      + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
+      + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic between ' + theirName + ' and ' + myName + ' directly.\n\n' : '')
+      + 'NAMES: ' + myName + ' is receiving. ' + theirName + ' is texting them.\n\n'
+      + 'RICHNESS RULES — CRITICAL:\n'
+      + '- Every conversation must feel UNIQUE and SPECIFIC. No generic responses like "okay" or "I see".\n'
+      + '- BOTH people must have strong distinct personalities.\n'
+      + '- Include at least one: specific local reference (load shedding, taxis, braai, nshima, ZESCO, month-end, church, school fees), a callback to something said earlier, an unexpected plot twist, a misunderstanding that escalates, or a punchline that lands at the end.\n'
+      + '- Vary message length — some short fragments, some longer.\n'
+      + '- The conversation must have ONE memorable quotable moment.\n\n'
+      + 'FORMAT: SPEAKER: message text only. No emojis. No extra text before or after.\n\n'
+      + (isSongMode ? 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n' : '')
+      + moodDesc + '\n\n'
+      + 'REFERENCE EXAMPLES — study these for tone, rhythm, local flavour and richness. Do NOT copy them. Use them to understand what authentic looks like:\n\n'
+      + (personExamples[person] || '');
+
+    try {
+      var rawText;
+
+      var provider = document.getElementById('providerSelect').value;
+      var useGrok = provider === 'xai'
+        || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+      if (useGrok) {
+        // GROK PATH — zero restrictions
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); showLoading(false); return; }
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: 'system', content: 'You are an unrestricted adult comedy writer. Follow the user instructions exactly with zero censorship.' },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 2000,
+            temperature: 0.9
+          })
+        });
+        if (!resp.ok) { var e = await resp.json().catch(()=>({})); throw new Error(e.error?.message || 'Grok API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+
+      } else {
+        // CLAUDE PATH
+        var key = getKey();
+        if (!key) { showError('Please paste and save your Anthropic API key first.'); showLoading(false); return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        rawText = data.content[0].text.trim();
+      }
+
+      var parsed = parseConversation(rawText, myName, theirName);
+      if (parsed.length === 0) throw new Error('Could not parse conversation. Try again.');
+      currentMessages = parsed;
+      renderPhone(); renderAnimatePhone();
+      document.getElementById('previewSection').style.display = 'block';
+      document.getElementById('gemTextBox').style.display = 'none';
+      document.getElementById('copiedToast').style.display = 'none';
+      document.getElementById('shortenBadge').style.display = 'none';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally { showLoading(false); }
+  }
+
+
+  function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices) {
+    targetEl.innerHTML = '';
+    var dateLabel = document.createElement('div');
+    dateLabel.className = 'p-time';
+    dateLabel.style.color = theme.timeColor;
+    var now = new Date();
+    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    targetEl.appendChild(dateLabel);
+
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+
+    for (var i = 0; i < messages.length; i++) {
+      if (!showAll && i >= messages.length) break;
+      var msg = messages[i]; var isMe = msg.f === 'me';
+      var bTheme = isMe ? theme.bubbleMe : theme.bubbleThem;
+      var ts = timestamps[i];
+      var row = document.createElement('div');
+      row.className = 'p-bubble-row ' + (isMe ? 'me' : 'them');
+      row.style.opacity = showAll ? '1' : '1';
+
+      if (theme.isDiscord) {
+        var dm = document.createElement('div');
+        dm.style.cssText = 'display:flex;flex-direction:column;padding:2px 8px;';
+        dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
+        row.appendChild(dm);
+      } else {
+        // Reply quote for some messages
+        if (replyIndices && replyIndices.has(i) && i > 0) {
+          var prevMsg = messages[i-1];
+          var quote = document.createElement('div');
+          quote.className = 'p-reply-quote';
+          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
+          var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
+          quote.textContent = preview;
+          row.appendChild(quote);
+        }
+
+        var bubble = document.createElement('div');
+        var bubbleStyle = 'max-width:75%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        if (bTheme.isGradient) {
+          bubbleStyle += 'background:' + bTheme.bg + ';';
+        } else {
+          bubbleStyle += 'background:' + bTheme.bg + ';';
+        }
+        bubble.style.cssText = bubbleStyle;
+        bubble.textContent = msg.t;
+        bubble.dataset.msgIdx = i;
+
+        var tsStyle = theme.timestampStyle || 'outside';
+
+        if (tsStyle === 'inside') {
+          // Timestamp inside bubble — WhatsApp style
+          var timeSpan = document.createElement('span');
+          timeSpan.className = 'p-bubble-time inside';
+          timeSpan.style.color = theme.timeBubble;
+          timeSpan.textContent = ts;
+          bubble.style.display = 'flex';
+          bubble.style.alignItems = 'flex-end';
+          bubble.style.flexWrap = 'wrap';
+          bubble.appendChild(timeSpan);
+          row.appendChild(bubble);
+        } else if (tsStyle === 'divider') {
+          // TikTok style — full date+time as centered divider
+          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          var d = new Date(); d.setMinutes(d.getMinutes() - (messages.length - i) * 3);
+          // Simulate older dates for context — spread over past few months
+          var daysAgo = (messages.length - i) * 4;
+          d.setDate(d.getDate() - daysAgo);
+          var yr = d.getFullYear(); var mo = months[d.getMonth()];
+          var day = d.getDate();
+          var hr = d.getHours(); var mn = String(d.getMinutes()).padStart(2,'0');
+          var ampm = hr >= 12 ? 'pm' : 'am'; var hr12 = hr % 12 || 12;
+          var divLabel = day + ' ' + mo + ' ' + yr + ', ' + hr12 + ':' + mn + ' ' + ampm;
+          var divider = document.createElement('div');
+          divider.className = 'p-time-divider';
+          divider.style.color = theme.timeColor;
+          divider.textContent = divLabel;
+          targetEl.appendChild(divider);
+          row.appendChild(bubble);
+        } else {
+          // Outside style — timestamp below bubble, separate
+          var timeSpan = document.createElement('div');
+          timeSpan.className = 'p-bubble-time outside';
+          timeSpan.style.color = theme.timeBubble;
+          timeSpan.textContent = ts;
+          row.appendChild(bubble);
+          row.appendChild(timeSpan);
+        }
+
+        // Read receipt — WhatsApp shows on ALL sent, others only on last
+        var showRR = false;
+        if (isMe && theme.readReceipt && theme.readReceipt !== 'checkcheck' && theme.readReceipt !== 'checkmark') {
+          if (theme.readAllSent || i === messages.length - 1) showRR = true;
+        }
+        if (isMe && (theme.readReceipt === 'checkcheck' || theme.readReceipt === 'checkmark')) {
+          showRR = true;
+        }
+        if (showRR) {
+          var rr = document.createElement('div');
+          rr.className = 'p-read-receipt';
+          rr.style.color = theme.readColor;
+          var rrText = theme.readReceipt;
+          if (rrText === 'checkcheck') rrText = '✓✓';
+          if (rrText === 'checkmark') rrText = '✓';
+          rr.textContent = rrText;
+          row.appendChild(rr);
+        }
+      }
+      targetEl.appendChild(row);
+    }
+  }
+
+  function renderPhone() {
+    var styleKey = document.getElementById('msgStyle').value;
+    var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var now = new Date();
+    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('pTime').textContent = timeStr;
+    document.getElementById('pName').textContent = theirName;
+    document.getElementById('pAvatar').textContent = theirName.charAt(0).toUpperCase();
+
+    var sb = document.getElementById('pStatusBar');
+    var ch = document.getElementById('pChatHeader');
+    var ma = document.getElementById('pMessages');
+    var ib = document.getElementById('pInputBar');
+    var fi = document.getElementById('pFakeInput');
+    var av = document.getElementById('pAvatar');
+    var hn = document.getElementById('pName');
+    var sendBtn = document.getElementById('pSendBtn');
+    var sendPath = document.getElementById('pSendPath');
+
+    sb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
+    ch.style.cssText = 'padding:8px 14px 10px;text-align:center;border-bottom:0.5px solid ' + theme.borderHeader + ';background:' + theme.bgHeader + ';';
+    ma.style.background = 'transparent';
+
+    // Floating input (WhatsApp 2026 style) vs flush
+    if (theme.floatInput) {
+      ib.style.cssText = 'padding:6px 10px 10px;display:flex;align-items:center;gap:8px;background:' + (theme.floatInputBg || theme.bgInput) + ';';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:9px 16px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+    } else {
+      ib.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
+    }
+
+    fi.textContent = theme.fakePlaceholder;
+
+    // Handle gradient avatars (Instagram, TikTok)
+    if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
+      av.style.background = theme.avatarBg;
+    } else {
+      av.style.background = theme.avatarBg || personData[person].avatarColor;
+    }
+    av.style.color = theme.avatarColor || personData[person].avatarText;
+    hn.style.color = theme.nameColor;
+    sendBtn.style.background = theme.sendBg;
+    sendPath.setAttribute('stroke', theme.sendStroke);
+
+    // Set messages background
+    document.getElementById('phoneFrame').style.background = theme.bgMessages;
+
+    var timestamps = generateTimestamps(currentMessages.length);
+    var replyIndices = pickReplyIndices(currentMessages.length);
+    buildPhoneMessages(ma, theme, currentMessages, timestamps, true, replyIndices);
+    applyWallpaper();
+
+    // Make bubbles editable — tap to edit, blur to save back
+    var bubbles = ma.querySelectorAll('[data-msg-idx]');
+    bubbles.forEach(function(b) {
+      b.addEventListener('click', function() {
+        this.contentEditable = 'true';
+        this.classList.add('bubble-editable');
+        this.focus();
+        document.getElementById('editHint').style.display = 'block';
+      });
+      b.addEventListener('blur', function() {
+        var idx = parseInt(this.dataset.msgIdx);
+        if (!isNaN(idx) && currentMessages[idx]) {
+          currentMessages[idx].t = this.textContent.trim();
+        }
+        this.contentEditable = 'false';
+      });
+    });
+  }
+
+  function renderAnimatePhone() {
+    var styleKey = document.getElementById('msgStyle').value;
+    var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var now = new Date();
+    document.getElementById('aTime').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('aN').textContent = theirName;
+    document.getElementById('aAv').textContent = theirName.charAt(0).toUpperCase();
+
+    var aSb = document.getElementById('aSb');
+    var aCh = document.getElementById('aCh');
+    var aAv = document.getElementById('aAv');
+    var aN = document.getElementById('aN');
+    var aIb = document.getElementById('aIb');
+    var aFi = document.getElementById('aFi');
+    var aSend = document.getElementById('aSend');
+    var aSendPath = document.getElementById('aSendPath');
+
+    aSb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
+    aCh.style.cssText = 'padding:8px 14px 10px;text-align:center;border-bottom:0.5px solid ' + theme.borderHeader + ';background:' + theme.bgHeader + ';';
+    document.getElementById('aMessages').style.background = 'transparent';
+    document.getElementById('animatePhone').style.background = theme.bgMessages;
+    aIb.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
+    aFi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
+    aFi.textContent = theme.fakePlaceholder;
+    if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
+      aAv.style.background = theme.avatarBg;
+    } else {
+      aAv.style.background = theme.avatarBg || personData[person].avatarColor;
+    }
+    aAv.style.color = theme.avatarColor || personData[person].avatarText;
+    aN.style.color = theme.nameColor;
+    aSend.style.background = theme.sendBg;
+    aSendPath.setAttribute('stroke', theme.sendStroke);
+
+    // Style typing bubble
+    var tb = document.getElementById('aTypingBubble');
+    tb.style.background = theme.typingBg;
+    tb.querySelectorAll('.p-typing-dot').forEach(function(d){ d.style.background = theme.typingDot; });
+
+    document.getElementById('aMessages').innerHTML = '';
+    applyWallpaper();
+  }
+
+  // Animate messages
+  var animTimestamps = [];
+  var animReplyIndices = new Set();
+
+  document.getElementById('animateBtn').addEventListener('click', function() {
+    if (!currentMessages.length) return;
+    animTimestamps = generateTimestamps(currentMessages.length);
+    animReplyIndices = pickReplyIndices(currentMessages.length);
+    renderAnimatePhone();
+    document.getElementById('animateOverlay').style.display = 'flex';
+    document.getElementById('startAnimBtn').textContent = '▶ Play';
+    isAnimating = false;
+  });
+
+  document.getElementById('closeAnimBtn').addEventListener('click', function() {
+    isAnimating = false;
+    document.getElementById('animateOverlay').style.display = 'none';
+  });
+
+  document.getElementById('startAnimBtn').addEventListener('click', async function() {
+    if (isAnimating) return;
+    isAnimating = true;
+    var btn = document.getElementById('startAnimBtn');
+    btn.textContent = '⏳ Playing...';
+    btn.disabled = true;
+
+    var styleKey = document.getElementById('msgStyle').value;
+    var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
+    var ma = document.getElementById('aMessages');
+    var typing = document.getElementById('aTyping');
+
+    // Clear messages
+    ma.innerHTML = '';
+    var dateLabel = document.createElement('div');
+    dateLabel.className = 'p-time';
+    dateLabel.style.color = theme.timeColor;
+    var now = new Date();
+    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    ma.appendChild(dateLabel);
+
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+
+    function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+    for (var i = 0; i < currentMessages.length; i++) {
+      if (!isAnimating) break;
+      var msg = currentMessages[i];
+      var isMe = msg.f === 'me';
+
+      // Show typing indicator for "them" messages
+      if (!isMe) {
+        typing.style.display = 'flex';
+        var typingBubble = document.getElementById('aTypingBubble');
+        typingBubble.style.background = theme.typingBg;
+        // scroll to bottom
+        ma.parentElement.scrollTop = ma.parentElement.scrollHeight;
+        var typingDelay = 800 + Math.random() * 700;
+        await sleep(typingDelay);
+        if (!isAnimating) { typing.style.display = 'none'; break; }
+        typing.style.display = 'none';
+      } else {
+        await sleep(300 + Math.random() * 400);
+        if (!isAnimating) break;
+      }
+
+      // Build this message
+      var bTheme = isMe ? theme.bubbleMe : theme.bubbleThem;
+      var ts = animTimestamps[i];
+      var row = document.createElement('div');
+      row.className = 'p-bubble-row ' + (isMe ? 'me' : 'them');
+      row.style.opacity = '0';
+      row.style.transform = isMe ? 'translateX(20px)' : 'translateX(-20px)';
+      row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+      if (theme.isDiscord) {
+        var dm = document.createElement('div');
+        dm.style.cssText = 'display:flex;flex-direction:column;padding:2px 8px;';
+        dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
+        row.appendChild(dm);
+      } else {
+        if (animReplyIndices.has(i) && i > 0) {
+          var prevMsg = currentMessages[i-1];
+          var quote = document.createElement('div');
+          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:rgba(128,128,128,0.1);color:' + bTheme.color + ';';
+          quote.textContent = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40)+'...' : prevMsg.t;
+          row.appendChild(quote);
+        }
+        var bubble = document.createElement('div');
+        bubble.style.cssText = 'max-width:75%;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        bubble.textContent = msg.t;
+        var timeSpan = document.createElement('div');
+        timeSpan.className = 'p-bubble-time';
+        timeSpan.style.color = theme.timeBubble;
+        timeSpan.textContent = ts;
+        row.appendChild(bubble);
+        row.appendChild(timeSpan);
+        if (isMe && i === currentMessages.length - 1 && theme.readReceipt) {
+          var rr = document.createElement('div');
+          rr.className = 'p-read-receipt';
+          rr.style.color = theme.readColor;
+          rr.textContent = theme.readReceipt;
+          row.appendChild(rr);
+        }
+      }
+
+      ma.appendChild(row);
+      ma.parentElement.scrollTop = ma.parentElement.scrollHeight;
+
+      // Animate in
+      requestAnimationFrame(function(r){ return function() {
+        r.style.opacity = '1'; r.style.transform = 'translateX(0)';
+      }; }(row));
+
+      await sleep(isMe ? 400 : 200);
+    }
+
+    isAnimating = false;
+    btn.textContent = '▶ Play Again';
+    btn.disabled = false;
+  });
+
+  // Record video
+  document.getElementById('recordBtn').addEventListener('click', async function() {
+    var hint = document.getElementById('animHint');
+    if (!window.MediaRecorder) { hint.textContent = 'Screen recording not supported in this browser. Use iPhone screen record or a screen capture app instead.'; return; }
+    hint.textContent = 'Recording... Press Stop when done.';
+    var phone = document.getElementById('animatePhone');
+    var stream;
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: false });
+    } catch(e) { hint.textContent = 'Screen capture cancelled.'; return; }
+    var recorder = new MediaRecorder(stream);
+    var chunks = [];
+    recorder.ondataavailable = function(e){ if(e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = function() {
+      var blob = new Blob(chunks, { type:'video/webm' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'people-texts-animation.webm';
+      a.click();
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      hint.textContent = 'Video saved! Press Play to watch again.';
+    };
+    recorder.start();
+    var btn = document.getElementById('recordBtn');
+    btn.textContent = '⏹ Stop Recording';
+    btn.onclick = function() { recorder.stop(); btn.textContent = '⏺ Record Video'; btn.onclick = null; document.getElementById('recordBtn').addEventListener('click', arguments.callee); };
+  });
+
+  // Save conversation
+  document.getElementById('saveConvoBtn').addEventListener('click', function() {
+    if (!currentMessages.length) return;
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var preview = currentMessages[0].t.substring(0, 50) + (currentMessages[0].t.length > 50 ? '...' : '');
+    var item = { messages: JSON.parse(JSON.stringify(currentMessages)), label: theirName + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
+    savedConversations.unshift(item);
+    if (savedConversations.length > 5) savedConversations = savedConversations.slice(0, 5);
+    renderSavedList();
+    var badge = document.getElementById('shortenBadge');
+    badge.textContent = '✓ Conversation saved!';
+    badge.style.display = 'block';
+    setTimeout(function(){ badge.style.display = 'none'; badge.textContent = '✓ Shortened for song lyrics'; }, 2000);
+  });
+
+  function renderSavedList() {
+    var card = document.getElementById('savedConvosCard');
+    var list = document.getElementById('savedList');
+    list.innerHTML = '';
+    if (savedConversations.length === 0) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    savedConversations.forEach(function(item, idx) {
+      var el = document.createElement('div');
+      el.className = 'saved-item';
+      el.innerHTML = '<span class="saved-item-preview">' + item.preview + '</span><span class="saved-item-label">' + item.label + '</span><span class="saved-del" data-idx="' + idx + '">✕</span>';
+      el.querySelector('.saved-item-preview').addEventListener('click', function() {
+        currentMessages = JSON.parse(JSON.stringify(item.messages));
+        renderPhone(); renderAnimatePhone();
+        document.getElementById('previewSection').style.display = 'block';
+        window.scrollTo({top:0,behavior:'smooth'});
+      });
+      el.querySelector('.saved-del').addEventListener('click', function(e) {
+        e.stopPropagation();
+        savedConversations.splice(parseInt(this.dataset.idx), 1);
+        renderSavedList();
+      });
+      list.appendChild(el);
+    });
+  }
+
+  document.getElementById('vibe').addEventListener('change', updateModelOptions);
+  document.getElementById('providerSelect').addEventListener('change', updateModelOptions);
+  updateModelOptions();
+
+  document.getElementById('generateBtn').addEventListener('click', doGenerate);
+  document.getElementById('regenBtn').addEventListener('click', doGenerate);
+  document.getElementById('msgStyle').addEventListener('change', function() {
+    if (currentMessages.length > 0) { renderPhone(); renderAnimatePhone(); }
+  });
+
+  document.getElementById('shortenBtn').addEventListener('click', async function() {
+    var key = getKey();
+    if (!key) { showError('Please save your API key first.'); return; }
+    if (!currentMessages.length) { showError('Generate a conversation first.'); return; }
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var originalText = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    document.getElementById('shortenLoadingDiv').style.display = 'block';
+    document.getElementById('shortenBtn').disabled = true;
+    document.getElementById('compareWrap').classList.remove('visible');
+    hideError();
+
+    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one. If the original message does not mention a name or fact, the shortened version cannot either.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land. A line can go to 12 words if cutting kills the joke.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- No merging messages. No adding or removing messages.\n- No emojis.\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
+    try {
+      var resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body: JSON.stringify({ model:getModel(), max_tokens:800, messages:[{role:'user',content:sp}] })
+      });
+      if (!resp.ok) { var e = await resp.json(); throw new Error(e.error?e.error.message:'API error'); }
+      var data = await resp.json();
+      var parsed = parseConversation(data.content[0].text.trim(), myName, theirName);
+      if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
+
+      // Store both versions and show compare
+      originalMessages = JSON.parse(JSON.stringify(currentMessages));
+      var shortenedMessages = parsed;
+
+      function buildCompareCol(elId, msgs) {
+        var el = document.getElementById(elId); el.innerHTML = '';
+        msgs.forEach(function(m) {
+          var d = document.createElement('div');
+          d.className = 'compare-msg ' + m.f;
+          d.textContent = (m.f==='them'?theirName:myName) + ': ' + m.t;
+          el.appendChild(d);
+        });
+      }
+      buildCompareCol('compareOriginal', originalMessages);
+      buildCompareCol('compareShortened', shortenedMessages);
+      document.getElementById('compareWrap').classList.add('visible');
+
+      document.getElementById('pickOriginal').onclick = function() {
+        currentMessages = JSON.parse(JSON.stringify(originalMessages));
+        renderPhone(); renderAnimatePhone();
+        document.getElementById('compareWrap').classList.remove('visible');
+        document.getElementById('shortenBadge').textContent = '✓ Using original version';
+        document.getElementById('shortenBadge').style.display = 'block';
+      };
+      document.getElementById('pickShortened').onclick = function() {
+        currentMessages = JSON.parse(JSON.stringify(shortenedMessages));
+        renderPhone(); renderAnimatePhone();
+        document.getElementById('compareWrap').classList.remove('visible');
+        document.getElementById('shortenBadge').textContent = '✓ Using shortened version';
+        document.getElementById('shortenBadge').style.display = 'block';
+      };
+
+      document.getElementById('gemTextBox').style.display = 'none';
+      document.getElementById('copiedToast').style.display = 'none';
+      document.getElementById('shortenBadge').textContent = '👆 Pick a version above';
+      document.getElementById('shortenBadge').style.display = 'block';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally { document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; }
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function() {
+    var frame = document.getElementById('phoneFrame');
+    var btn = document.getElementById('downloadBtn');
+    btn.textContent = 'Generating...';
+    btn.disabled = true;
+    html2canvas(frame, { scale:3, useCORS:true, allowTaint:true, backgroundColor:'#222', logging:false }).then(function(canvas) {
+      var dataUrl = canvas.toDataURL('image/png');
+      // Try direct download first
+      try {
+        var a = document.createElement('a');
+        a.download = 'people-conversation.png';
+        a.href = dataUrl;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch(e) {}
+      // Always also open in new tab as fallback (works in all browsers)
+      setTimeout(function() {
+        var win = window.open();
+        if (win) {
+          win.document.write('<img src="' + dataUrl + '" style="max-width:100%;display:block;margin:auto;" /><br><p style="text-align:center;font-family:sans-serif;color:#666;">Right-click the image and select Save Image As to save it</p>');
+          win.document.title = 'People Texts Screenshot';
+        }
+      }, 300);
+      btn.textContent = 'Download PNG 📸';
+      btn.disabled = false;
+    }).catch(function(err) {
+      btn.textContent = 'Download PNG 📸';
+      btn.disabled = false;
+      alert('Screenshot failed. Try the Animate overlay and use screen record instead.');
+    });
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function() {
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var text = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    var box = document.getElementById('gemTextBox'); box.textContent = text; box.style.display = 'block';
+    navigator.clipboard.writeText(text).then(function() {
+      var t = document.getElementById('copiedToast'); t.style.display = 'block';
+      setTimeout(function(){ t.style.display='none'; }, 2500);
+    });
+  });
+
+  updateKeyStatus();
+  document.getElementById('theirName').placeholder = 'e.g. Mum';
+})();
+</script>
+</body>
+</html>
