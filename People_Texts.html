@@ -378,7 +378,7 @@
     nephew:    { defaultName: 'Nephew',     avatarColor: '#a0c4f4', avatarText: '#2d4a7a' }
   };
 
-  // ── REVISED NEUTRAL INTERNATIONAL PERSON DESCRIPTIONS ───────
+  // ── FINAL REVISED NEUTRAL INTERNATIONAL PERSON DESCRIPTIONS ─
   var personDescriptions = {
     mom: 'a caring mother texting her child. She speaks with warmth mixed with concern and occasional gentle guilt. She asks about daily life, whether you are eating or sleeping enough, when you will visit or call, and shares small family updates. She can be dramatic about minor things and often uses a nurturing but slightly nosy tone. Some versions are more passive-aggressive with guilt, while others are openly worried and affectionate.',
     dad: 'a father texting his child. He tends to be short, direct, and occasionally blunt or hilariously matter-of-fact. He checks in about practical things with minimal punctuation or emotional flair, then disappears. He can be randomly deep or completely oblivious to tone. His messages often feel either very practical or strangely profound with almost no in-between.',
@@ -387,7 +387,7 @@
     bestfriend: 'a best friend texting their closest person. They are unfiltered, chaotic, and supportive at the same time. They hype, drag lovingly, share ridiculous life updates, and have no boundaries. The energy is raw, funny, and deeply familiar. Conversations can swing from serious to unhinged within a few messages.',
     partner: 'a romantic partner texting their significant other. The tone can shift dramatically between sweet, dramatic, jealous, needy, playful, frustrated, or passive-aggressive depending on the situation. Small things can quickly escalate into big emotional moments. The dynamic feels intimate but sometimes volatile.',
     coworker: 'a coworker or boss texting in a professional setting. The tone is often passive-aggressive, overly polite, corporate, or subtly competitive. References work drama, deadlines, meetings, and power dynamics. Everything feels slightly tense or performative, even when trying to sound friendly.',
-    stranger: 'a random stranger from anywhere in the world who slid into the DMs or sent an unexpected text. This person can be from any country or background. Possible energies include: wrong number confusion, overly familiar internet stranger, awkward but harmless, slightly creepy, scammy or salesy, overly enthusiastic, mysterious, or completely random. The dynamic is usually awkward, weird, funny, unsettling, or unexpectedly entertaining depending on the stranger\'s personality and intent.',
+    stranger: 'a random stranger from anywhere in the world who slid into the DMs or sent an unexpected text. This person can be from any country or background. Possible energies include: wrong number confusion, overly familiar internet stranger, awkward but harmless, slightly creepy, scammy or salesy, overly enthusiastic, mysterious, love-bombing, or completely random. The dynamic is usually awkward, weird, funny, unsettling, or unexpectedly entertaining depending on the stranger\'s personality and intent.',
     niece: 'a niece texting her aunt or uncle. She is dramatic, overly familiar for her age, asks for favors or money in a roundabout way, shares too much about her social life, and treats her relative like a cool older friend. Gen Z energy mixed with family entitlement. She often overshares and expects immediate emotional support or help.',
     nephew: 'a nephew texting his aunt or uncle. He is chaotic and only checks in when he needs something (usually money, advice, or a favour). He shares questionable life choices and has a mix of student energy and street smarts. The dynamic is funny but slightly exhausting, with him often trying to sound more mature than he is.'
   };
@@ -646,7 +646,7 @@
       + 'FORMAT: SPEAKER: message text only. No emojis. No extra text before or after.\n\n'
       + (isSongMode ? 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n' : '')
       + moodDesc + '\n\n'
-      + 'Focus on natural, believable, internationally relatable dialogue. Do not copy any specific regional examples.';
+      + 'Focus on natural, believable, internationally relatable dialogue with no regional flavour.';
 
     try {
       var rawText;
