@@ -216,6 +216,36 @@
     <div class="mood-label" id="moodLabel">😤 Heated — tension builds, things get spicy</div>
   </div>
 
+  <div class="section-title" style="display:flex;align-items:center;gap:8px;">🎵 Suno Campaign Presets <span style="font-size:10px;background:#7c3aed;color:#fff;padding:2px 7px;border-radius:6px;font-weight:600;letter-spacing:0.05em;">JUNE</span></div>
+  <div style="margin-bottom:8px;">
+    <select id="sunoPreset" style="width:100%;background:#252525;border:1px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:13px;color:#f0f0f0;outline:none;">
+      <option value="">— Pick a campaign format to auto-fill —</option>
+      <optgroup label="💬 Text → Song Formats">
+        <option value="comments">Format 5 — Viral Comments to Song</option>
+        <option value="texts">Format 6 — Fake Text Thread to Song</option>
+        <option value="slack">Format 6b — Slack / Group Chat to Song</option>
+        <option value="headlines">Format 7 — Unhinged Headlines to Song</option>
+        <option value="culture">Format 8 — Culture Trend Texts to Song</option>
+      </optgroup>
+      <optgroup label="😂 Humorous Scenarios">
+        <option value="genz_student">Format 9a — Gen Z Student Moment</option>
+        <option value="genz_intern">Format 9b — Employee / Intern Moment</option>
+        <option value="lie">Format 1 — Biggest Lie You Ever Heard</option>
+      </optgroup>
+      <optgroup label="🏟️ Stadium Anthems (World Cup safe)">
+        <option value="stadium_hype">Stadium — Hype Fan Texts</option>
+        <option value="stadium_drama">Stadium — Match Drama Texts</option>
+      </optgroup>
+      <optgroup label="🧪 Weekly Experiments">
+        <option value="notes_breakup">Notes App — Breakup Note to Song</option>
+        <option value="notes_todo">Notes App — Chaotic To-Do List to Song</option>
+        <option value="until_noticed">Until Someone Notices Series</option>
+      </optgroup>
+    </select>
+  </div>
+  <div id="sunoPresetDesc" style="display:none;background:#1a1a2e;border:1px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:12px;color:#a78bfa;margin-bottom:10px;line-height:1.6;"></div>
+  <button class="btn" id="applyPresetBtn" style="display:none;background:#7c3aed;color:#fff;margin-bottom:16px;">Apply Preset ✨</button>
+
   <div class="section-title">Chat Wallpaper</div>
   <div class="wallpaper-grid" id="wallpaperGrid"></div>
   <div style="margin-top:8px;margin-bottom:16px;">
@@ -451,6 +481,123 @@
     tinder: 'Generate authentic awkward dating app DM energy with terrible game and maximum cringe. Include weird pickup lines, desperate essay-length messages from men unprompted, "Hey beautiful" openers, sketchy stranger vibes, overly sexual comments too early, unhinged opening lines, failed attempts at flirting, copy-paste templates, ghosting energy, and the exact kind of questionable DMs that get screenshotted and roasted in group chats.'
   };
 
+  // ── SUNO CAMPAIGN PRESETS ─────────────────────────────────────
+  var sunoPresets = {
+    comments: {
+      label: 'Format 5 — Viral Comments to Song',
+      desc: '📱 Simulates a "tell me something interesting" viral post comment section. Use Song Mode then copy to Gem. Add CTA in first half of video.',
+      person: 'stranger', vibe: 'funny', mode: 'song', msgStyle: 'instagram',
+      topic: 'strangers replying to a viral "I am bored tell me something" post with the most unhinged random facts and confessions'
+    },
+    texts: {
+      label: 'Format 6 — Fake Text Thread to Song',
+      desc: '💬 Creates a believable but unhinged fake conversation that gets turned into a Suno song. Keep it brand-safe — no illegal or scandalous topics.',
+      person: 'bestfriend', vibe: 'unhinged', mode: 'song', msgStyle: 'imessage',
+      topic: 'completely unhinged group chat where someone does something embarrassing and the others will not let it go'
+    },
+    slack: {
+      label: 'Format 6b — Slack / Group Chat to Song',
+      desc: '💼 Fake Slack or work group chat energy turned into a song. Passive aggressive office chaos. Add CTA in first half.',
+      person: 'coworker', vibe: 'passive', mode: 'song', msgStyle: 'discord',
+      topic: 'someone replies-all to the whole company by accident and the chaos that follows in the Slack channel'
+    },
+    headlines: {
+      label: 'Format 7 — Unhinged Headlines to Song',
+      desc: '📰 Fake text reactions to a wild but brand-safe news headline. Screenshot and turn into a Suno song. No illegal or scandalous topics.',
+      person: 'bestfriend', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'reacting to a completely ridiculous viral news headline that sounds made up but is technically real'
+    },
+    culture: {
+      label: 'Format 8 — Culture Trend Texts to Song',
+      desc: '🔥 Fake texts about a trending topic (sports, pop culture, viral moment). Same format as headlines but culture-focused.',
+      person: 'bestfriend', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
+      topic: 'two friends texting about a massive sports upset or viral pop culture moment nobody saw coming'
+    },
+    genz_student: {
+      label: 'Format 9a — Gen Z Student Moment',
+      desc: '🎓 Unhinged student texting a professor or friend about grades, extensions, or campus chaos. Hook + context + song reaction + CTA = viral.',
+      person: 'coworker', vibe: 'dramatic', mode: 'song', msgStyle: 'imessage',
+      topic: 'student desperately texting their professor begging for a grade extension or asking to round up their grade so they can graduate'
+    },
+    genz_intern: {
+      label: 'Format 9b — Employee / Intern Moment',
+      desc: '💼 Intern or employee texting about unhinged workplace situations. Can be from the intern OR the manager angle.',
+      person: 'coworker', vibe: 'passive', mode: 'song', msgStyle: 'slack',
+      topic: 'intern sends an email to the entire company by mistake or does something wildly unprofessional on their first week'
+    },
+    lie: {
+      label: 'Format 1 — Biggest Lie You Ever Heard',
+      desc: '💔 Hard-hitting lie as the topic — can be funny, relatable, or gut-punch emotional. First frame = question. Second = the lie. Third = reaction. Song matches the vibe.',
+      person: 'partner', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'the most devastating promise someone made that turned out to be the biggest lie — delivered with full emotional weight'
+    },
+    stadium_hype: {
+      label: 'Stadium — Hype Fan Texts',
+      desc: '🏟️ Fan group chat energy during a massive soccer match. SAFE: no FIFA, no World Cup, no player names, no trophies. Stadium anthems and crowd energy only.',
+      person: 'bestfriend', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'fans going absolutely crazy in the group chat during the biggest soccer match of the year at an iconic stadium — pure crowd energy and stadium anthem vibes'
+    },
+    stadium_drama: {
+      label: 'Stadium — Match Drama Texts',
+      desc: '⚽ Texts reacting to a shocking match moment — missed penalty, last-minute goal, red card chaos. SAFE: no FIFA, no World Cup, no specific player names.',
+      person: 'brother', vibe: 'unhinged', mode: 'song', msgStyle: 'imessage',
+      topic: 'absolute mayhem in the group chat after a last-minute goal or missed penalty in a huge soccer match — stadium erupting energy'
+    },
+    notes_breakup: {
+      label: 'Notes App — Breakup Note to Song',
+      desc: '📝 Simulates a raw unfiltered Notes App voice memo or journal entry about a breakup or situationship. Turns directly into a Suno song.',
+      person: 'stranger', vibe: 'dramatic', mode: 'song', msgStyle: 'imessage',
+      topic: 'unfiltered notes app thoughts someone wrote at 2am after a breakup — raw, honest, slightly unhinged, emotionally messy'
+    },
+    notes_todo: {
+      label: 'Notes App — Chaotic To-Do List to Song',
+      desc: '📋 A to-do list that completely falls apart and becomes someone\'s cry for help. Funny chaos energy turned into a Suno song.',
+      person: 'stranger', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
+      topic: 'a to-do list that starts normal then completely spirals into existential chaos and personal confessions by message 5'
+    },
+    until_noticed: {
+      label: 'Until Someone Notices Series',
+      desc: '📅 "Day X of doing something until someone notices" — serialized format. Each post builds suspense. Can be funny or heartfelt. Song matches the escalating energy.',
+      person: 'bestfriend', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
+      topic: 'day 12 of texting someone daily with a different ridiculous compliment until they finally notice and react'
+    }
+  };
+
+  document.getElementById('sunoPreset').addEventListener('change', function() {
+    var val = this.value;
+    var descEl = document.getElementById('sunoPresetDesc');
+    var btnEl = document.getElementById('applyPresetBtn');
+    if (!val || !sunoPresets[val]) {
+      descEl.style.display = 'none';
+      btnEl.style.display = 'none';
+      return;
+    }
+    descEl.textContent = sunoPresets[val].desc;
+    descEl.style.display = 'block';
+    btnEl.style.display = 'block';
+  });
+
+  document.getElementById('applyPresetBtn').addEventListener('click', function() {
+    var val = document.getElementById('sunoPreset').value;
+    if (!val || !sunoPresets[val]) return;
+    var p = sunoPresets[val];
+    if (p.person) document.getElementById('person').value = p.person;
+    if (p.vibe) { document.getElementById('vibe').value = p.vibe; updateModelOptions(); }
+    if (p.msgStyle) document.getElementById('msgStyle').value = p.msgStyle;
+    if (p.topic) document.getElementById('topic').value = p.topic;
+    if (p.mode) setMode(p.mode);
+    // Visual feedback
+    var btn = document.getElementById('applyPresetBtn');
+    btn.textContent = '✓ Preset Applied!';
+    btn.style.background = '#4ade80';
+    btn.style.color = '#000';
+    setTimeout(function() {
+      btn.textContent = 'Apply Preset ✨';
+      btn.style.background = '#7c3aed';
+      btn.style.color = '#fff';
+    }, 1800);
+  });
+
   function updateModelOptions() {
     var provider = document.getElementById('providerSelect').value;
     var modelSelect = document.getElementById('modelSelect');
@@ -549,6 +696,7 @@
     else if (mode === 'full') desc.textContent = 'Mid Thread: 7–10 messages with natural flow and some back-and-forth';
     else desc.textContent = 'Song Mode: 6–10 short lines (8–15 words each) optimized for turning into lyrics';
   }
+  window.setMode = setMode;
 
   function generateTimestamps(count) {
     var now = new Date();
