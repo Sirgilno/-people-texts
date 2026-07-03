@@ -1514,7 +1514,6 @@
 
   document.getElementById('shortenBtn').addEventListener('click', async function() {
     var key = getKey();
-    if (!key) { showError('Please save your API key first.'); return; }
     if (!currentMessages.length) { showError('Generate a conversation first.'); return; }
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
@@ -1527,14 +1526,36 @@
 
     var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- No merging messages. No adding or removing messages.\n- No emojis.\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
     try {
-      var resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body: JSON.stringify({ model:getModel(), max_tokens:800, messages:[{role:'user',content:sp}] })
-      });
-      if (!resp.ok) { var e = await resp.json(); throw new Error(e.error?e.error.message:'API error'); }
-      var data = await resp.json();
-      var parsed = parseConversation(data.content[0].text.trim(), myName, theirName);
+      var shortenModel = getModel();
+      var shortenProvider = document.getElementById('providerSelect').value;
+      var shortenVibe = document.getElementById('vibe').value;
+      var shortenUseGrok = shortenProvider === 'xai' || (shortenProvider === 'auto' && (shortenVibe === 'unhinged' || shortenVibe === 'unhingedmax'));
+      var rawShortenText;
+
+      if (shortenUseGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: shortenModel, messages: [{ role: 'user', content: sp }], max_tokens: 800, temperature: 0.7 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawShortenText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        if (!key) { showError('Please save your API key first.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body: JSON.stringify({ model:shortenModel, max_tokens:800, messages:[{role:'user',content:sp}] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error?e.error.message:'API error'); }
+        var data = await resp.json();
+        rawShortenText = data.content[0].text.trim();
+      }
+
+      var parsed = parseConversation(rawShortenText, myName, theirName);
       if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
 
       originalMessages = JSON.parse(JSON.stringify(currentMessages));
