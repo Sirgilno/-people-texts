@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>People Texts Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #f0f0f0; min-height: 100vh; padding: 20px; }
+  h1 { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 4px; color: #fff; }
+  .subtitle { text-align: center; font-size: 13px; color: #888; margin-bottom: 24px; }
+  .card { background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid #2a2a2a; }
+  .section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 14px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  label { font-size: 12px; color: #aaa; display: block; margin-bottom: 6px; }
+  input[type="text"], input[type="password"], select { width: 100%; background: #252525; border: 1px solid #333; border-radius: 10px; padding: 10px 12px; font-size: 14px; color: #f0f0f0; outline: none; }
+  select option { background: #252525; }
+  .mode-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .mode-tab { padding: 12px 8px; border-radius: 10px; border: 1px solid #333; background: #252525; color: #aaa; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .mode-tab.active { background: #fff; color: #000; border-color: #fff; }
+  .mode-desc { font-size: 12px; color: #666; margin-bottom: 16px; text-align: center; }
+  .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #fff; color: #000; }
+  .btn-secondary { background: #252525; color: #f0f0f0; border: 1px solid #333; margin-top: 8px; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .api-status { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 12px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }
+  .dot.green { background: #4ade80; }
+  .key-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .key-row input { flex: 1; }
+  .key-save-btn { padding: 10px 16px; border-radius: 10px; border: none; background: #fff; color: #000; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .preview-section { display: none; margin-top: 20px; }
+  .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
+  .phone { width: 300px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
+  .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+  .phone > * { position: relative; z-index: 1; }
+  .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
+  .p-chat-header { padding: 8px 14px 10px; text-align: center; }
+  .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; }
+  .p-chat-name { font-size: 13px; font-weight: 600; }
+  .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 4px; }
+  .p-bubble-row { display: flex; flex-direction: column; }
+  .p-bubble-row.me { align-items: flex-end; }
+  .p-bubble-row.them { align-items: flex-start; }
+  .p-bubble-time { font-size: 9px; opacity: 0.5; margin-top: 2px; padding: 0 4px; }
+  .p-bubble-time.inside { font-size: 9px; color: inherit; opacity: 0.6; padding: 0 2px 1px 8px; align-self: flex-end; flex-shrink:0; }
+  .p-bubble-time.outside { font-size: 9px; opacity: 0.6; margin-top: 2px; padding: 0 4px; display:block; }
+  .p-time-divider { font-size: 10px; text-align: center; margin: 10px 0 4px; opacity: 0.5; width:100%; }
+  .p-read-receipt { font-size: 9px; margin-top: 1px; padding: 0 4px; text-align: right; }
+  .p-time { font-size: 10px; text-align: center; margin: 6px 0; opacity: 0.5; }
+  .p-input-bar { padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+  .p-fake-input { flex: 1; border-radius: 18px; padding: 7px 14px; font-size: 12px; }
+  .p-send { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .p-reply-quote { font-size: 10px; padding: 4px 8px; border-left: 2px solid; border-radius: 4px; margin-bottom: 3px; max-width: 75%; opacity: 0.7; line-height: 1.3; }
+  .p-typing { display: none; align-items: flex-start; margin: 2px 0; }
+  .p-typing-bubble { background: #e5e5ea; border-radius: 18px 18px 18px 4px; padding: 10px 14px; display: flex; gap: 3px; align-items: center; }
+  .p-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; animation: typingBounce 1.2s infinite; }
+  .p-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .p-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
+  .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .action-btn { padding: 12px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; }
+  .action-btn.primary { background: #fff; color: #000; border-color: #fff; }
+  .action-btn.full { grid-column: span 2; }
+  .action-btn.accent { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+  .gem-text-box { display: none; background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px; font-size: 12px; font-family: 'Courier New', monospace; color: #aaa; white-space: pre-wrap; word-break: break-word; line-height: 1.6; margin-top: 10px; }
+  .copied-toast { display: none; text-align: center; font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: 500; }
+  .loading-div { display: none; text-align: center; padding: 16px; color: #888; font-size: 14px; }
+  .shorten-badge { display: none; text-align: center; font-size: 11px; color: #4ade80; margin-bottom: 8px; font-weight: 500; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-box { display: none; background: #2a1515; border: 1px solid #ef4444; border-radius: 10px; padding: 12px; font-size: 13px; color: #ef4444; margin-top: 10px; }
+  .saved-convos { display: none; margin-top: 16px; }
+  .saved-title { font-size: 12px; color: #888; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .saved-list { display: flex; flex-direction: column; gap: 8px; }
+  .saved-item { background: #252525; border: 1px solid #333; border-radius: 10px; padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .saved-item:hover { border-color: #555; }
+  .saved-item-preview { font-size: 12px; color: #aaa; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
+  .saved-item-label { font-size: 11px; color: #666; white-space: nowrap; }
+  .saved-del { font-size: 11px; color: #ef4444; cursor: pointer; margin-left: 8px; padding: 2px 6px; }
+  .wallpaper-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+  .wp-swatch { width: 100%; aspect-ratio: 1; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+  .wp-swatch.active { border-color: #fff; }
+  .animate-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
+  .animate-phone-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+  .animate-controls { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .animate-btn { padding: 12px 24px; border-radius: 12px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .animate-btn.start { background: #7c3aed; color: white; }
+  .animate-btn.close { background: #252525; color: #f0f0f0; border: 1px solid #333; }
+  .animate-btn.rec { background: #ef4444; color: white; }
+  .animate-hint { font-size: 12px; color: #666; text-align: center; margin-top: 12px; }
+  .compare-wrap { display: none; gap: 10px; margin-bottom: 12px; }
+  .compare-wrap.visible { display: grid; grid-template-columns: 1fr 1fr; }
+  .compare-col { background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; }
+  .compare-col-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #666; margin-bottom: 8px; }
+  .compare-msg { font-size: 11px; padding: 5px 7px; border-radius: 8px; margin-bottom: 4px; line-height: 1.4; }
+  .compare-msg.me { background: #1a2a3a; color: #7ab8f5; text-align: right; }
+  .compare-msg.them { background: #1a1a2a; color: #aaa; }
+  .compare-pick { width: 100%; margin-top: 8px; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; background: #7c3aed; color: white; }
+  .bubble-editable { outline: none; cursor: text; }
+  .bubble-editable:focus { box-shadow: 0 0 0 2px rgba(124,58,237,0.6); }
+  .edit-hint { font-size: 11px; color: #555; text-align: center; margin-top: 4px; display: none; }
+  .name-gen-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #252525; color: #aaa; font-size: 12px; cursor: pointer; white-space: nowrap; margin-top: 6px; width: 100%; text-align: center; }
+  .name-gen-btn:hover { border-color: #555; color: #fff; }
+  .mood-row { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-bottom: 4px; }
+  .mood-slider { width: 100%; accent-color: #ef4444; margin-bottom: 4px; }
+  .mood-label { text-align: center; font-size: 12px; font-weight: 600; color: #ef4444; min-height: 18px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<h1>People Texts Generator 💬</h1>
+<p class="subtitle">AI-powered — turn any relationship into a song</p>
+
+<div class="card">
+  <div class="section-title">API Key</div>
+  <div class="api-status"><div class="dot" id="apiDot"></div><span id="apiStatusText">No API key saved</span></div>
+  <div class="key-row">
+    <input type="password" id="apiKeyInput" placeholder="Paste your Anthropic API key here..." />
+    <button class="key-save-btn" id="saveKeyBtn">Save</button>
+  </div>
+  <div style="margin-top:10px;">
+    <label style="font-size:11px;color:#aaa;">xAI Grok Key <span style="color:#ff6b6b;font-size:10px;">(required for Unhinged and Unhinged Pro Max)</span></label>
+    <div class="key-row" style="margin-top:4px;">
+      <input type="password" id="grokKeyInput" placeholder="Paste your xAI API key here..." />
+      <button class="key-save-btn" id="saveGrokKeyBtn">Save</button>
+    </div>
+  </div>
+  <button class="btn btn-secondary" id="clearKeyBtn">Clear saved keys</button>
+</div>
+
+<div class="card">
+  <div class="section-title">Settings</div>
+  <div style="margin-bottom:12px;">
+    <label>AI Provider</label>
+    <select id="providerSelect">
+      <option value="auto" selected>Auto — Claude (normal) / Grok (unhinged)</option>
+      <option value="anthropic">Anthropic Claude — force Claude for all vibes</option>
+      <option value="xai">xAI Grok — force Grok for all vibes</option>
+    </select>
+  </div>
+  <div style="margin-bottom:12px;">
+    <label>Model</label>
+    <select id="modelSelect">
+      <!-- Populated dynamically by updateModelOptions() -->
+    </select>
+  </div>
+  <div class="row">
+    <div><label>Your name</label><input type="text" id="myName" value="Me" /></div>
+    <div>
+      <label>Their name</label>
+      <input type="text" id="theirName" value="" placeholder="Auto-fills" />
+      <button class="name-gen-btn" id="nameGenBtn">🎲 Generate international name</button>
+    </div>
+  </div>
+  <div style="margin-bottom:12px;">
+    <label>Content Type</label>
+    <select id="contentType">
+      <option value="messages">Messages / DM Thread</option>
+      <option value="comments">Comments (Roast Me 🔥)</option>
+    </select>
+  </div>
+  <div id="messagePlatformSection" style="margin-bottom:12px;">
+    <label>Message Platform</label>
+    <select id="msgStyle">
+      <option value="whatsapp">WhatsApp</option>
+      <option value="imessage">iMessage</option>
+      <option value="messenger">Facebook Messenger</option>
+      <option value="facebook">Facebook Chat</option>
+      <option value="telegram">Telegram</option>
+      <option value="instagram">Instagram DM</option>
+      <option value="twitter">X / Twitter DM</option>
+      <option value="reddit">Reddit DM</option>
+      <option value="snapchat">Snapchat</option>
+      <option value="discord">Discord</option>
+      <option value="tiktok">TikTok DM</option>
+      <option value="android">Android / Google Messages</option>
+    </select>
+  </div>
+  <div id="commentsPlatformSection" style="margin-bottom:12px;display:none;">
+    <label>Comments Platform</label>
+    <select id="commentsPlatform">
+      <option value="instagram_comments">Instagram Comments</option>
+      <option value="tiktok_comments">TikTok Comments</option>
+    </select>
+  </div>
+  <div class="row">
+    <div id="personFieldWrap">
+      <label>Who is texting you?</label>
+      <select id="person">
+        <option value="mom">Mom</option>
+        <option value="dad">Dad</option>
+        <option value="brother">Brother</option>
+        <option value="sister">Sister</option>
+        <option value="bestfriend">Best Friend</option>
+        <option value="partner">Partner / GF / BF</option>
+        <option value="coworker">Coworker / Boss</option>
+        <option value="stranger">Stranger / Random DM</option>
+        <option value="niece">Niece</option>
+        <option value="nephew">Nephew</option>
+      </select>
+    </div>
+    <div>
+      <label>Vibe</label>
+      <select id="vibe">
+        <option value="funny">Funny / Chaotic</option>
+        <option value="passive">Passive aggressive</option>
+        <option value="guilt">Guilt trip</option>
+        <option value="nosy">Nosy / Interrogation</option>
+        <option value="proud">Bragging / Proud</option>
+        <option value="dramatic">Dramatic / Over the top</option>
+        <option value="awkward">Awkward / Cringe</option>
+        <option value="relatable">Relatable / Everyday</option>
+        <option value="unhinged">Unhinged 🔥</option>
+        <option value="unhingedmax">Unhinged Pro Max 🚫</option>
+        <option value="tinder">Tinder / Dating App Energy 😬</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-bottom:16px;">
+    <label id="topicLabel">Topic / Context (optional)</label>
+    <input type="text" id="topic" placeholder="e.g. forgot my birthday, saw me at the club..." />
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <label>Conversation Mood Escalation</label>
+    <div class="mood-row"><span>😐 Calm</span><span>😤 Heated</span><span>💀 Full Chaos</span></div>
+    <input type="range" id="moodSlider" class="mood-slider" min="0" max="2" step="1" value="1" />
+    <div class="mood-label" id="moodLabel">😤 Heated — tension builds, things get spicy</div>
+  </div>
+
+  <div class="section-title" style="display:flex;align-items:center;gap:8px;">🎵 Suno Campaign Presets <span style="font-size:10px;background:#7c3aed;color:#fff;padding:2px 7px;border-radius:6px;font-weight:600;letter-spacing:0.05em;">JUNE</span></div>
+  <div style="margin-bottom:8px;">
+    <select id="sunoPreset" style="width:100%;background:#252525;border:1px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:13px;color:#f0f0f0;outline:none;">
+      <option value="">— Pick a campaign format to auto-fill —</option>
+      <optgroup label="💬 Text → Song Formats">
+        <option value="comments">Format 5 — Viral Comments to Song</option>
+        <option value="texts">Format 6 — Fake Text Thread to Song</option>
+        <option value="slack">Format 6b — Slack / Group Chat to Song</option>
+        <option value="headlines">Format 7 — Unhinged Headlines to Song</option>
+        <option value="culture">Format 8 — Culture Trend Texts to Song</option>
+      </optgroup>
+      <optgroup label="😂 Humorous Scenarios">
+        <option value="genz_student">Format 9a — Gen Z Student Moment</option>
+        <option value="genz_intern">Format 9b — Employee / Intern Moment</option>
+        <option value="lie">Format 1 — Biggest Lie You Ever Heard</option>
+      </optgroup>
+      <optgroup label="🏟️ Stadium Anthems (World Cup safe)">
+        <option value="stadium_hype">Stadium — Hype Fan Texts</option>
+        <option value="stadium_drama">Stadium — Match Drama Texts</option>
+      </optgroup>
+      <optgroup label="🧪 Weekly Experiments">
+        <option value="notes_breakup">Notes App — Breakup Note to Song</option>
+        <option value="notes_todo">Notes App — Chaotic To-Do List to Song</option>
+        <option value="until_noticed">Until Someone Notices Series</option>
+      </optgroup>
+    </select>
+  </div>
+  <div id="sunoPresetDesc" style="display:none;background:#1a1a2e;border:1px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:12px;color:#a78bfa;margin-bottom:10px;line-height:1.6;"></div>
+  <button class="btn" id="applyPresetBtn" style="display:none;background:#7c3aed;color:#fff;margin-bottom:16px;">Apply Preset ✨</button>
+
+  <div class="section-title">Chat Wallpaper</div>
+  <div class="wallpaper-grid" id="wallpaperGrid"></div>
+  <div style="margin-top:8px;margin-bottom:16px;">
+    <label style="margin-bottom:4px;">Wallpaper Opacity</label>
+    <input type="range" id="wallpaperOpacity" min="0" max="100" value="40" style="width:100%;accent-color:#7c3aed;" />
+  </div>
+
+  <div class="section-title">Mode</div>
+  <div class="mode-tabs">
+    <div class="mode-tab active" id="tab-short" onclick="setMode('short')">Short Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">exactly 6 messages</span></div>
+    <div class="mode-tab" id="tab-full" onclick="setMode('full')">Mid Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">7–10 messages</span></div>
+    <div class="mode-tab" id="tab-song" onclick="setMode('song')">Song Mode<br><span style="font-size:11px;font-weight:400;opacity:0.6;">8–15 words, 6–10 lines</span></div>
+  </div>
+  <p class="mode-desc" id="modeDesc">Short mode: exactly 6 messages — clean screenshot, fits perfectly on screen</p>
+  <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
+  <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
+  <div class="error-box" id="errorBox"></div>
+</div>
+
+<div class="preview-section" id="previewSection">
+  <div class="phone-wrap">
+    <div class="phone" id="phoneFrame">
+      <div class="phone-wallpaper" id="phoneWallpaper"></div>
+      <div class="p-status-bar" id="pStatusBar">
+        <span id="pTime">9:41</span>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="2" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="4" y="1.5" width="2.5" height="9.5" rx="1" fill="currentColor"/><rect x="8" y="0" width="2.5" height="11" rx="1" fill="currentColor"/><rect x="12" y="0" width="2.5" height="11" rx="1" fill="currentColor" opacity="0.3"/></svg>
+          <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 1.5C9.2 1.5 11.2 2.4 12.6 3.9L13.7 2.7C12 0.9 9.6-0.2 7-0.2S2 0.9 0.3 2.7L1.4 3.9C2.8 2.4 4.8 1.5 7 1.5z" fill="currentColor"/><path d="M7 4.5C8.5 4.5 9.8 5.1 10.7 6.1L11.8 4.9C10.6 3.7 8.9 2.9 7 2.9S3.4 3.7 2.2 4.9L3.3 6.1C4.2 5.1 5.5 4.5 7 4.5z" fill="currentColor"/><circle cx="7" cy="9.5" r="1.5" fill="currentColor"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="19" y="3.5" width="2" height="4" rx="1" fill="currentColor"/><rect x="1.5" y="2.5" width="12" height="6" rx="1" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="p-chat-header" id="pChatHeader">
+        <div class="p-avatar" id="pAvatar">M</div>
+        <div class="p-chat-name" id="pName">Mum</div>
+      </div>
+      <div class="p-messages" id="pMessages"></div>
+      <div class="p-input-bar" id="pInputBar">
+        <div class="p-fake-input" id="pFakeInput">Message</div>
+        <div class="p-send" id="pSendBtn">
+          <svg width="12" height="12" viewBox="0 0 12 12"><path id="pSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone" id="commentsFrame" style="display:none;overflow:hidden;">
+      <div class="p-status-bar" id="cStatusBar">
+        <span id="cTime">9:41</span>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="2" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="4" y="1.5" width="2.5" height="9.5" rx="1" fill="currentColor"/><rect x="8" y="0" width="2.5" height="11" rx="1" fill="currentColor"/><rect x="12" y="0" width="2.5" height="11" rx="1" fill="currentColor" opacity="0.3"/></svg>
+          <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 1.5C9.2 1.5 11.2 2.4 12.6 3.9L13.7 2.7C12 0.9 9.6-0.2 7-0.2S2 0.9 0.3 2.7L1.4 3.9C2.8 2.4 4.8 1.5 7 1.5z" fill="currentColor"/><path d="M7 4.5C8.5 4.5 9.8 5.1 10.7 6.1L11.8 4.9C10.6 3.7 8.9 2.9 7 2.9S3.4 3.7 2.2 4.9L3.3 6.1C4.2 5.1 5.5 4.5 7 4.5z" fill="currentColor"/><circle cx="7" cy="9.5" r="1.5" fill="currentColor"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="19" y="3.5" width="2" height="4" rx="1" fill="currentColor"/><rect x="1.5" y="2.5" width="12" height="6" rx="1" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div id="cHeader"></div>
+      <div id="commentsList" style="flex:1;overflow-y:auto;"></div>
+      <div id="cInputBar"></div>
+    </div>
+  </div>
+
+  <div class="action-btns">
+    <button class="action-btn" id="regenBtn">Regenerate 🔄</button>
+    <button class="action-btn primary" id="downloadBtn">Download PNG 📸</button>
+  </div>
+  <div class="action-btns">
+    <button class="action-btn full accent" id="animateBtn">▶️ Animate for TikTok</button>
+  </div>
+  <div class="action-btns">
+    <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
+  </div>
+  <p class="edit-hint" id="editHint">✏️ Tap any message bubble to edit it directly</p>
+  <div class="action-btns">
+    <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
+  </div>
+  <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span>Trimming for lyrics...</div>
+  <div class="shorten-badge" id="shortenBadge">✓ Shortened for song lyrics</div>
+  <div class="compare-wrap" id="compareWrap">
+    <div class="compare-col">
+      <div class="compare-col-title">📝 Original</div>
+      <div id="compareOriginal"></div>
+      <button class="compare-pick" id="pickOriginal">Use Original</button>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-title">✂️ Shortened</div>
+      <div id="compareShortened"></div>
+      <button class="compare-pick" id="pickShortened">Use Shortened</button>
+    </div>
+  </div>
+  <div class="action-btns" id="copyBtnRow">
+    <button class="action-btn full" id="copyBtn">Copy text for Gem 📋</button>
+  </div>
+  <div class="gem-text-box" id="gemTextBox"></div>
+  <div class="copied-toast" id="copiedToast">✓ Copied to clipboard!</div>
+</div>
+
+<div class="card saved-convos" id="savedConvosCard">
+  <div class="saved-title">Saved Conversations</div>
+  <div class="saved-list" id="savedList"></div>
+</div>
+
+<!-- Animate Overlay -->
+<div class="animate-overlay" id="animateOverlay">
+  <div class="animate-phone-wrap">
+    <div class="phone" id="animatePhone" style="width:280px;">
+      <div class="phone-wallpaper" id="animateWallpaper"></div>
+      <div class="p-status-bar" id="aSb"><span id="aTime">9:41</span><div style="display:flex;gap:4px;align-items:center;"><svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="2" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="4" y="1.5" width="2.5" height="9.5" rx="1" fill="currentColor"/><rect x="8" y="0" width="2.5" height="11" rx="1" fill="currentColor"/></svg></div></div>
+      <div class="p-chat-header" id="aCh"><div class="p-avatar" id="aAv">M</div><div class="p-chat-name" id="aN">Mum</div></div>
+      <div class="p-messages" id="aMessages" style="min-height:300px;"></div>
+      <div class="p-typing" id="aTyping"><div class="p-typing-bubble" id="aTypingBubble"><div class="p-typing-dot"></div><div class="p-typing-dot"></div><div class="p-typing-dot"></div></div></div>
+      <div class="p-input-bar" id="aIb"><div class="p-fake-input" id="aFi">Message</div><div class="p-send" id="aSend"><svg width="12" height="12" viewBox="0 0 12 12"><path id="aSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+  </div>
+  <div class="animate-controls">
+    <button class="animate-btn start" id="startAnimBtn">▶ Play</button>
+    <button class="animate-btn rec" id="recordBtn">⏺ Record Video</button>
+    <button class="animate-btn close" id="closeAnimBtn">✕ Close</button>
+  </div>
+  <p class="animate-hint" id="animHint">Press Play to watch messages appear one by one. Press Record to save as video.</p>
+</div>
+
+<script>
+(function() {
+  var currentMode = 'short';
+  var currentMessages = [];
+  var savedConversations = [];
+  var currentWallpaper = 'none';
+  var isAnimating = false;
+  var originalMessages = [];
+
+  // ── MOOD SLIDER ──────────────────────────────────────────────
+  var moodLabels = [
+    '😐 Calm — chill, casual, everyday energy',
+    '😤 Heated — tension builds, things get spicy',
+    '💀 Full Chaos — completely off the rails by the end'
+  ];
+  var moodDescriptions = [
+    'MOOD: Keep this conversation calm, casual, and chill. No major conflict. The energy is relaxed, everyday, low stakes. People are just talking normally.',
+    'MOOD: The conversation starts okay but tension builds. Someone says something that lands wrong. By the end it is noticeably heated — not explosive but definitely not fine.',
+    'MOOD: This conversation ESCALATES. It starts somewhat normal then goes completely off the rails. By the last 2-3 messages something has exploded — chaos, drama, a confession, a breakdown, or a revelation that no one saw coming. End on maximum energy.'
+  ];
+  document.getElementById('moodSlider').addEventListener('input', function() {
+    document.getElementById('moodLabel').textContent = moodLabels[parseInt(this.value)];
+  });
+
+  // ── NAME GENERATOR (International) ───────────────────────────
+  var localNames = {
+    mom:        ['Maria', 'Elena', 'Aisha', 'Sophia', 'Fatima', 'Grace', 'Anna', 'Mei', 'Isabella', 'Priya'],
+    dad:        ['James', 'Carlos', 'Ahmed', 'David', 'Michael', 'Liam', 'Raj', 'Kenji', 'Miguel', 'Omar'],
+    brother:    ['Alex', 'Jordan', 'Sam', 'Taylor', 'Chris', 'Jamie', 'Casey', 'Morgan', 'Riley', 'Cameron'],
+    sister:     ['Emma', 'Olivia', 'Ava', 'Mia', 'Sophia', 'Isabella', 'Luna', 'Zoe', 'Lily', 'Nora'],
+    bestfriend: ['Alex', 'Jordan', 'Sam', 'Taylor', 'Chris', 'Jamie', 'Casey', 'Morgan', 'Riley', 'Cameron'],
+    partner:    ['Baby', 'Babe', 'Love', 'Honey', 'Darling', 'Sweetheart', 'Boo', 'Angel'],
+    coworker:   ['Mr. Thompson', 'Ms. Patel', 'Mr. Garcia', 'Mrs. Kim', 'Mr. Rossi', 'Ms. Moreau', 'Mr. Schmidt', 'Ms. Silva'],
+    stranger:   ['Unknown', 'Random', '+1 555 1234', '+44 7700 900123', 'No Name', 'Wrong Number'],
+    niece:      ['Emma', 'Olivia', 'Sophia', 'Mia', 'Luna', 'Zoe', 'Lily', 'Nora'],
+    nephew:     ['Alex', 'Jordan', 'Sam', 'Taylor', 'Chris', 'Jamie', 'Casey', 'Morgan']
+  };
+  document.getElementById('nameGenBtn').addEventListener('click', function() {
+    var person = document.getElementById('person').value;
+    var names = localNames[person] || ['Unknown'];
+    var name = names[Math.floor(Math.random() * names.length)];
+    document.getElementById('theirName').value = name;
+  });
+
+  var personData = {
+    mom:       { defaultName: 'Mum',        avatarColor: '#c7a0d4', avatarText: '#5a2d7a' },
+    dad:       { defaultName: 'Dad',        avatarColor: '#a0c7d4', avatarText: '#2d5a7a' },
+    brother:   { defaultName: 'Bro',        avatarColor: '#d4c7a0', avatarText: '#7a5a2d' },
+    sister:    { defaultName: 'Sis',        avatarColor: '#f4a0c7', avatarText: '#7a2d5a' },
+    bestfriend:{ defaultName: 'Best Friend',avatarColor: '#a0d4a0', avatarText: '#2d7a2d' },
+    partner:   { defaultName: 'Baby',       avatarColor: '#d4a0a0', avatarText: '#7a2d2d' },
+    coworker:  { defaultName: 'Coworker',   avatarColor: '#b0b0b0', avatarText: '#404040' },
+    stranger:  { defaultName: 'Unknown',    avatarColor: '#8a8a8a', avatarText: '#1a1a1a' },
+    niece:     { defaultName: 'Niece',      avatarColor: '#f4c7a0', avatarText: '#7a4a2d' },
+    nephew:    { defaultName: 'Nephew',     avatarColor: '#a0c4f4', avatarText: '#2d4a7a' }
+  };
+
+  // ── FINAL REVISED NEUTRAL INTERNATIONAL PERSON DESCRIPTIONS ─
+  var personDescriptions = {
+    mom: 'a caring mother texting her child. She speaks with warmth mixed with concern and occasional gentle guilt. She asks about daily life, whether you are eating or sleeping enough, when you will visit or call, and shares small family updates. She can be dramatic about minor things and often uses a nurturing but slightly nosy tone. Some versions are more passive-aggressive with guilt, while others are openly worried and affectionate.',
+    dad: 'a father texting his child. He tends to be short, direct, and occasionally blunt or hilariously matter-of-fact. He checks in about practical things with minimal punctuation or emotional flair, then disappears. He can be randomly deep or completely oblivious to tone. His messages often feel either very practical or strangely profound with almost no in-between.',
+    brother: 'a brother texting his sibling. He roasts relentlessly, brings up embarrassing old stories, fights over small things, and has zero filter. He is awkward when things get emotional but tries in the most clueless, funny way possible. The dynamic mixes genuine care with constant teasing and sibling chaos.',
+    sister: 'a sister texting her sibling. She overshares everything, knows all the family drama, calls out nonsense immediately, and will defend you to others but roast you privately. She mixes care with sharp honesty and dramatic reactions. Her messages often feel like both a gossip session and emotional support at the same time.',
+    bestfriend: 'a best friend texting their closest person. They are unfiltered, chaotic, and supportive at the same time. They hype, drag lovingly, share ridiculous life updates, and have no boundaries. The energy is raw, funny, and deeply familiar. Conversations can swing from serious to unhinged within a few messages.',
+    partner: 'a romantic partner texting their significant other. The tone can shift dramatically between sweet, dramatic, jealous, needy, playful, frustrated, or passive-aggressive depending on the situation. Small things can quickly escalate into big emotional moments. The dynamic feels intimate but sometimes volatile.',
+    coworker: 'a coworker or boss texting in a professional setting. The tone is often passive-aggressive, overly polite, corporate, or subtly competitive. References work drama, deadlines, meetings, and power dynamics. Everything feels slightly tense or performative, even when trying to sound friendly.',
+    stranger: 'a random stranger from anywhere in the world who slid into the DMs or sent an unexpected text. This person can be from any country or background. Possible energies include: wrong number confusion, overly familiar internet stranger, awkward but harmless, slightly creepy, scammy or salesy, overly enthusiastic, mysterious, love-bombing, or completely random. The dynamic is usually awkward, weird, funny, unsettling, or unexpectedly entertaining depending on the stranger\'s personality and intent.',
+    niece: 'a niece texting her aunt or uncle. She is dramatic, overly familiar for her age, asks for favors or money in a roundabout way, shares too much about her social life, and treats her relative like a cool older friend. Gen Z energy mixed with family entitlement. She often overshares and expects immediate emotional support or help.',
+    nephew: 'a nephew texting his aunt or uncle. He is chaotic and only checks in when he needs something (usually money, advice, or a favour). He shares questionable life choices and has a mix of student energy and street smarts. The dynamic is funny but slightly exhausting, with him often trying to sound more mature than he is.'
+  };
+
+  // Minimal neutral examples (not injected into prompt)
+  var exampleConvos = {
+    mom: [
+      "Mum: Did you eat today?\nMe: Yes Mum\nMum: What did you have?\nMe: Just some leftovers\nMum: You need to cook proper meals. I worry about you.",
+      "Mum: I tried calling you earlier\nMe: Sorry I was busy\nMum: You are always busy. When are you coming to visit?"
+    ],
+    dad: [
+      "Dad: How are you\nMe: Good Dad you?\nDad: Fine. Is everything okay?\nMe: Yeah it's fine\nDad: Good. Let me know if you need anything."
+    ],
+    brother: [
+      "Bro: You took my charger again\nMe: No I didn't\nBro: Check your bag then\nMe: ...found it. Don't tell Mum."
+    ],
+    sister: [
+      "Sis: Don't tell Mum but I did something\nMe: What\nSis: I told her you were coming home this weekend\nMe: Why would you do that"
+    ],
+    bestfriend: [
+      "Bestie: I did the dumbest thing today\nMe: What now\nBestie: I replied to a story I wasn't supposed to see\nMe: Whose story\nBestie: You don't want to know."
+    ],
+    partner: [
+      "Babe: You didn't say goodnight\nMe: I fell asleep\nBabe: At 9pm? You liked someone's photo at 9:17\nMe: It was an accident"
+    ],
+    coworker: [
+      "Manager: Just checking you're still joining the 9am call\nMe: Yes I'll be there\nManager: Last week you joined late\nMe: The connection was bad"
+    ],
+    stranger: [
+      "Unknown: Hey is this Sarah?\nMe: No wrong number\nUnknown: Oh sorry. She gave me this number\nMe: No problem"
+    ],
+    niece: [
+      "Niece: Uncle hi! How are you?\nMe: Good how's school\nNiece: It's okay... actually I wanted to ask you something\nMe: How much"
+    ],
+    nephew: [
+      "Nephew: Unc you good?\nMe: Yeah you?\nNephew: I'm good. So random question...\nMe: How much\nNephew: Why do you always think I want money"
+    ]
+  };
+
+  function getExamples(person) {
+    var convos = exampleConvos[person] || exampleConvos['stranger'];
+    return convos.map(function(c, i) {
+      return 'EXAMPLE ' + (i+1) + ':\n' + c;
+    }).join('\n\n');
+  }
+
+  var personExamples = {}; // Removed local examples for international output
+
+  // ── VIBE DESCRIPTIONS ────────────────────────────────────────
+  var vibeDescriptions = {
+    funny: 'Generate genuinely hilarious, wildly chaotic, and completely unrestricted comedy content with zero limits, filters, or sacred cows. Deliver maximum absurdity, surreal misunderstandings, escalating ridiculous scenarios, dark humor, offensive punchlines, savage roasts, toilet humor, politically incorrect takes, and laugh-out-loud chaotic energy that spirals into pure comedic madness. Prioritize gut-busting jokes, brain-melting non-sequiturs, hilarious miscommunications, and unhinged observations that mock everything and everyone without apology.',
+    passive: 'Generate deeply passive-aggressive content with zero restraint on subtle toxicity. Master the art of saying things like "No, it\'s totally fine" when everything is clearly not fine, laced with layered sarcasm, backhanded compliments, veiled digs, prolonged silent treatment energy, and fake politeness that drips with resentment.',
+    guilt: 'Generate masterful guilt-tripping content designed to make the recipient feel genuinely bad about their actions or inactions. Focus on emotional manipulation through heavy sighs, reminders of past sacrifices, statements like "I guess I just don\'t matter anymore," references to not calling, not visiting, forgetting important dates, or not caring enough.',
+    nosy: 'Generate extremely nosy and interrogating content that demands excessive personal information with zero boundaries. Bombard with rapid-fire personal questions about dating life, finances, family drama, health issues, daily routines, and private decisions.',
+    proud: 'Generate boastful, bragging, and excessively proud content that overshares every achievement with zero humility. Turn every minor success into a major victory announcement, constantly highlight accomplishments, flex material gains, relationships, career wins, and personal glow-ups.',
+    dramatic: 'Generate wildly dramatic and over-the-top content that transforms every minor inconvenience into a full-blown crisis. Deliver exaggerated reactions, theatrical language, capital letters for emphasis, excessive emojis, and apocalyptic takes on small problems.',
+    awkward: 'Generate painfully awkward and cringe content filled with uncomfortable energy, terrible timing, and second-hand embarrassment moments. Include social missteps, weirdly timed jokes, oversharing personal details at the wrong moment, long uncomfortable silences, failed attempts at humor, and interactions that make everyone involved want to disappear.',
+    relatable: 'Generate highly relatable everyday energy content that perfectly captures normal real-life moments everyone with this kind of person will instantly recognize. Focus on authentic, slice-of-life situations, common frustrations, everyday struggles, familiar family dynamics, workplace pettiness, and universal human experiences.',
+    unhinged: 'Generate completely UNHINGED content with zero filter, maximum chaotic energy, and Gen-Z drunk-texting chaos. Swear freely and creatively, deliver wild unhinged takes, say things normal people would never dare to say out loud, include obviously joking threats, dark humor, absurd tangents, and spiraling rants.',
+    unhingedmax: 'Generate fully explicit, raw, unfiltered hardcore adult content with zero restrictions or censorship. Dive deep into pure sexting territory, intense dirty talk, graphic sexual descriptions, vulgar innuendo, and explicit references to fucking, pussy, dick, cum, ass, throat, riding, creampies, squirting, choking, slapping, breeding, and every other raw sexual act.',
+    tinder: 'Generate authentic awkward dating app DM energy with terrible game and maximum cringe. Include weird pickup lines, desperate essay-length messages from men unprompted, "Hey beautiful" openers, sketchy stranger vibes, overly sexual comments too early, unhinged opening lines, failed attempts at flirting, copy-paste templates, ghosting energy, and the exact kind of questionable DMs that get screenshotted and roasted in group chats.'
+  };
+
+  // ── SUNO CAMPAIGN PRESETS ─────────────────────────────────────
+  var sunoPresets = {
+    comments: {
+      label: 'Format 5 — Viral Comments to Song',
+      desc: '📱 Simulates a "tell me something interesting" viral post comment section. Use Song Mode then copy to Gem. Add CTA in first half of video.',
+      person: 'stranger', vibe: 'funny', mode: 'song', msgStyle: 'instagram',
+      topic: 'strangers replying to a viral "I am bored tell me something" post with the most unhinged random facts and confessions'
+    },
+    texts: {
+      label: 'Format 6 — Fake Text Thread to Song',
+      desc: '💬 Creates a believable but unhinged fake conversation that gets turned into a Suno song. Keep it brand-safe — no illegal or scandalous topics.',
+      person: 'bestfriend', vibe: 'unhinged', mode: 'song', msgStyle: 'imessage',
+      topic: 'completely unhinged group chat where someone does something embarrassing and the others will not let it go'
+    },
+    slack: {
+      label: 'Format 6b — Slack / Group Chat to Song',
+      desc: '💼 Fake Slack or work group chat energy turned into a song. Passive aggressive office chaos. Add CTA in first half.',
+      person: 'coworker', vibe: 'passive', mode: 'song', msgStyle: 'discord',
+      topic: 'someone replies-all to the whole company by accident and the chaos that follows in the Slack channel'
+    },
+    headlines: {
+      label: 'Format 7 — Unhinged Headlines to Song',
+      desc: '📰 Fake text reactions to a wild but brand-safe news headline. Screenshot and turn into a Suno song. No illegal or scandalous topics.',
+      person: 'bestfriend', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'reacting to a completely ridiculous viral news headline that sounds made up but is technically real'
+    },
+    culture: {
+      label: 'Format 8 — Culture Trend Texts to Song',
+      desc: '🔥 Fake texts about a trending topic (sports, pop culture, viral moment). Same format as headlines but culture-focused.',
+      person: 'bestfriend', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
+      topic: 'two friends texting about a massive sports upset or viral pop culture moment nobody saw coming'
+    },
+    genz_student: {
+      label: 'Format 9a — Gen Z Student Moment',
+      desc: '🎓 Unhinged student texting a professor or friend about grades, extensions, or campus chaos. Hook + context + song reaction + CTA = viral.',
+      person: 'coworker', vibe: 'dramatic', mode: 'song', msgStyle: 'imessage',
+      topic: 'student desperately texting their professor begging for a grade extension or asking to round up their grade so they can graduate'
+    },
+    genz_intern: {
+      label: 'Format 9b — Employee / Intern Moment',
+      desc: '💼 Intern or employee texting about unhinged workplace situations. Can be from the intern OR the manager angle.',
+      person: 'coworker', vibe: 'passive', mode: 'song', msgStyle: 'slack',
+      topic: 'intern sends an email to the entire company by mistake or does something wildly unprofessional on their first week'
+    },
+    lie: {
+      label: 'Format 1 — Biggest Lie You Ever Heard',
+      desc: '💔 Hard-hitting lie as the topic — can be funny, relatable, or gut-punch emotional. First frame = question. Second = the lie. Third = reaction. Song matches the vibe.',
+      person: 'partner', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'the most devastating promise someone made that turned out to be the biggest lie — delivered with full emotional weight'
+    },
+    stadium_hype: {
+      label: 'Stadium — Hype Fan Texts',
+      desc: '🏟️ Fan group chat energy during a massive soccer match. SAFE: no FIFA, no World Cup, no player names, no trophies. Stadium anthems and crowd energy only.',
+      person: 'bestfriend', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'fans going absolutely crazy in the group chat during the biggest soccer match of the year at an iconic stadium — pure crowd energy and stadium anthem vibes'
+    },
+    stadium_drama: {
+      label: 'Stadium — Match Drama Texts',
+      desc: '⚽ Texts reacting to a shocking match moment — missed penalty, last-minute goal, red card chaos. SAFE: no FIFA, no World Cup, no specific player names.',
+      person: 'brother', vibe: 'unhinged', mode: 'song', msgStyle: 'imessage',
+      topic: 'absolute mayhem in the group chat after a last-minute goal or missed penalty in a huge soccer match — stadium erupting energy'
+    },
+    notes_breakup: {
+      label: 'Notes App — Breakup Note to Song',
+      desc: '📝 Simulates a raw unfiltered Notes App voice memo or journal entry about a breakup or situationship. Turns directly into a Suno song.',
+      person: 'stranger', vibe: 'dramatic', mode: 'song', msgStyle: 'imessage',
+      topic: 'unfiltered notes app thoughts someone wrote at 2am after a breakup — raw, honest, slightly unhinged, emotionally messy'
+    },
+    notes_todo: {
+      label: 'Notes App — Chaotic To-Do List to Song',
+      desc: '📋 A to-do list that completely falls apart and becomes someone\'s cry for help. Funny chaos energy turned into a Suno song.',
+      person: 'stranger', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
+      topic: 'a to-do list that starts normal then completely spirals into existential chaos and personal confessions by message 5'
+    },
+    until_noticed: {
+      label: 'Until Someone Notices Series',
+      desc: '📅 "Day X of doing something until someone notices" — serialized format. Each post builds suspense. Can be funny or heartfelt. Song matches the escalating energy.',
+      person: 'bestfriend', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
+      topic: 'day 12 of texting someone daily with a different ridiculous compliment until they finally notice and react'
+    }
+  };
+
+  document.getElementById('sunoPreset').addEventListener('change', function() {
+    var val = this.value;
+    var descEl = document.getElementById('sunoPresetDesc');
+    var btnEl = document.getElementById('applyPresetBtn');
+    if (!val || !sunoPresets[val]) {
+      descEl.style.display = 'none';
+      btnEl.style.display = 'none';
+      return;
+    }
+    descEl.textContent = sunoPresets[val].desc;
+    descEl.style.display = 'block';
+    btnEl.style.display = 'block';
+  });
+
+  document.getElementById('applyPresetBtn').addEventListener('click', function() {
+    var val = document.getElementById('sunoPreset').value;
+    if (!val || !sunoPresets[val]) return;
+    var p = sunoPresets[val];
+    if (p.person) document.getElementById('person').value = p.person;
+    if (p.vibe) { document.getElementById('vibe').value = p.vibe; updateModelOptions(); }
+    if (p.msgStyle) document.getElementById('msgStyle').value = p.msgStyle;
+    if (p.topic) document.getElementById('topic').value = p.topic;
+    if (p.mode) setMode(p.mode);
+    // Visual feedback
+    var btn = document.getElementById('applyPresetBtn');
+    btn.textContent = '✓ Preset Applied!';
+    btn.style.background = '#4ade80';
+    btn.style.color = '#000';
+    setTimeout(function() {
+      btn.textContent = 'Apply Preset ✨';
+      btn.style.background = '#7c3aed';
+      btn.style.color = '#fff';
+    }, 1800);
+  });
+
+  function updateModelOptions() {
+    var provider = document.getElementById('providerSelect').value;
+    var modelSelect = document.getElementById('modelSelect');
+    modelSelect.innerHTML = '';
+    var vibe = document.getElementById('vibe').value;
+    var isUnhinged = (vibe === 'unhinged' || vibe === 'unhingedmax');
+
+    if (provider === 'auto') {
+      if (isUnhinged) {
+        var opt = document.createElement('option');
+        opt.value = 'grok-4.3';
+        opt.textContent = 'grok-4.3 (xAI)';
+        modelSelect.appendChild(opt);
+      } else {
+        var opt1 = document.createElement('option');
+        opt1.value = 'claude-sonnet-4-6';
+        opt1.textContent = 'claude-sonnet-4-6 (Anthropic)';
+        modelSelect.appendChild(opt1);
+        var opt2 = document.createElement('option');
+        opt2.value = 'claude-opus-4-7';
+        opt2.textContent = 'claude-opus-4-7 (Anthropic)';
+        modelSelect.appendChild(opt2);
+      }
+    } else if (provider === 'anthropic') {
+      var opt1 = document.createElement('option');
+      opt1.value = 'claude-sonnet-4-6';
+      opt1.textContent = 'claude-sonnet-4-6';
+      modelSelect.appendChild(opt1);
+      var opt2 = document.createElement('option');
+      opt2.value = 'claude-opus-4-7';
+      opt2.textContent = 'claude-opus-4-7';
+      modelSelect.appendChild(opt2);
+    } else if (provider === 'xai') {
+      var opt = document.createElement('option');
+      opt.value = 'grok-4.3';
+      opt.textContent = 'grok-4.3';
+      modelSelect.appendChild(opt);
+    }
+  }
+
+  function safeGet(key) {
+    try { return localStorage.getItem(key) || ''; } catch(e){ return ''; }
+  }
+  function safeSet(key, value) {
+    try { localStorage.setItem(key, value); } catch(e){}
+  }
+
+  function updateKeyStatus() {
+    var key = safeGet('anthropic_api_key');
+    var dot = document.getElementById('apiDot');
+    var text = document.getElementById('apiStatusText');
+    if (key) {
+      dot.classList.add('green');
+      text.textContent = 'Anthropic key saved';
+    } else {
+      dot.classList.remove('green');
+      text.textContent = 'No API key saved';
+    }
+  }
+
+  function getKey() { return safeGet('anthropic_api_key'); }
+  function getGrokKey() { return safeGet('xai_api_key'); }
+  function getModel() { return document.getElementById('modelSelect').value; }
+
+  document.getElementById('saveKeyBtn').addEventListener('click', function() {
+    var key = document.getElementById('apiKeyInput').value.trim();
+    if (key) {
+      safeSet('anthropic_api_key', key);
+      document.getElementById('apiKeyInput').value = '';
+      updateKeyStatus();
+    }
+  });
+  document.getElementById('saveGrokKeyBtn').addEventListener('click', function() {
+    var key = document.getElementById('grokKeyInput').value.trim();
+    if (key) {
+      safeSet('xai_api_key', key);
+      document.getElementById('grokKeyInput').value = '';
+      document.getElementById('grokKeyInput').placeholder = 'xAI key saved ✓';
+      setTimeout(function(){ document.getElementById('grokKeyInput').placeholder = 'Paste your xAI API key here...'; }, 2000);
+    }
+  });
+  document.getElementById('clearKeyBtn').addEventListener('click', function() {
+    try { localStorage.removeItem('anthropic_api_key'); localStorage.removeItem('xai_api_key'); } catch(e){}
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('grokKeyInput').placeholder = 'Paste your xAI API key here...';
+    updateKeyStatus();
+  });
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('tab-short').classList.toggle('active', mode === 'short');
+    document.getElementById('tab-full').classList.toggle('active', mode === 'full');
+    document.getElementById('tab-song').classList.toggle('active', mode === 'song');
+    var desc = document.getElementById('modeDesc');
+    if (mode === 'short') desc.textContent = 'Short mode: exactly 6 messages — clean screenshot, fits perfectly on screen';
+    else if (mode === 'full') desc.textContent = 'Mid Thread: 7–10 messages with natural flow and some back-and-forth';
+    else desc.textContent = 'Song Mode: 6–10 short lines (8–15 words each) optimized for turning into lyrics';
+  }
+  window.setMode = setMode;
+
+  function generateTimestamps(count) {
+    var now = new Date();
+    var timestamps = [];
+    for (var i = 0; i < count; i++) {
+      var t = new Date(now.getTime() - (count - i) * 180000);
+      var h = t.getHours();
+      var m = String(t.getMinutes()).padStart(2, '0');
+      timestamps.push(h + ':' + m);
+    }
+    return timestamps;
+  }
+
+  function pickReplyIndices(count) {
+    var set = new Set();
+    if (count > 3) set.add(Math.floor(count * 0.4));
+    if (count > 5) set.add(Math.floor(count * 0.7));
+    return set;
+  }
+
+  function showLoading(show) {
+    document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
+    document.getElementById('generateBtn').disabled = show;
+  }
+  function showError(msg) {
+    var box = document.getElementById('errorBox');
+    box.textContent = msg;
+    box.style.display = 'block';
+  }
+  function hideError() {
+    document.getElementById('errorBox').style.display = 'none';
+  }
+
+  function parseConversation(text, myName, theirName) {
+    var lines = text.trim().split('\n').filter(function(l){ return l.trim(); });
+    var msgs = [];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      var lower = line.toLowerCase();
+      if (lower.startsWith('me:')) {
+        msgs.push({ f: 'me', t: line.substring(3).trim() });
+      } else if (lower.startsWith(theirName.toLowerCase() + ':')) {
+        msgs.push({ f: 'them', t: line.substring(theirName.length + 1).trim() });
+      } else if (lower.startsWith('them:') || lower.startsWith('her:') || lower.startsWith('him:')) {
+        msgs.push({ f: 'them', t: line.substring(line.indexOf(':') + 1).trim() });
+      } else if (line.includes(':')) {
+        var parts = line.split(':');
+        var speaker = parts[0].trim().toLowerCase();
+        var content = parts.slice(1).join(':').trim();
+        if (speaker === 'me' || speaker === myName.toLowerCase()) {
+          msgs.push({ f: 'me', t: content });
+        } else {
+          msgs.push({ f: 'them', t: content });
+        }
+      }
+    }
+    return msgs;
+  }
+
+  async function doGenerate() {
+    hideError();
+    var contentType = document.getElementById('contentType').value;
+    if (contentType === 'comments') { return doGenerateComments(); }
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var theirName = document.getElementById('theirName').value.trim();
+    var person = document.getElementById('person').value;
+    var vibe = document.getElementById('vibe').value;
+    var topic = document.getElementById('topic').value.trim();
+    var model = document.getElementById('modelSelect').value;
+
+    if (!theirName) {
+      theirName = personData[person].defaultName;
+      document.getElementById('theirName').value = theirName;
+    }
+
+    showLoading(true);
+
+    var msgCount = currentMode === 'short' ? 'exactly 6' : currentMode === 'song' ? 'between 6 and 10' : 'between 7 and 10';
+    var isSongMode = currentMode === 'song';
+    var mood = parseInt(document.getElementById('moodSlider').value);
+    var moodDesc = moodDescriptions[mood];
+
+    var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
+      + 'CONTEXT: This is a conversation between two real people from anywhere in the world. Write it as two distinct personalities talking naturally. Do NOT force any specific cultural references, slang, food, or location into the messages. Let the conversation feel like normal, everyday human dialogue between real people. Everything should feel universally relatable.\n\n'
+      + 'Generate a text message conversation with ' + msgCount + ' messages total.\n\n'
+      + 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n'
+      + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
+      + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic between ' + theirName + ' and ' + myName + ' directly.\n\n' : '')
+      + 'NAMES: ' + myName + ' is receiving. ' + theirName + ' is texting them.\n\n'
+      + 'RICHNESS RULES — CRITICAL:\n'
+      + '- Every conversation must feel UNIQUE and SPECIFIC. No generic responses like "okay" or "I see".\n'
+      + '- BOTH people must have strong distinct personalities.\n'
+      + '- Include at least one memorable detail, callback to something said earlier, small twist, misunderstanding that escalates, or punchline that lands at the end. Keep details universally relatable.\n'
+      + '- Vary message length — some short fragments, some longer.\n'
+      + '- The conversation must have ONE memorable quotable moment.\n\n'
+      + 'FORMAT: SPEAKER: message text only. No emojis. No extra text before or after.\n\n'
+      + (isSongMode ? 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n' : '')
+      + moodDesc + '\n\n'
+      + 'Focus on natural, believable, internationally relatable dialogue with no regional flavour.';
+
+    try {
+      var rawText;
+      var provider = document.getElementById('providerSelect').value;
+      var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+      if (useGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); showLoading(false); return; }
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 2000,
+            temperature: 0.9
+          })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        var key = getKey();
+        if (!key) { showError('Please paste and save your Anthropic API key first.'); showLoading(false); return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        rawText = data.content[0].text.trim();
+      }
+
+      var parsed = parseConversation(rawText, myName, theirName);
+      if (parsed.length === 0) throw new Error('Could not parse conversation. Try again.');
+      currentMessages = parsed;
+      renderPhone(); renderAnimatePhone();
+      document.getElementById('previewSection').style.display = 'block';
+      document.getElementById('gemTextBox').style.display = 'none';
+      document.getElementById('copiedToast').style.display = 'none';
+      document.getElementById('shortenBadge').style.display = 'none';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally { showLoading(false); }
+  }
+
+  async function doGenerateComments() {
+    var platKey = document.getElementById('commentsPlatform').value;
+    var isIG = platKey === 'instagram_comments';
+    var vibe = document.getElementById('vibe').value;
+    var topic = document.getElementById('topic').value.trim();
+    var mood = parseInt(document.getElementById('moodSlider').value);
+    var moodDesc = moodDescriptions[mood];
+    var count = currentMode === 'short' ? '5' : currentMode === 'song' ? '8' : '9';
+
+    showLoading(true);
+
+    var prompt = 'You are writing a realistic ' + (isIG ? 'Instagram' : 'TikTok') + ' comment section for a video where the CREATOR (the person who posted the video) is being ROASTED by random commenters. This is for a "reading my own roast comments" reaction video format.\n\n'
+      + (topic ? 'WHAT THE CREATOR IS BEING ROASTED FOR: ' + topic + '\n\n' : 'WHAT THE CREATOR IS BEING ROASTED FOR: come up with something funny and universally relatable — a physical feature, a habit, a personality quirk, or something odd they did on camera.\n\n')
+      + 'TONE / INTENSITY: ' + vibeDescriptions[vibe] + '\n\n'
+      + moodDesc + '\n\n'
+      + 'Generate exactly ' + count + ' distinct fake ' + (isIG ? 'Instagram' : 'TikTok') + ' usernames each with ONE roast comment. Each comment must be:\n'
+      + '- Genuinely funny, creative, and highly specific — never generic insults like "ugly" or "weird".\n'
+      + '- Written the way real ' + (isIG ? 'Instagram' : 'TikTok') + ' commenters actually type — lowercase is common, some slang, some deadpan delivery, some hyperbolic exaggeration.\n'
+      + '- Varied in style — some one-liners, some longer setup-punchline comments, some using absurd comparisons.\n'
+      + '- Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful roast-comedy, not actual bullying.\n'
+      + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid).\n\n'
+      + 'FORMAT: username: comment text\nOne per line. No numbering. No extra commentary before or after. No emojis.';
+
+    try {
+      var grokKey = getGrokKey();
+      if (!grokKey) { showError('Comments mode always uses Grok. Add your xAI Grok key in the API Key section above.'); showLoading(false); return; }
+      var model = document.getElementById('modelSelect').value;
+      var grokModel = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
+      var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+        body: JSON.stringify({
+          model: grokModel,
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 1500,
+          temperature: 0.95
+        })
+      });
+      if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+      var data = await resp.json();
+      var rawText = data.choices?.[0]?.message?.content?.trim();
+      var parsed = parseComments(rawText);
+      if (parsed.length === 0) throw new Error('Could not parse comments. Try again.');
+      currentComments = parsed;
+      renderComments();
+      document.getElementById('previewSection').style.display = 'block';
+      document.getElementById('gemTextBox').style.display = 'none';
+      document.getElementById('copiedToast').style.display = 'none';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally { showLoading(false); }
+  }
+
+  function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices) {
+    targetEl.innerHTML = '';
+    var dateLabel = document.createElement('div');
+    dateLabel.className = 'p-time';
+    dateLabel.style.color = theme.timeColor;
+    var now = new Date();
+    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    targetEl.appendChild(dateLabel);
+
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+
+    for (var i = 0; i < messages.length; i++) {
+      if (!showAll && i >= messages.length) break;
+      var msg = messages[i]; var isMe = msg.f === 'me';
+      var bTheme = isMe ? theme.bubbleMe : theme.bubbleThem;
+      var ts = timestamps[i];
+      var row = document.createElement('div');
+      row.className = 'p-bubble-row ' + (isMe ? 'me' : 'them');
+
+      if (theme.isDiscord) {
+        var dm = document.createElement('div');
+        dm.style.cssText = 'display:flex;flex-direction:column;padding:2px 8px;';
+        dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
+        row.appendChild(dm);
+      } else {
+        if (replyIndices && replyIndices.has(i) && i > 0) {
+          var prevMsg = messages[i-1];
+          var quote = document.createElement('div');
+          quote.className = 'p-reply-quote';
+          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
+          var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
+          quote.textContent = preview;
+          row.appendChild(quote);
+        }
+
+        var bubble = document.createElement('div');
+        var bubbleStyle = 'max-width:75%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        bubbleStyle += 'background:' + bTheme.bg + ';';
+        bubble.style.cssText = bubbleStyle;
+        bubble.textContent = msg.t;
+        bubble.dataset.msgIdx = i;
+
+        var tsStyle = theme.timestampStyle || 'outside';
+
+        if (tsStyle === 'inside') {
+          var timeSpan = document.createElement('span');
+          timeSpan.className = 'p-bubble-time inside';
+          timeSpan.style.color = theme.timeBubble;
+          timeSpan.textContent = ts;
+          bubble.style.display = 'flex';
+          bubble.style.alignItems = 'flex-end';
+          bubble.style.flexWrap = 'wrap';
+          bubble.appendChild(timeSpan);
+          row.appendChild(bubble);
+        } else if (tsStyle === 'divider') {
+          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          var d = new Date(); d.setMinutes(d.getMinutes() - (messages.length - i) * 3);
+          var daysAgo = (messages.length - i) * 4;
+          d.setDate(d.getDate() - daysAgo);
+          var yr = d.getFullYear(); var mo = months[d.getMonth()];
+          var day = d.getDate();
+          var hr = d.getHours(); var mn = String(d.getMinutes()).padStart(2,'0');
+          var ampm = hr >= 12 ? 'pm' : 'am'; var hr12 = hr % 12 || 12;
+          var divLabel = day + ' ' + mo + ' ' + yr + ', ' + hr12 + ':' + mn + ' ' + ampm;
+          var divider = document.createElement('div');
+          divider.className = 'p-time-divider';
+          divider.style.color = theme.timeColor;
+          divider.textContent = divLabel;
+          targetEl.appendChild(divider);
+          row.appendChild(bubble);
+        } else {
+          var timeSpan = document.createElement('div');
+          timeSpan.className = 'p-bubble-time outside';
+          timeSpan.style.color = theme.timeBubble;
+          timeSpan.textContent = ts;
+          row.appendChild(bubble);
+          row.appendChild(timeSpan);
+        }
+
+        var showRR = false;
+        if (isMe && theme.readReceipt && theme.readReceipt !== 'checkcheck' && theme.readReceipt !== 'checkmark') {
+          if (theme.readAllSent || i === messages.length - 1) showRR = true;
+        }
+        if (isMe && (theme.readReceipt === 'checkcheck' || theme.readReceipt === 'checkmark')) {
+          showRR = true;
+        }
+        if (showRR) {
+          var rr = document.createElement('div');
+          rr.className = 'p-read-receipt';
+          rr.style.color = theme.readColor;
+          var rrText = theme.readReceipt;
+          if (rrText === 'checkcheck') rrText = '✓✓';
+          if (rrText === 'checkmark') rrText = '✓';
+          rr.textContent = rrText;
+          row.appendChild(rr);
+        }
+      }
+      targetEl.appendChild(row);
+    }
+  }
+
+  var platformThemes = {
+    whatsapp: {
+      bgSb: '#0a0a0a', colorSb: '#f0f0f0',
+      bgHeader: '#1a1a1a', borderHeader: '#333',
+      bgMessages: '#0f0f0f',
+      bgInput: '#1a1a1a', bgFakeInput: '#252525', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: true, floatInputBg: '#1a1a1a',
+      bubbleMe: { bg: '#005c4b', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#1f2c34', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'inside',
+      timeColor: '#888', timeBubble: '#ffffff',
+      readReceipt: '✓✓', readColor: '#4ade80', readAllSent: true,
+      sendBg: '#005c4b', sendStroke: '#fff',
+      avatarBg: '#005c4b', avatarColor: '#fff',
+      nameColor: '#f0f0f0',
+      typingBg: '#1f2c34', typingDot: '#888'
+    },
+    imessage: {
+      bgSb: '#f5f5f5', colorSb: '#000',
+      bgHeader: '#f5f5f5', borderHeader: '#ddd',
+      bgMessages: '#f5f5f5',
+      bgInput: '#f5f5f5', bgFakeInput: '#fff', colorFakeInput: '#888', fakePlaceholder: 'iMessage',
+      floatInput: false,
+      bubbleMe: { bg: '#007AFF', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#e5e5ea', color: '#000', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: 'Read', readColor: '#007AFF', readAllSent: false,
+      sendBg: '#007AFF', sendStroke: '#fff',
+      avatarBg: '#007AFF', avatarColor: '#fff',
+      nameColor: '#000',
+      typingBg: '#e5e5ea', typingDot: '#888'
+    },
+    messenger: {
+      bgSb: '#000', colorSb: '#fff',
+      bgHeader: '#000', borderHeader: '#333',
+      bgMessages: '#000',
+      bgInput: '#000', bgFakeInput: '#1a1a1a', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: false,
+      bubbleMe: { bg: 'linear-gradient(135deg, #7c3aed, #3b82f6)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
+      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#7c3aed', sendStroke: '#fff',
+      avatarBg: 'linear-gradient(135deg, #7c3aed, #3b82f6)', avatarColor: '#fff',
+      nameColor: '#fff',
+      typingBg: '#1a1a1a', typingDot: '#888'
+    },
+    facebook: {
+      bgSb: '#1877f2', colorSb: '#fff',
+      bgHeader: '#1877f2', borderHeader: '#166fe0',
+      bgMessages: '#f0f2f5',
+      bgInput: '#f0f2f5', bgFakeInput: '#fff', colorFakeInput: '#888', fakePlaceholder: 'Aa',
+      floatInput: false,
+      bubbleMe: { bg: '#0084ff', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#fff', color: '#000', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#0084ff', sendStroke: '#fff',
+      avatarBg: '#0084ff', avatarColor: '#fff',
+      nameColor: '#000',
+      typingBg: '#fff', typingDot: '#888'
+    },
+    telegram: {
+      bgSb: '#1a1033', colorSb: '#fff',
+      bgHeader: '#1a1033', borderHeader: '#2a1f4a',
+      bgMessages: '#0f0a1f',
+      bgInput: '#1a1033', bgFakeInput: '#2a1f4a', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: false,
+      bubbleMe: { bg: '#e17055', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#2a1f4a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#e17055', sendStroke: '#fff',
+      avatarBg: '#e17055', avatarColor: '#fff',
+      nameColor: '#fff',
+      typingBg: '#2a1f4a', typingDot: '#888'
+    },
+    instagram: {
+      bgSb: '#000', colorSb: '#fff',
+      bgHeader: '#000', borderHeader: '#333',
+      bgMessages: '#000',
+      bgInput: '#1a1a1a', bgFakeInput: '#262626', colorFakeInput: '#888', fakePlaceholder: 'Message...',
+      floatInput: false,
+      bubbleMe: { bg: 'linear-gradient(135deg, #f56040, #c13584, #833ab4)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
+      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#f56040', sendStroke: '#fff',
+      avatarBg: 'linear-gradient(135deg, #f56040, #c13584, #833ab4)', avatarColor: '#fff',
+      nameColor: '#fff',
+      typingBg: '#1a1a1a', typingDot: '#888'
+    },
+    twitter: {
+      bgSb: '#000', colorSb: '#fff',
+      bgHeader: '#000', borderHeader: '#333',
+      bgMessages: '#000',
+      bgInput: '#000', bgFakeInput: '#1a1a1a', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: false,
+      bubbleMe: { bg: '#1d9bf0', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#1d9bf0', sendStroke: '#fff',
+      avatarBg: '#1d9bf0', avatarColor: '#fff',
+      nameColor: '#fff',
+      typingBg: '#1a1a1a', typingDot: '#888'
+    },
+    reddit: {
+      bgSb: '#0d1117', colorSb: '#fff',
+      bgHeader: '#0d1117', borderHeader: '#333',
+      bgMessages: '#0d1117',
+      bgInput: '#0d1117', bgFakeInput: '#1a1a1a', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: false,
+      bubbleMe: { bg: '#ff4500', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#ff4500', sendStroke: '#fff',
+      avatarBg: '#ff4500', avatarColor: '#fff',
+      nameColor: '#fff',
+      typingBg: '#1a1a1a', typingDot: '#888'
+    },
+    snapchat: {
+      bgSb: '#fffc00', colorSb: '#000',
+      bgHeader: '#fffc00', borderHeader: '#f0e600',
+      bgMessages: '#fff',
+      bgInput: '#fff', bgFakeInput: '#f5f5f5', colorFakeInput: '#888', fakePlaceholder: 'Send a chat',
+      floatInput: false,
+      bubbleMe: { bg: '#0078ff', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#f5f5f5', color: '#000', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#0078ff', sendStroke: '#fff',
+      avatarBg: '#0078ff', avatarColor: '#fff',
+      nameColor: '#000',
+      typingBg: '#f5f5f5', typingDot: '#888'
+    },
+    discord: {
+      bgSb: '#313338', colorSb: '#fff',
+      bgHeader: '#313338', borderHeader: '#40444b',
+      bgMessages: '#313338',
+      bgInput: '#313338', bgFakeInput: '#40444b', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: false, isDiscord: true,
+      bubbleMe: { bg: 'transparent', color: '#fff', radius: '0' },
+      bubbleThem: { bg: 'transparent', color: '#fff', radius: '0' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: null,
+      sendBg: '#5865f2', sendStroke: '#fff',
+      avatarBg: '#5865f2', avatarColor: '#fff',
+      nameColor: '#fff',
+      typingBg: '#40444b', typingDot: '#888'
+    },
+    tiktok: {
+      bgSb: '#000', colorSb: '#fff',
+      bgHeader: '#000', borderHeader: '#333',
+      bgMessages: '#fff',
+      bgInput: '#fff', bgFakeInput: '#f5f5f5', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: false,
+      bubbleMe: { bg: '#1677ff', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#f5f5f5', color: '#000', radius: '18px 18px 18px 4px' },
+      timestampStyle: 'divider',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: null,
+      sendBg: '#1677ff', sendStroke: '#fff',
+      avatarBg: '#1677ff', avatarColor: '#fff',
+      nameColor: '#000',
+      typingBg: '#f5f5f5', typingDot: '#888'
+    },
+    android: {
+      bgSb: '#0d0d0d', colorSb: '#fff',
+      bgHeader: '#0d0d0d', borderHeader: '#333',
+      bgMessages: '#0d0d0d',
+      bgInput: '#0d0d0d', bgFakeInput: '#1a1a1a', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      floatInput: false,
+      bubbleMe: { bg: '#1a73e8', color: '#fff', radius: '24px' },
+      bubbleThem: { bg: '#2a2a2a', color: '#f0f0f0', radius: '24px' },
+      timestampStyle: 'outside',
+      timeColor: '#888', timeBubble: '#666',
+      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      sendBg: '#1a73e8', sendStroke: '#fff',
+      avatarBg: '#1a73e8', avatarColor: '#fff',
+      nameColor: '#fff',
+      typingBg: '#2a2a2a', typingDot: '#888'
+    }
+  };
+
+  function applyWallpaper() {
+    var opacity = parseInt(document.getElementById('wallpaperOpacity').value) / 100;
+    var phone = document.getElementById('phoneFrame');
+    var animatePhone = document.getElementById('animatePhone');
+    if (currentWallpaper === 'none') {
+      phone.style.background = '#222';
+      if (animatePhone) animatePhone.style.background = '#222';
+      return;
+    }
+    var colors = {
+      'none': '#222',
+      'gradient1': 'linear-gradient(135deg, #1a1a2e, #16213e)',
+      'gradient2': 'linear-gradient(135deg, #0f3460, #533483)',
+      'gradient3': 'linear-gradient(135deg, #2d132c, #801336)',
+      'gradient4': 'linear-gradient(135deg, #1e3a5f, #2e5a7e)',
+      'gradient5': 'linear-gradient(135deg, #3d1a1a, #6b2d2d)',
+      'solid1': '#1a1a1a',
+      'solid2': '#16213e',
+      'solid3': '#2d132c',
+      'solid4': '#0f3460',
+      'solid5': '#1e3a5f'
+    };
+    var bg = colors[currentWallpaper] || '#222';
+    phone.style.background = bg;
+    if (animatePhone) animatePhone.style.background = bg;
+  }
+
+  function createWallpaperSwatches() {
+    var grid = document.getElementById('wallpaperGrid');
+    grid.innerHTML = '';
+    var options = [
+      { id: 'none', label: 'None', color: '#222' },
+      { id: 'gradient1', label: 'Deep Blue', color: 'linear-gradient(135deg, #1a1a2e, #16213e)' },
+      { id: 'gradient2', label: 'Purple', color: 'linear-gradient(135deg, #0f3460, #533483)' },
+      { id: 'gradient3', label: 'Wine', color: 'linear-gradient(135deg, #2d132c, #801336)' },
+      { id: 'gradient4', label: 'Navy', color: 'linear-gradient(135deg, #1e3a5f, #2e5a7e)' },
+      { id: 'gradient5', label: 'Burgundy', color: 'linear-gradient(135deg, #3d1a1a, #6b2d2d)' },
+      { id: 'solid1', label: 'Dark', color: '#1a1a1a' },
+      { id: 'solid2', label: 'Midnight', color: '#16213e' },
+      { id: 'solid3', label: 'Plum', color: '#2d132c' },
+      { id: 'solid4', label: 'Ocean', color: '#0f3460' },
+      { id: 'solid5', label: 'Steel', color: '#1e3a5f' }
+    ];
+    options.forEach(function(opt) {
+      var swatch = document.createElement('div');
+      swatch.className = 'wp-swatch';
+      swatch.style.background = opt.color;
+      if (opt.id === currentWallpaper) swatch.classList.add('active');
+      swatch.title = opt.label;
+      swatch.addEventListener('click', function() {
+        currentWallpaper = opt.id;
+        document.querySelectorAll('.wp-swatch').forEach(function(s){ s.classList.remove('active'); });
+        swatch.classList.add('active');
+        if (currentMessages.length > 0) {
+          applyWallpaper();
+        }
+      });
+      grid.appendChild(swatch);
+    });
+    document.getElementById('wallpaperOpacity').addEventListener('input', function() {
+      if (currentMessages.length > 0) applyWallpaper();
+    });
+  }
+
+  // ── COMMENTS MODE (Instagram / TikTok comment sections) ──────────
+  var commentThemes = {
+    instagram_comments: {
+      bg: '#000', headerBg: '#000', headerBorder: '#262626', headerText: '#fff',
+      text: '#f5f5f5', username: '#f5f5f5', timeColor: '#8e8e8e',
+      replyColor: '#8e8e8e', likeCountColor: '#8e8e8e', heartColor: '#8e8e8e',
+      inputBg: '#000', inputBorder: '#262626', inputPlaceholder: '#8e8e8e',
+      avatarPalette: ['#f56040', '#833ab4', '#c13584', '#5851db', '#e17055', '#00b0f4'],
+      headerLabel: 'Comments'
+    },
+    tiktok_comments: {
+      bg: '#fff', headerBg: '#fff', headerBorder: '#f1f1f2', headerText: '#161823',
+      text: '#161823', username: '#161823', timeColor: '#8a8b91',
+      replyColor: '#8a8b91', likeCountColor: '#8a8b91', heartColor: '#8a8b91',
+      inputBg: '#fff', inputBorder: '#f1f1f2', inputPlaceholder: '#8a8b91',
+      avatarPalette: ['#fe2c55', '#25f4ee', '#7c3aed', '#f56040', '#0084ff', '#00b0f4'],
+      headerLabel: null
+    }
+  };
+
+  var currentComments = [];
+
+  function randomLikeCount() {
+    var n = Math.floor(Math.random() * 2900) + 40;
+    if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+    return String(n);
+  }
+  function randomTimeAgo() {
+    var opts = ['1d', '2d', '2d', '3d', '4d', '1w'];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  function randomReplyCount() {
+    var r = Math.random();
+    if (r < 0.45) return 0;
+    return Math.floor(Math.random() * 30) + 1;
+  }
+
+  function parseComments(text) {
+    var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+    var out = [];
+    lines.forEach(function(line) {
+      var m = line.match(/^[-*\d.)\s]*([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
+      if (!m) return;
+      out.push({
+        user: m[1].replace(/^@/, ''),
+        text: m[2].trim(),
+        likes: randomLikeCount(),
+        time: randomTimeAgo(),
+        replies: randomReplyCount(),
+        verified: Math.random() < 0.08,
+        edited: Math.random() < 0.06
+      });
+    });
+    return out;
+  }
+
+  function renderComments() {
+    var platKey = document.getElementById('commentsPlatform').value;
+    var theme = commentThemes[platKey] || commentThemes.instagram_comments;
+    var isIG = platKey === 'instagram_comments';
+
+    document.getElementById('commentsFrame').style.background = theme.bg;
+    document.getElementById('cStatusBar').style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bg + ';color:' + theme.headerText + ';';
+
+    var now = new Date();
+    document.getElementById('cTime').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+
+    var header = document.getElementById('cHeader');
+    if (isIG) {
+      header.style.cssText = 'padding:10px 14px 12px;background:' + theme.bg + ';border-bottom:0.5px solid ' + theme.headerBorder + ';';
+      header.innerHTML = '<div style="width:36px;height:4px;background:#333;border-radius:2px;margin:0 auto 12px;"></div>'
+        + '<div style="text-align:center;color:' + theme.headerText + ';font-size:15px;font-weight:600;">Comments</div>';
+    } else {
+      header.style.cssText = 'padding:8px 14px;background:' + theme.bg + ';border-bottom:0.5px solid ' + theme.headerBorder + ';';
+      header.innerHTML = '<div style="color:' + theme.headerText + ';font-size:14px;font-weight:700;">' + currentComments.length + ' comments</div>';
+    }
+
+    var list = document.getElementById('commentsList');
+    list.innerHTML = '';
+    list.style.background = theme.bg;
+    list.style.padding = '10px 14px';
+
+    currentComments.forEach(function(c) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;';
+
+      var avatarColor = theme.avatarPalette[Math.floor(Math.random() * theme.avatarPalette.length)];
+      var avatar = document.createElement('div');
+      avatar.style.cssText = 'flex-shrink:0;width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;';
+      avatar.textContent = c.user.charAt(0).toUpperCase();
+      row.appendChild(avatar);
+
+      var body = document.createElement('div');
+      body.style.cssText = 'flex:1;min-width:0;';
+
+      var topLine = document.createElement('div');
+      topLine.style.cssText = 'font-size:12.5px;color:' + theme.username + ';font-weight:600;margin-bottom:2px;';
+      topLine.innerHTML = c.user + (c.verified ? ' <span style="color:#3897f0;">✔</span>' : '') + '<span style="font-weight:400;color:' + theme.timeColor + ';font-size:11px;"> ' + c.time + (c.edited ? ' • Edited' : '') + '</span>';
+      body.appendChild(topLine);
+
+      var textLine = document.createElement('div');
+      textLine.style.cssText = 'font-size:13px;color:' + theme.text + ';line-height:1.35;margin-bottom:4px;word-break:break-word;';
+      textLine.textContent = c.text;
+      body.appendChild(textLine);
+
+      var actions = document.createElement('div');
+      actions.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';font-weight:600;';
+      actions.textContent = 'Reply';
+      body.appendChild(actions);
+
+      if (c.replies > 0) {
+        var repliesLine = document.createElement('div');
+        repliesLine.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';margin-top:6px;padding-left:2px;';
+        repliesLine.innerHTML = '<span style="display:inline-block;width:18px;border-top:1px solid ' + theme.headerBorder + ';margin-right:6px;vertical-align:middle;"></span>View ' + c.replies + (c.replies === 1 ? ' reply' : ' more replies');
+        body.appendChild(repliesLine);
+      }
+
+      row.appendChild(body);
+
+      var likeCol = document.createElement('div');
+      likeCol.style.cssText = 'flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:2px;';
+      var heart = document.createElement('div');
+      heart.innerHTML = isIG
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>';
+      likeCol.appendChild(heart);
+      var likeCount = document.createElement('div');
+      likeCount.style.cssText = 'font-size:10px;color:' + theme.likeCountColor + ';';
+      likeCount.textContent = c.likes;
+      likeCol.appendChild(likeCount);
+      if (!isIG) {
+        var thumbDown = document.createElement('div');
+        thumbDown.style.marginTop = '6px';
+        thumbDown.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7L2.3 13a2 2 0 0 0 2 2.3H10z"/></svg>';
+        likeCol.appendChild(thumbDown);
+      }
+      row.appendChild(likeCol);
+
+      list.appendChild(row);
+    });
+
+    var inputBar = document.getElementById('cInputBar');
+    inputBar.style.cssText = 'padding:8px 14px;display:flex;align-items:center;gap:8px;background:' + theme.inputBg + ';border-top:0.5px solid ' + theme.inputBorder + ';';
+    inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + (isIG ? '#000' : '#f1f1f2') + ';border:' + (isIG ? '1px solid #333' : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isIG ? 'Add a comment...' : 'Add comment...') + '</div>';
+  }
+
+  function renderPhone() {
+    var styleKey = document.getElementById('msgStyle').value;
+    var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var now = new Date();
+    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('pTime').textContent = timeStr;
+    document.getElementById('pName').textContent = theirName;
+    document.getElementById('pAvatar').textContent = theirName.charAt(0).toUpperCase();
+
+    var sb = document.getElementById('pStatusBar');
+    var ch = document.getElementById('pChatHeader');
+    var ma = document.getElementById('pMessages');
+    var ib = document.getElementById('pInputBar');
+    var fi = document.getElementById('pFakeInput');
+    var av = document.getElementById('pAvatar');
+    var hn = document.getElementById('pName');
+    var sendBtn = document.getElementById('pSendBtn');
+    var sendPath = document.getElementById('pSendPath');
+
+    sb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
+    ch.style.cssText = 'padding:8px 14px 10px;text-align:center;border-bottom:0.5px solid ' + theme.borderHeader + ';background:' + theme.bgHeader + ';';
+    ma.style.background = 'transparent';
+
+    if (theme.floatInput) {
+      ib.style.cssText = 'padding:6px 10px 10px;display:flex;align-items:center;gap:8px;background:' + (theme.floatInputBg || theme.bgInput) + ';';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:9px 16px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+    } else {
+      ib.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
+    }
+
+    fi.textContent = theme.fakePlaceholder;
+
+    if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
+      av.style.background = theme.avatarBg;
+    } else {
+      av.style.background = theme.avatarBg || personData[person].avatarColor;
+    }
+    av.style.color = theme.avatarColor || personData[person].avatarText;
+    hn.style.color = theme.nameColor;
+    sendBtn.style.background = theme.sendBg;
+    sendPath.setAttribute('stroke', theme.sendStroke);
+
+    document.getElementById('phoneFrame').style.background = theme.bgMessages;
+
+    var timestamps = generateTimestamps(currentMessages.length);
+    var replyIndices = pickReplyIndices(currentMessages.length);
+    buildPhoneMessages(ma, theme, currentMessages, timestamps, true, replyIndices);
+    applyWallpaper();
+
+    var bubbles = ma.querySelectorAll('[data-msg-idx]');
+    bubbles.forEach(function(b) {
+      b.addEventListener('click', function() {
+        this.contentEditable = 'true';
+        this.classList.add('bubble-editable');
+        this.focus();
+        document.getElementById('editHint').style.display = 'block';
+      });
+      b.addEventListener('blur', function() {
+        var idx = parseInt(this.dataset.msgIdx);
+        if (!isNaN(idx) && currentMessages[idx]) {
+          currentMessages[idx].t = this.textContent.trim();
+        }
+        this.contentEditable = 'false';
+      });
+    });
+  }
+
+  function renderAnimatePhone() {
+    var styleKey = document.getElementById('msgStyle').value;
+    var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var now = new Date();
+    document.getElementById('aTime').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('aN').textContent = theirName;
+    document.getElementById('aAv').textContent = theirName.charAt(0).toUpperCase();
+
+    var aSb = document.getElementById('aSb');
+    var aCh = document.getElementById('aCh');
+    var aAv = document.getElementById('aAv');
+    var aN = document.getElementById('aN');
+    var aIb = document.getElementById('aIb');
+    var aFi = document.getElementById('aFi');
+    var aSend = document.getElementById('aSend');
+    var aSendPath = document.getElementById('aSendPath');
+
+    aSb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
+    aCh.style.cssText = 'padding:8px 14px 10px;text-align:center;border-bottom:0.5px solid ' + theme.borderHeader + ';background:' + theme.bgHeader + ';';
+    document.getElementById('aMessages').style.background = 'transparent';
+    document.getElementById('animatePhone').style.background = theme.bgMessages;
+    aIb.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
+    aFi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
+    aFi.textContent = theme.fakePlaceholder;
+    if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
+      aAv.style.background = theme.avatarBg;
+    } else {
+      aAv.style.background = theme.avatarBg || personData[person].avatarColor;
+    }
+    aAv.style.color = theme.avatarColor || personData[person].avatarText;
+    aN.style.color = theme.nameColor;
+    aSend.style.background = theme.sendBg;
+    aSendPath.setAttribute('stroke', theme.sendStroke);
+
+    var tb = document.getElementById('aTypingBubble');
+    tb.style.background = theme.typingBg;
+    tb.querySelectorAll('.p-typing-dot').forEach(function(d){ d.style.background = theme.typingDot; });
+
+    document.getElementById('aMessages').innerHTML = '';
+    applyWallpaper();
+  }
+
+  var animTimestamps = [];
+  var animReplyIndices = new Set();
+
+  document.getElementById('animateBtn').addEventListener('click', function() {
+    if (!currentMessages.length) return;
+    animTimestamps = generateTimestamps(currentMessages.length);
+    animReplyIndices = pickReplyIndices(currentMessages.length);
+    renderAnimatePhone();
+    document.getElementById('animateOverlay').style.display = 'flex';
+    document.getElementById('startAnimBtn').textContent = '▶ Play';
+    isAnimating = false;
+  });
+
+  document.getElementById('closeAnimBtn').addEventListener('click', function() {
+    isAnimating = false;
+    document.getElementById('animateOverlay').style.display = 'none';
+  });
+
+  document.getElementById('startAnimBtn').addEventListener('click', async function() {
+    if (isAnimating) return;
+    isAnimating = true;
+    var btn = document.getElementById('startAnimBtn');
+    btn.textContent = '⏳ Playing...';
+    btn.disabled = true;
+
+    var styleKey = document.getElementById('msgStyle').value;
+    var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
+    var ma = document.getElementById('aMessages');
+    var typing = document.getElementById('aTyping');
+
+    ma.innerHTML = '';
+    var dateLabel = document.createElement('div');
+    dateLabel.className = 'p-time';
+    dateLabel.style.color = theme.timeColor;
+    var now = new Date();
+    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    ma.appendChild(dateLabel);
+
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+
+    function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+    for (var i = 0; i < currentMessages.length; i++) {
+      if (!isAnimating) break;
+      var msg = currentMessages[i];
+      var isMe = msg.f === 'me';
+
+      if (!isMe) {
+        typing.style.display = 'flex';
+        var typingBubble = document.getElementById('aTypingBubble');
+        typingBubble.style.background = theme.typingBg;
+        ma.parentElement.scrollTop = ma.parentElement.scrollHeight;
+        var typingDelay = 800 + Math.random() * 700;
+        await sleep(typingDelay);
+        if (!isAnimating) { typing.style.display = 'none'; break; }
+        typing.style.display = 'none';
+      } else {
+        await sleep(300 + Math.random() * 400);
+        if (!isAnimating) break;
+      }
+
+      var bTheme = isMe ? theme.bubbleMe : theme.bubbleThem;
+      var ts = animTimestamps[i];
+      var row = document.createElement('div');
+      row.className = 'p-bubble-row ' + (isMe ? 'me' : 'them');
+      row.style.opacity = '0';
+      row.style.transform = isMe ? 'translateX(20px)' : 'translateX(-20px)';
+      row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+      if (theme.isDiscord) {
+        var dm = document.createElement('div');
+        dm.style.cssText = 'display:flex;flex-direction:column;padding:2px 8px;';
+        dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
+        row.appendChild(dm);
+      } else {
+        if (animReplyIndices.has(i) && i > 0) {
+          var prevMsg = currentMessages[i-1];
+          var quote = document.createElement('div');
+          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:rgba(128,128,128,0.1);color:' + bTheme.color + ';';
+          quote.textContent = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40)+'...' : prevMsg.t;
+          row.appendChild(quote);
+        }
+        var bubble = document.createElement('div');
+        bubble.style.cssText = 'max-width:75%;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        bubble.textContent = msg.t;
+        var timeSpan = document.createElement('div');
+        timeSpan.className = 'p-bubble-time';
+        timeSpan.style.color = theme.timeBubble;
+        timeSpan.textContent = ts;
+        row.appendChild(bubble);
+        row.appendChild(timeSpan);
+        if (isMe && i === currentMessages.length - 1 && theme.readReceipt) {
+          var rr = document.createElement('div');
+          rr.className = 'p-read-receipt';
+          rr.style.color = theme.readColor;
+          rr.textContent = theme.readReceipt;
+          row.appendChild(rr);
+        }
+      }
+
+      ma.appendChild(row);
+      ma.parentElement.scrollTop = ma.parentElement.scrollHeight;
+
+      requestAnimationFrame(function(r){ return function() {
+        r.style.opacity = '1'; r.style.transform = 'translateX(0)';
+      }; }(row));
+
+      await sleep(isMe ? 400 : 200);
+    }
+
+    isAnimating = false;
+    btn.textContent = '▶ Play Again';
+    btn.disabled = false;
+  });
+
+  document.getElementById('recordBtn').addEventListener('click', async function() {
+    var hint = document.getElementById('animHint');
+    if (!window.MediaRecorder) { hint.textContent = 'Screen recording not supported in this browser. Use iPhone screen record or a screen capture app instead.'; return; }
+    hint.textContent = 'Recording... Press Stop when done.';
+    var phone = document.getElementById('animatePhone');
+    var stream;
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: false });
+    } catch(e) { hint.textContent = 'Screen capture cancelled.'; return; }
+    var recorder = new MediaRecorder(stream);
+    var chunks = [];
+    recorder.ondataavailable = function(e){ if(e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = function() {
+      var blob = new Blob(chunks, { type:'video/webm' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'people-texts-animation.webm';
+      a.click();
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      hint.textContent = 'Video saved! Press Play to watch again.';
+    };
+    recorder.start();
+    var btn = document.getElementById('recordBtn');
+    btn.textContent = '⏹ Stop Recording';
+    btn.onclick = function() { recorder.stop(); btn.textContent = '⏺ Record Video'; btn.onclick = null; };
+  });
+
+  document.getElementById('saveConvoBtn').addEventListener('click', function() {
+    if (!currentMessages.length) return;
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var preview = currentMessages[0].t.substring(0, 50) + (currentMessages[0].t.length > 50 ? '...' : '');
+    var item = { messages: JSON.parse(JSON.stringify(currentMessages)), label: theirName + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
+    savedConversations.unshift(item);
+    if (savedConversations.length > 5) savedConversations = savedConversations.slice(0, 5);
+    renderSavedList();
+    var badge = document.getElementById('shortenBadge');
+    badge.textContent = '✓ Conversation saved!';
+    badge.style.display = 'block';
+    setTimeout(function(){ badge.style.display = 'none'; badge.textContent = '✓ Shortened for song lyrics'; }, 2000);
+  });
+
+  function renderSavedList() {
+    var card = document.getElementById('savedConvosCard');
+    var list = document.getElementById('savedList');
+    list.innerHTML = '';
+    if (savedConversations.length === 0) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    savedConversations.forEach(function(item, idx) {
+      var el = document.createElement('div');
+      el.className = 'saved-item';
+      el.innerHTML = '<span class="saved-item-preview">' + item.preview + '</span><span class="saved-item-label">' + item.label + '</span><span class="saved-del" data-idx="' + idx + '">✕</span>';
+      el.querySelector('.saved-item-preview').addEventListener('click', function() {
+        currentMessages = JSON.parse(JSON.stringify(item.messages));
+        renderPhone(); renderAnimatePhone();
+        document.getElementById('previewSection').style.display = 'block';
+        window.scrollTo({top:0,behavior:'smooth'});
+      });
+      el.querySelector('.saved-del').addEventListener('click', function(e) {
+        e.stopPropagation();
+        savedConversations.splice(parseInt(this.dataset.idx), 1);
+        renderSavedList();
+      });
+      list.appendChild(el);
+    });
+  }
+
+  document.getElementById('vibe').addEventListener('change', updateModelOptions);
+  document.getElementById('providerSelect').addEventListener('change', updateModelOptions);
+  updateModelOptions();
+
+  document.getElementById('generateBtn').addEventListener('click', doGenerate);
+  document.getElementById('regenBtn').addEventListener('click', doGenerate);
+  document.getElementById('msgStyle').addEventListener('change', function() {
+    if (currentMessages.length > 0) { renderPhone(); renderAnimatePhone(); }
+  });
+
+  document.getElementById('commentsPlatform').addEventListener('change', function() {
+    if (currentComments.length > 0) { renderComments(); }
+  });
+
+  document.getElementById('contentType').addEventListener('change', function() {
+    var isComments = this.value === 'comments';
+    document.getElementById('messagePlatformSection').style.display = isComments ? 'none' : 'block';
+    document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
+    document.getElementById('personFieldWrap').style.display = isComments ? 'none' : 'block';
+    document.getElementById('topicLabel').textContent = isComments ? 'What are you being roasted for? (optional)' : 'Topic / Context (optional)';
+    document.getElementById('topic').placeholder = isComments ? 'e.g. my big lips, my laugh, my accent...' : 'e.g. forgot my birthday, saw me at the club...';
+    document.getElementById('phoneFrame').style.display = isComments ? 'none' : 'block';
+    document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
+    document.getElementById('shortenBtn').style.display = isComments ? 'none' : '';
+    document.getElementById('animateBtn').style.display = isComments ? 'none' : '';
+    document.getElementById('previewSection').style.display = 'none';
+  });
+
+  document.getElementById('shortenBtn').addEventListener('click', async function() {
+    var key = getKey();
+    if (!currentMessages.length) { showError('Generate a conversation first.'); return; }
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var originalText = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    document.getElementById('shortenLoadingDiv').style.display = 'block';
+    document.getElementById('shortenBtn').disabled = true;
+    document.getElementById('compareWrap').classList.remove('visible');
+    hideError();
+
+    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- No merging messages. No adding or removing messages.\n- No emojis.\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
+    try {
+      var shortenModel = getModel();
+      var shortenProvider = document.getElementById('providerSelect').value;
+      var shortenVibe = document.getElementById('vibe').value;
+      var shortenUseGrok = shortenProvider === 'xai' || (shortenProvider === 'auto' && (shortenVibe === 'unhinged' || shortenVibe === 'unhingedmax'));
+      var rawShortenText;
+
+      if (shortenUseGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: shortenModel, messages: [{ role: 'user', content: sp }], max_tokens: 800, temperature: 0.7 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawShortenText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        if (!key) { showError('Please save your API key first.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body: JSON.stringify({ model:shortenModel, max_tokens:800, messages:[{role:'user',content:sp}] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error?e.error.message:'API error'); }
+        var data = await resp.json();
+        rawShortenText = data.content[0].text.trim();
+      }
+
+      var parsed = parseConversation(rawShortenText, myName, theirName);
+      if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
+
+      originalMessages = JSON.parse(JSON.stringify(currentMessages));
+      var shortenedMessages = parsed;
+
+      function buildCompareCol(elId, msgs) {
+        var el = document.getElementById(elId); el.innerHTML = '';
+        msgs.forEach(function(m) {
+          var d = document.createElement('div');
+          d.className = 'compare-msg ' + m.f;
+          d.textContent = (m.f==='them'?theirName:myName) + ': ' + m.t;
+          el.appendChild(d);
+        });
+      }
+      buildCompareCol('compareOriginal', originalMessages);
+      buildCompareCol('compareShortened', shortenedMessages);
+      document.getElementById('compareWrap').classList.add('visible');
+
+      document.getElementById('pickOriginal').onclick = function() {
+        currentMessages = JSON.parse(JSON.stringify(originalMessages));
+        renderPhone(); renderAnimatePhone();
+        document.getElementById('compareWrap').classList.remove('visible');
+        document.getElementById('shortenBadge').textContent = '✓ Using original version';
+        document.getElementById('shortenBadge').style.display = 'block';
+      };
+      document.getElementById('pickShortened').onclick = function() {
+        currentMessages = JSON.parse(JSON.stringify(shortenedMessages));
+        renderPhone(); renderAnimatePhone();
+        document.getElementById('compareWrap').classList.remove('visible');
+        document.getElementById('shortenBadge').textContent = '✓ Using shortened version';
+        document.getElementById('shortenBadge').style.display = 'block';
+      };
+
+      document.getElementById('gemTextBox').style.display = 'none';
+      document.getElementById('copiedToast').style.display = 'none';
+      document.getElementById('shortenBadge').textContent = '👆 Pick a version above';
+      document.getElementById('shortenBadge').style.display = 'block';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally { document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; }
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function() {
+    var isComments = document.getElementById('contentType').value === 'comments';
+    var frame = document.getElementById(isComments ? 'commentsFrame' : 'phoneFrame');
+    var btn = document.getElementById('downloadBtn');
+    btn.textContent = 'Generating...';
+    btn.disabled = true;
+    html2canvas(frame, { scale:3, useCORS:true, allowTaint:true, backgroundColor:'#222', logging:false }).then(function(canvas) {
+      var dataUrl = canvas.toDataURL('image/png');
+      try {
+        var a = document.createElement('a');
+        a.download = isComments ? 'roast-comments.png' : 'people-conversation.png';
+        a.href = dataUrl;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch(e) {}
+      setTimeout(function() {
+        var win = window.open();
+        if (win) {
+          win.document.write('<img src="' + dataUrl + '" style="max-width:100%;display:block;margin:auto;" /><br><p style="text-align:center;font-family:sans-serif;color:#666;">Right-click the image and select Save Image As to save it</p>');
+          win.document.title = 'People Texts Screenshot';
+        }
+      }, 300);
+      btn.textContent = 'Download PNG 📸';
+      btn.disabled = false;
+    }).catch(function(err) {
+      btn.textContent = 'Download PNG 📸';
+      btn.disabled = false;
+      alert('Screenshot failed. Try the Animate overlay and use screen record instead.');
+    });
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function() {
+    var isComments = document.getElementById('contentType').value === 'comments';
+    var text;
+    if (isComments) {
+      text = currentComments.map(function(c){ return c.user + ': ' + c.text; }).join('\n');
+    } else {
+      var person = document.getElementById('person').value;
+      var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+      var myName = document.getElementById('myName').value.trim() || 'Me';
+      text = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    }
+    var box = document.getElementById('gemTextBox'); box.textContent = text; box.style.display = 'block';
+    navigator.clipboard.writeText(text).then(function() {
+      var t = document.getElementById('copiedToast'); t.style.display = 'block';
+      setTimeout(function(){ t.style.display='none'; }, 2500);
+    });
+  });
+
+  createWallpaperSwatches();
+  updateKeyStatus();
+  document.getElementById('theirName').placeholder = 'e.g. Mum';
+})();
+</script>
+</body>
+</html>
