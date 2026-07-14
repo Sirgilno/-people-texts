@@ -155,6 +155,13 @@
     </div>
   </div>
   <div style="margin-bottom:12px;">
+    <label>Content Type</label>
+    <select id="contentType">
+      <option value="messages">Messages / DM Thread</option>
+      <option value="comments">Comments (Roast Me 🔥)</option>
+    </select>
+  </div>
+  <div id="messagePlatformSection" style="margin-bottom:12px;">
     <label>Message Platform</label>
     <select id="msgStyle">
       <option value="whatsapp">WhatsApp</option>
@@ -171,8 +178,15 @@
       <option value="android">Android / Google Messages</option>
     </select>
   </div>
+  <div id="commentsPlatformSection" style="margin-bottom:12px;display:none;">
+    <label>Comments Platform</label>
+    <select id="commentsPlatform">
+      <option value="instagram_comments">Instagram Comments</option>
+      <option value="tiktok_comments">TikTok Comments</option>
+    </select>
+  </div>
   <div class="row">
-    <div>
+    <div id="personFieldWrap">
       <label>Who is texting you?</label>
       <select id="person">
         <option value="mom">Mom</option>
@@ -205,7 +219,7 @@
     </div>
   </div>
   <div style="margin-bottom:16px;">
-    <label>Topic / Context (optional)</label>
+    <label id="topicLabel">Topic / Context (optional)</label>
     <input type="text" id="topic" placeholder="e.g. forgot my birthday, saw me at the club..." />
   </div>
 
@@ -288,6 +302,20 @@
           <svg width="12" height="12" viewBox="0 0 12 12"><path id="pSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
       </div>
+    </div>
+
+    <div class="phone" id="commentsFrame" style="display:none;overflow:hidden;">
+      <div class="p-status-bar" id="cStatusBar">
+        <span id="cTime">9:41</span>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="2" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="4" y="1.5" width="2.5" height="9.5" rx="1" fill="currentColor"/><rect x="8" y="0" width="2.5" height="11" rx="1" fill="currentColor"/><rect x="12" y="0" width="2.5" height="11" rx="1" fill="currentColor" opacity="0.3"/></svg>
+          <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 1.5C9.2 1.5 11.2 2.4 12.6 3.9L13.7 2.7C12 0.9 9.6-0.2 7-0.2S2 0.9 0.3 2.7L1.4 3.9C2.8 2.4 4.8 1.5 7 1.5z" fill="currentColor"/><path d="M7 4.5C8.5 4.5 9.8 5.1 10.7 6.1L11.8 4.9C10.6 3.7 8.9 2.9 7 2.9S3.4 3.7 2.2 4.9L3.3 6.1C4.2 5.1 5.5 4.5 7 4.5z" fill="currentColor"/><circle cx="7" cy="9.5" r="1.5" fill="currentColor"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="19" y="3.5" width="2" height="4" rx="1" fill="currentColor"/><rect x="1.5" y="2.5" width="12" height="6" rx="1" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div id="cHeader"></div>
+      <div id="commentsList" style="flex:1;overflow-y:auto;"></div>
+      <div id="cInputBar"></div>
     </div>
   </div>
 
@@ -759,6 +787,8 @@
 
   async function doGenerate() {
     hideError();
+    var contentType = document.getElementById('contentType').value;
+    if (contentType === 'comments') { return doGenerateComments(); }
     var myName = document.getElementById('myName').value.trim() || 'Me';
     var theirName = document.getElementById('theirName').value.trim();
     var person = document.getElementById('person').value;
@@ -838,6 +868,58 @@
       document.getElementById('gemTextBox').style.display = 'none';
       document.getElementById('copiedToast').style.display = 'none';
       document.getElementById('shortenBadge').style.display = 'none';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally { showLoading(false); }
+  }
+
+  async function doGenerateComments() {
+    var platKey = document.getElementById('commentsPlatform').value;
+    var isIG = platKey === 'instagram_comments';
+    var vibe = document.getElementById('vibe').value;
+    var topic = document.getElementById('topic').value.trim();
+    var mood = parseInt(document.getElementById('moodSlider').value);
+    var moodDesc = moodDescriptions[mood];
+    var count = currentMode === 'short' ? '5' : currentMode === 'song' ? '8' : '9';
+
+    showLoading(true);
+
+    var prompt = 'You are writing a realistic ' + (isIG ? 'Instagram' : 'TikTok') + ' comment section for a video where the CREATOR (the person who posted the video) is being ROASTED by random commenters. This is for a "reading my own roast comments" reaction video format.\n\n'
+      + (topic ? 'WHAT THE CREATOR IS BEING ROASTED FOR: ' + topic + '\n\n' : 'WHAT THE CREATOR IS BEING ROASTED FOR: come up with something funny and universally relatable — a physical feature, a habit, a personality quirk, or something odd they did on camera.\n\n')
+      + 'TONE / INTENSITY: ' + vibeDescriptions[vibe] + '\n\n'
+      + moodDesc + '\n\n'
+      + 'Generate exactly ' + count + ' distinct fake ' + (isIG ? 'Instagram' : 'TikTok') + ' usernames each with ONE roast comment. Each comment must be:\n'
+      + '- Genuinely funny, creative, and highly specific — never generic insults like "ugly" or "weird".\n'
+      + '- Written the way real ' + (isIG ? 'Instagram' : 'TikTok') + ' commenters actually type — lowercase is common, some slang, some deadpan delivery, some hyperbolic exaggeration.\n'
+      + '- Varied in style — some one-liners, some longer setup-punchline comments, some using absurd comparisons.\n'
+      + '- Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful roast-comedy, not actual bullying.\n'
+      + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid).\n\n'
+      + 'FORMAT: username: comment text\nOne per line. No numbering. No extra commentary before or after. No emojis.';
+
+    try {
+      var grokKey = getGrokKey();
+      if (!grokKey) { showError('Comments mode always uses Grok. Add your xAI Grok key in the API Key section above.'); showLoading(false); return; }
+      var model = document.getElementById('modelSelect').value;
+      var grokModel = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
+      var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+        body: JSON.stringify({
+          model: grokModel,
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 1500,
+          temperature: 0.95
+        })
+      });
+      if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+      var data = await resp.json();
+      var rawText = data.choices?.[0]?.message?.content?.trim();
+      var parsed = parseComments(rawText);
+      if (parsed.length === 0) throw new Error('Could not parse comments. Try again.');
+      currentComments = parsed;
+      renderComments();
+      document.getElementById('previewSection').style.display = 'block';
+      document.getElementById('gemTextBox').style.display = 'none';
+      document.getElementById('copiedToast').style.display = 'none';
     } catch(err) { showError('Error: ' + err.message); }
     finally { showLoading(false); }
   }
@@ -1204,6 +1286,152 @@
     });
   }
 
+  // ── COMMENTS MODE (Instagram / TikTok comment sections) ──────────
+  var commentThemes = {
+    instagram_comments: {
+      bg: '#000', headerBg: '#000', headerBorder: '#262626', headerText: '#fff',
+      text: '#f5f5f5', username: '#f5f5f5', timeColor: '#8e8e8e',
+      replyColor: '#8e8e8e', likeCountColor: '#8e8e8e', heartColor: '#8e8e8e',
+      inputBg: '#000', inputBorder: '#262626', inputPlaceholder: '#8e8e8e',
+      avatarPalette: ['#f56040', '#833ab4', '#c13584', '#5851db', '#e17055', '#00b0f4'],
+      headerLabel: 'Comments'
+    },
+    tiktok_comments: {
+      bg: '#fff', headerBg: '#fff', headerBorder: '#f1f1f2', headerText: '#161823',
+      text: '#161823', username: '#161823', timeColor: '#8a8b91',
+      replyColor: '#8a8b91', likeCountColor: '#8a8b91', heartColor: '#8a8b91',
+      inputBg: '#fff', inputBorder: '#f1f1f2', inputPlaceholder: '#8a8b91',
+      avatarPalette: ['#fe2c55', '#25f4ee', '#7c3aed', '#f56040', '#0084ff', '#00b0f4'],
+      headerLabel: null
+    }
+  };
+
+  var currentComments = [];
+
+  function randomLikeCount() {
+    var n = Math.floor(Math.random() * 2900) + 40;
+    if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+    return String(n);
+  }
+  function randomTimeAgo() {
+    var opts = ['1d', '2d', '2d', '3d', '4d', '1w'];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  function randomReplyCount() {
+    var r = Math.random();
+    if (r < 0.45) return 0;
+    return Math.floor(Math.random() * 30) + 1;
+  }
+
+  function parseComments(text) {
+    var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+    var out = [];
+    lines.forEach(function(line) {
+      var m = line.match(/^[-*\d.)\s]*([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
+      if (!m) return;
+      out.push({
+        user: m[1].replace(/^@/, ''),
+        text: m[2].trim(),
+        likes: randomLikeCount(),
+        time: randomTimeAgo(),
+        replies: randomReplyCount(),
+        verified: Math.random() < 0.08,
+        edited: Math.random() < 0.06
+      });
+    });
+    return out;
+  }
+
+  function renderComments() {
+    var platKey = document.getElementById('commentsPlatform').value;
+    var theme = commentThemes[platKey] || commentThemes.instagram_comments;
+    var isIG = platKey === 'instagram_comments';
+
+    document.getElementById('commentsFrame').style.background = theme.bg;
+    document.getElementById('cStatusBar').style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bg + ';color:' + theme.headerText + ';';
+
+    var now = new Date();
+    document.getElementById('cTime').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+
+    var header = document.getElementById('cHeader');
+    if (isIG) {
+      header.style.cssText = 'padding:10px 14px 12px;background:' + theme.bg + ';border-bottom:0.5px solid ' + theme.headerBorder + ';';
+      header.innerHTML = '<div style="width:36px;height:4px;background:#333;border-radius:2px;margin:0 auto 12px;"></div>'
+        + '<div style="text-align:center;color:' + theme.headerText + ';font-size:15px;font-weight:600;">Comments</div>';
+    } else {
+      header.style.cssText = 'padding:8px 14px;background:' + theme.bg + ';border-bottom:0.5px solid ' + theme.headerBorder + ';';
+      header.innerHTML = '<div style="color:' + theme.headerText + ';font-size:14px;font-weight:700;">' + currentComments.length + ' comments</div>';
+    }
+
+    var list = document.getElementById('commentsList');
+    list.innerHTML = '';
+    list.style.background = theme.bg;
+    list.style.padding = '10px 14px';
+
+    currentComments.forEach(function(c) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;';
+
+      var avatarColor = theme.avatarPalette[Math.floor(Math.random() * theme.avatarPalette.length)];
+      var avatar = document.createElement('div');
+      avatar.style.cssText = 'flex-shrink:0;width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;';
+      avatar.textContent = c.user.charAt(0).toUpperCase();
+      row.appendChild(avatar);
+
+      var body = document.createElement('div');
+      body.style.cssText = 'flex:1;min-width:0;';
+
+      var topLine = document.createElement('div');
+      topLine.style.cssText = 'font-size:12.5px;color:' + theme.username + ';font-weight:600;margin-bottom:2px;';
+      topLine.innerHTML = c.user + (c.verified ? ' <span style="color:#3897f0;">✔</span>' : '') + '<span style="font-weight:400;color:' + theme.timeColor + ';font-size:11px;"> ' + c.time + (c.edited ? ' • Edited' : '') + '</span>';
+      body.appendChild(topLine);
+
+      var textLine = document.createElement('div');
+      textLine.style.cssText = 'font-size:13px;color:' + theme.text + ';line-height:1.35;margin-bottom:4px;word-break:break-word;';
+      textLine.textContent = c.text;
+      body.appendChild(textLine);
+
+      var actions = document.createElement('div');
+      actions.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';font-weight:600;';
+      actions.textContent = 'Reply';
+      body.appendChild(actions);
+
+      if (c.replies > 0) {
+        var repliesLine = document.createElement('div');
+        repliesLine.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';margin-top:6px;padding-left:2px;';
+        repliesLine.innerHTML = '<span style="display:inline-block;width:18px;border-top:1px solid ' + theme.headerBorder + ';margin-right:6px;vertical-align:middle;"></span>View ' + c.replies + (c.replies === 1 ? ' reply' : ' more replies');
+        body.appendChild(repliesLine);
+      }
+
+      row.appendChild(body);
+
+      var likeCol = document.createElement('div');
+      likeCol.style.cssText = 'flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:2px;';
+      var heart = document.createElement('div');
+      heart.innerHTML = isIG
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>';
+      likeCol.appendChild(heart);
+      var likeCount = document.createElement('div');
+      likeCount.style.cssText = 'font-size:10px;color:' + theme.likeCountColor + ';';
+      likeCount.textContent = c.likes;
+      likeCol.appendChild(likeCount);
+      if (!isIG) {
+        var thumbDown = document.createElement('div');
+        thumbDown.style.marginTop = '6px';
+        thumbDown.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7L2.3 13a2 2 0 0 0 2 2.3H10z"/></svg>';
+        likeCol.appendChild(thumbDown);
+      }
+      row.appendChild(likeCol);
+
+      list.appendChild(row);
+    });
+
+    var inputBar = document.getElementById('cInputBar');
+    inputBar.style.cssText = 'padding:8px 14px;display:flex;align-items:center;gap:8px;background:' + theme.inputBg + ';border-top:0.5px solid ' + theme.inputBorder + ';';
+    inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + (isIG ? '#000' : '#f1f1f2') + ';border:' + (isIG ? '1px solid #333' : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isIG ? 'Add a comment...' : 'Add comment...') + '</div>';
+  }
+
   function renderPhone() {
     var styleKey = document.getElementById('msgStyle').value;
     var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
@@ -1512,6 +1740,24 @@
     if (currentMessages.length > 0) { renderPhone(); renderAnimatePhone(); }
   });
 
+  document.getElementById('commentsPlatform').addEventListener('change', function() {
+    if (currentComments.length > 0) { renderComments(); }
+  });
+
+  document.getElementById('contentType').addEventListener('change', function() {
+    var isComments = this.value === 'comments';
+    document.getElementById('messagePlatformSection').style.display = isComments ? 'none' : 'block';
+    document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
+    document.getElementById('personFieldWrap').style.display = isComments ? 'none' : 'block';
+    document.getElementById('topicLabel').textContent = isComments ? 'What are you being roasted for? (optional)' : 'Topic / Context (optional)';
+    document.getElementById('topic').placeholder = isComments ? 'e.g. my big lips, my laugh, my accent...' : 'e.g. forgot my birthday, saw me at the club...';
+    document.getElementById('phoneFrame').style.display = isComments ? 'none' : 'block';
+    document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
+    document.getElementById('shortenBtn').style.display = isComments ? 'none' : '';
+    document.getElementById('animateBtn').style.display = isComments ? 'none' : '';
+    document.getElementById('previewSection').style.display = 'none';
+  });
+
   document.getElementById('shortenBtn').addEventListener('click', async function() {
     var key = getKey();
     if (!currentMessages.length) { showError('Generate a conversation first.'); return; }
@@ -1598,7 +1844,8 @@
   });
 
   document.getElementById('downloadBtn').addEventListener('click', function() {
-    var frame = document.getElementById('phoneFrame');
+    var isComments = document.getElementById('contentType').value === 'comments';
+    var frame = document.getElementById(isComments ? 'commentsFrame' : 'phoneFrame');
     var btn = document.getElementById('downloadBtn');
     btn.textContent = 'Generating...';
     btn.disabled = true;
@@ -1606,7 +1853,7 @@
       var dataUrl = canvas.toDataURL('image/png');
       try {
         var a = document.createElement('a');
-        a.download = 'people-conversation.png';
+        a.download = isComments ? 'roast-comments.png' : 'people-conversation.png';
         a.href = dataUrl;
         document.body.appendChild(a);
         a.click();
@@ -1629,10 +1876,16 @@
   });
 
   document.getElementById('copyBtn').addEventListener('click', function() {
-    var person = document.getElementById('person').value;
-    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
-    var myName = document.getElementById('myName').value.trim() || 'Me';
-    var text = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    var isComments = document.getElementById('contentType').value === 'comments';
+    var text;
+    if (isComments) {
+      text = currentComments.map(function(c){ return c.user + ': ' + c.text; }).join('\n');
+    } else {
+      var person = document.getElementById('person').value;
+      var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+      var myName = document.getElementById('myName').value.trim() || 'Me';
+      text = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    }
     var box = document.getElementById('gemTextBox'); box.textContent = text; box.style.display = 'block';
     navigator.clipboard.writeText(text).then(function() {
       var t = document.getElementById('copiedToast'); t.style.display = 'block';
