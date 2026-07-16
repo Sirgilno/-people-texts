@@ -185,6 +185,14 @@
       <option value="tiktok_comments">TikTok Comments</option>
     </select>
   </div>
+  <div id="avatarStyleSection" style="margin-bottom:12px;display:none;">
+    <label>Avatar Style</label>
+    <select id="avatarStyle">
+      <option value="mixed" selected>Mixed (a few real, some cartoon, some blank)</option>
+      <option value="procedural">All Generated Avatars (cartoon)</option>
+      <option value="realistic">All Realistic Photos</option>
+    </select>
+  </div>
   <div class="row">
     <div id="personFieldWrap">
       <label>Who is texting you?</label>
@@ -267,13 +275,23 @@
     <input type="range" id="wallpaperOpacity" min="0" max="100" value="40" style="width:100%;accent-color:#7c3aed;" />
   </div>
 
-  <div class="section-title">Mode</div>
-  <div class="mode-tabs">
-    <div class="mode-tab active" id="tab-short" onclick="setMode('short')">Short Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">exactly 6 messages</span></div>
-    <div class="mode-tab" id="tab-full" onclick="setMode('full')">Mid Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">7–10 messages</span></div>
-    <div class="mode-tab" id="tab-song" onclick="setMode('song')">Song Mode<br><span style="font-size:11px;font-weight:400;opacity:0.6;">8–15 words, 6–10 lines</span></div>
+  <div id="modeSection">
+    <div class="section-title">Mode</div>
+    <div class="mode-tabs">
+      <div class="mode-tab active" id="tab-short" onclick="setMode('short')">Short Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">exactly 6 messages</span></div>
+      <div class="mode-tab" id="tab-full" onclick="setMode('full')">Mid Thread<br><span style="font-size:11px;font-weight:400;opacity:0.6;">7–10 messages</span></div>
+      <div class="mode-tab" id="tab-song" onclick="setMode('song')">Song Mode<br><span style="font-size:11px;font-weight:400;opacity:0.6;">8–15 words, 6–10 lines</span></div>
+    </div>
+    <p class="mode-desc" id="modeDesc">Short mode: exactly 6 messages — clean screenshot, fits perfectly on screen</p>
   </div>
-  <p class="mode-desc" id="modeDesc">Short mode: exactly 6 messages — clean screenshot, fits perfectly on screen</p>
+  <div id="commentCountSection" style="display:none;margin-bottom:12px;">
+    <label>Number of Comments</label>
+    <select id="commentCount">
+      <option value="10">10 comments</option>
+      <option value="12" selected>12 comments</option>
+      <option value="15">15 comments</option>
+    </select>
+  </div>
   <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
   <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
   <div class="error-box" id="errorBox"></div>
@@ -329,7 +347,7 @@
   <div class="action-btns">
     <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
   </div>
-  <p class="edit-hint" id="editHint">✏️ Tap any message bubble to edit it directly</p>
+  <p class="edit-hint" id="editHint">✏️ Tap any message or comment to edit it directly</p>
   <div class="action-btns">
     <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
   </div>
@@ -876,43 +894,69 @@
     var platKey = document.getElementById('commentsPlatform').value;
     var isIG = platKey === 'instagram_comments';
     var vibe = document.getElementById('vibe').value;
-    var topic = document.getElementById('topic').value.trim();
+    var hook = document.getElementById('topic').value.trim();
     var mood = parseInt(document.getElementById('moodSlider').value);
     var moodDesc = moodDescriptions[mood];
-    var count = currentMode === 'short' ? '5' : currentMode === 'song' ? '8' : '9';
+    var count = document.getElementById('commentCount').value;
+
+    if (!hook) { showError('Paste the hook / on-screen caption from your video first.'); return; }
 
     showLoading(true);
 
-    var prompt = 'You are writing a realistic ' + (isIG ? 'Instagram' : 'TikTok') + ' comment section for a video where the CREATOR (the person who posted the video) is being ROASTED by random commenters. This is for a "reading my own roast comments" reaction video format.\n\n'
-      + (topic ? 'WHAT THE CREATOR IS BEING ROASTED FOR: ' + topic + '\n\n' : 'WHAT THE CREATOR IS BEING ROASTED FOR: come up with something funny and universally relatable — a physical feature, a habit, a personality quirk, or something odd they did on camera.\n\n')
+    var vocabBank = 'REAL COMMENT-CULTURE REFERENCE — study these real patterns and write NEW comments in these styles, mixing several across the batch (do not copy these verbatim):\n\n'
+      + '1. DELAYED-REALIZATION BACKHANDED COMPLIMENT — sounds sincere and warm at first, the insult only lands a few seconds later on second read. Formal/polite vocabulary, often quoted like something said to your face. Examples of the PATTERN (write new ones, never reuse): "I like how you don\'t let common sense and logic get in the way of your thoughts" / "You\'re the first person I\'ve met who has used their full potential" / "It\'s truly remarkable that you were the strongest swimmer your father had" / "You brighten every room you walk out of" / "You have a unique way of making everyone in the room feel smarter".\n\n'
+      + '2. BLUNT ONE-LINER REACTION — very short, deadpan, sometimes just a quoted callback to the video plus a laughing emoji. e.g. "\'I ran away\' too blunt 😂" / "I ran away man😂😂😂".\n\n'
+      + '3. "NOBODY ASKED BUT" — a random tangential fact or correction nobody requested, deadpan delivery. e.g. "Nobody asked but the name of the movie is: Congo."\n\n'
+      + '4. PURE REACTION / LOW EFFORT — just emojis or a couple words, no real sentence. e.g. "😂😂😂😂" or "Cool 😎🆒 thanks".\n\n'
+      + '5. TAG-A-FRIEND — calls out a specific friend to come see the post, often with a skull or crying-laughing emoji. e.g. "@sarah.moss come look at this 💀" — include 1-2 of these in the batch, inventing a believable @handle each time.\n\n'
+      + '6. FOREIGN LANGUAGE AGREEMENT — occasionally one commenter replies in a different language agreeing or reacting (keep it short, one line, no translation needed from you).\n\n'
+      + '7. HYPE / OVER-THE-TOP COMPLIMENT — when the hook explicitly asks for hype (not roast), commenters go maximally over the top, treating something mundane like it is the most impressive thing ever, often gassing it up sarcastically-but-genuinely. e.g. someone hyping a wooden fence like a bodybuilder\'s physique.\n\n'
+      + '8. CREATIVE COMPARISON — when the hook asks for a comparison/description bait ("describe X as a Y"), commenters get genuinely witty and specific with the comparison, not generic.\n\n'
+      + 'Read the HOOK below and decide which of these patterns (and mix of patterns) naturally fits what the hook is asking for. A roast-me hook pulls from patterns 1, 2, 3. A hype-me hook pulls from pattern 7. A confession/advice-bait hook pulls from real specific short answers. A comparison hook pulls from pattern 8. Always mix in at least one pattern 4 (low effort) and one pattern 5 (tag a friend) somewhere in the batch for realism, regardless of hook type.\n\n';
+
+    var prompt = 'You are writing a realistic ' + (isIG ? 'Instagram' : 'TikTok') + ' comment section under a video. This is for a "reading my own comments" reaction video format where the creator screenshots and reacts to real comment sections.\n\n'
+      + 'THE HOOK / ON-SCREEN CAPTION OF THE VIDEO (this is what commenters are reacting to): "' + hook + '"\n\n'
+      + vocabBank
       + 'TONE / INTENSITY: ' + vibeDescriptions[vibe] + '\n\n'
       + moodDesc + '\n\n'
-      + 'Generate exactly ' + count + ' distinct fake ' + (isIG ? 'Instagram' : 'TikTok') + ' usernames each with ONE roast comment. Each comment must be:\n'
-      + '- Genuinely funny, creative, and highly specific — never generic insults like "ugly" or "weird".\n'
-      + '- Written the way real ' + (isIG ? 'Instagram' : 'TikTok') + ' commenters actually type — lowercase is common, some slang, some deadpan delivery, some hyperbolic exaggeration.\n'
-      + '- Varied in style — some one-liners, some longer setup-punchline comments, some using absurd comparisons.\n'
-      + '- Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful roast-comedy, not actual bullying.\n'
-      + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid).\n\n'
-      + 'FORMAT: username: comment text\nOne per line. No numbering. No extra commentary before or after. No emojis.';
+      + 'Generate exactly ' + count + ' distinct fake ' + (isIG ? 'Instagram' : 'TikTok') + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
+      + 'Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful comedy, not actual bullying.\n\n'
+      + 'Mark exactly ONE of the comments (the funniest/best one) by starting that line with [PINNED] before the username — this represents the top comment the algorithm surfaced. Mark exactly ONE different comment (can overlap logic-wise but must be a different line) by starting it with [LIKED] before the username — this represents a comment the creator personally liked. Every other line has no marker.\n\n'
+      + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid, victor.j1_, tonnyjayworld).\n\n'
+      + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nOne per line. No numbering. No extra commentary before or after this list.';
 
     try {
-      var grokKey = getGrokKey();
-      if (!grokKey) { showError('Comments mode always uses Grok. Add your xAI Grok key in the API Key section above.'); showLoading(false); return; }
+      var rawText;
+      var provider = document.getElementById('providerSelect').value;
+      var vibeForRouting = vibe;
+      var useGrok = provider === 'xai' || (provider === 'auto' && (vibeForRouting === 'unhinged' || vibeForRouting === 'unhingedmax'));
       var model = document.getElementById('modelSelect').value;
-      var grokModel = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
-      var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-        body: JSON.stringify({
-          model: grokModel,
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 1500,
-          temperature: 0.95
-        })
-      });
-      if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-      var data = await resp.json();
-      var rawText = data.choices?.[0]?.message?.content?.trim();
+
+      if (useGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Add your xAI Grok key in the API Key section above, or switch Provider to Claude.'); showLoading(false); return; }
+        var grokModel = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: grokModel, messages: [{ role: 'user', content: prompt }], max_tokens: 2000, temperature: 0.95 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        var key = getKey();
+        if (!key) { showError('Please save your Anthropic API key first, or switch Provider to xAI Grok.'); showLoading(false); return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        rawText = data.content[0].text.trim();
+      }
+
       var parsed = parseComments(rawText);
       if (parsed.length === 0) throw new Error('Could not parse comments. Try again.');
       currentComments = parsed;
@@ -1323,11 +1367,62 @@
     return Math.floor(Math.random() * 30) + 1;
   }
 
+  // Deterministic string hash → used to seed procedural avatars so the same
+  // username always gets the same look across re-renders.
+  function hashSeed(str) {
+    var h = 0;
+    for (var i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+    return h;
+  }
+
+  // Generates a fully self-contained SVG avatar as a data URI — no network
+  // request at all, so it renders identically in a real browser, on Vercel,
+  // AND inside Claude's sandboxed artifact preview (which blocks outbound
+  // image requests to third-party domains like i.pravatar.cc).
+  var avatarPalettes = [
+    ['#f56040','#ffdc80'], ['#833ab4','#fd1d1d'], ['#00b0f4','#00f2ea'],
+    ['#7c3aed','#f56040'], ['#fe2c55','#25f4ee'], ['#4ade80','#0084ff'],
+    ['#f97316','#ec4899'], ['#8b5cf6','#06b6d4']
+  ];
+  function generateProceduralAvatarDataUri(seedStr) {
+    var seed = hashSeed(seedStr);
+    var pal = avatarPalettes[seed % avatarPalettes.length];
+    var angle = seed % 360;
+    var eyeOffsetX = 6 + (seed % 5);
+    var eyeY = 26 + (seed % 6);
+    var mouthCurve = (seed % 2 === 0) ? 'M 22 42 Q 32 50 42 42' : 'M 22 44 Q 32 38 42 44';
+    var shapeSeed = (seed >> 3) % 3;
+    var shapeEl = '';
+    if (shapeSeed === 0) {
+      shapeEl = '<circle cx="' + (18 + (seed % 20)) + '" cy="' + (14 + (seed % 12)) + '" r="' + (10 + (seed % 8)) + '" fill="rgba(255,255,255,0.15)"/>';
+    } else if (shapeSeed === 1) {
+      shapeEl = '<rect x="' + (seed % 24) + '" y="' + (seed % 20) + '" width="' + (20 + (seed % 16)) + '" height="' + (20 + (seed % 16)) + '" rx="8" fill="rgba(255,255,255,0.12)" transform="rotate(' + angle + ' 32 32)"/>';
+    } else {
+      shapeEl = '<polygon points="32,8 54,50 10,50" fill="rgba(255,255,255,0.12)" transform="rotate(' + angle + ' 32 32)"/>';
+    }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">'
+      + '<defs><linearGradient id="g' + seed + '" x1="0%" y1="0%" x2="100%" y2="100%">'
+      + '<stop offset="0%" stop-color="' + pal[0] + '"/><stop offset="100%" stop-color="' + pal[1] + '"/></linearGradient></defs>'
+      + '<circle cx="32" cy="32" r="32" fill="url(#g' + seed + ')"/>'
+      + shapeEl
+      + '<circle cx="' + (32 - eyeOffsetX) + '" cy="' + eyeY + '" r="3" fill="rgba(0,0,0,0.55)"/>'
+      + '<circle cx="' + (32 + eyeOffsetX) + '" cy="' + eyeY + '" r="3" fill="rgba(0,0,0,0.55)"/>'
+      + '<path d="' + mouthCurve + '" stroke="rgba(0,0,0,0.55)" stroke-width="3" fill="none" stroke-linecap="round"/>'
+      + '</svg>';
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  }
+
   function parseComments(text) {
     var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
     var out = [];
     lines.forEach(function(line) {
-      var m = line.match(/^[-*\d.)\s]*([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
+      var isPinned = false, isLiked = false;
+      var cleanLine = line;
+      var pinnedMatch = cleanLine.match(/^\[PINNED\]\s*/i);
+      if (pinnedMatch) { isPinned = true; cleanLine = cleanLine.replace(pinnedMatch[0], ''); }
+      var likedMatch = cleanLine.match(/^\[LIKED\]\s*/i);
+      if (likedMatch) { isLiked = true; cleanLine = cleanLine.replace(likedMatch[0], ''); }
+      var m = cleanLine.match(/^[-*\d.)\s]*([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
       if (!m) return;
       out.push({
         user: m[1].replace(/^@/, ''),
@@ -1336,10 +1431,33 @@
         time: randomTimeAgo(),
         replies: randomReplyCount(),
         verified: Math.random() < 0.08,
-        edited: Math.random() < 0.06
+        edited: Math.random() < 0.06,
+        pinned: isPinned,
+        creatorLiked: isLiked,
+        avatarSeed: Math.floor(Math.random() * 70) + 1
       });
     });
+    assignAvatarKinds(out);
     return out;
+  }
+
+  // Assigns each comment an avatar "kind" so a batch reads as a natural mix
+  // of real-looking commenters, cartoon ones, and a few with no picture at
+  // all — instead of every comment looking the same.
+  function assignAvatarKinds(list) {
+    if (list.length === 0) return;
+    var indices = list.map(function(_, i) { return i; });
+    for (var i = indices.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+    }
+    var realisticCount = Math.min(list.length, 3 + Math.round(Math.random()));
+    var blankCount = Math.min(list.length - realisticCount, Math.round(list.length * 0.2));
+    indices.forEach(function(idx, pos) {
+      if (pos < realisticCount) list[idx].avatarKind = 'realistic';
+      else if (pos < realisticCount + blankCount) list[idx].avatarKind = 'blank';
+      else list[idx].avatarKind = 'cartoon';
+    });
   }
 
   function renderComments() {
@@ -1370,30 +1488,92 @@
 
     currentComments.forEach(function(c) {
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;';
+      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;' + (c.pinned ? 'background:' + (isIG ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)') + ';border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;' : '');
 
+      var avatarStyle = (document.getElementById('avatarStyle') || {}).value || 'mixed';
+      var effectiveKind = avatarStyle === 'mixed' ? (c.avatarKind || 'cartoon')
+        : (avatarStyle === 'realistic' ? 'realistic' : 'cartoon');
       var avatarColor = theme.avatarPalette[Math.floor(Math.random() * theme.avatarPalette.length)];
       var avatar = document.createElement('div');
-      avatar.style.cssText = 'flex-shrink:0;width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;';
-      avatar.textContent = c.user.charAt(0).toUpperCase();
-      row.appendChild(avatar);
+      avatar.style.cssText = 'flex-shrink:0;width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;overflow:hidden;';
+
+      if (effectiveKind === 'blank') {
+        // No picture, no letter — just a plain colored circle, matching the
+        // "some blank" look of a real comment section.
+        row.appendChild(avatar);
+      } else {
+        var avatarImg = document.createElement('img');
+        avatarImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        avatarImg.onload = function() { avatar.textContent = ''; };
+        if (effectiveKind === 'realistic') {
+          avatar.textContent = c.user.charAt(0).toUpperCase();
+          avatarImg.src = 'https://i.pravatar.cc/64?img=' + c.avatarSeed;
+          // If the realistic photo can't load (e.g. blocked network, offline,
+          // or inside Claude's sandboxed artifact preview), fall back to a
+          // generated avatar instead of leaving a bare letter.
+          avatarImg.onerror = function() { this.onerror = null; this.src = generateProceduralAvatarDataUri(c.user); };
+        } else {
+          avatarImg.src = generateProceduralAvatarDataUri(c.user);
+        }
+        avatar.appendChild(avatarImg);
+        row.appendChild(avatar);
+      }
 
       var body = document.createElement('div');
       body.style.cssText = 'flex:1;min-width:0;';
 
+      if (c.pinned) {
+        var pinnedTag = document.createElement('div');
+        pinnedTag.style.cssText = 'font-size:10px;color:' + theme.replyColor + ';font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:4px;';
+        pinnedTag.innerHTML = '📌 Pinned by creator';
+        body.appendChild(pinnedTag);
+      }
+
       var topLine = document.createElement('div');
       topLine.style.cssText = 'font-size:12.5px;color:' + theme.username + ';font-weight:600;margin-bottom:2px;';
-      topLine.innerHTML = c.user + (c.verified ? ' <span style="color:#3897f0;">✔</span>' : '') + '<span style="font-weight:400;color:' + theme.timeColor + ';font-size:11px;"> ' + c.time + (c.edited ? ' • Edited' : '') + '</span>';
+      var usernameSpan = document.createElement('span');
+      usernameSpan.className = 'bubble-editable';
+      usernameSpan.contentEditable = 'true';
+      usernameSpan.spellcheck = false;
+      usernameSpan.textContent = c.user;
+      usernameSpan.addEventListener('blur', function() {
+        c.user = this.textContent.trim() || c.user;
+        if (effectiveKind !== 'blank') { avatar.textContent = c.user.charAt(0).toUpperCase(); }
+      });
+      usernameSpan.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+      topLine.appendChild(usernameSpan);
+      if (c.verified) {
+        var verifiedBadge = document.createElement('span');
+        verifiedBadge.style.color = '#3897f0';
+        verifiedBadge.textContent = ' ✔';
+        topLine.appendChild(verifiedBadge);
+      }
+      var timeSpan = document.createElement('span');
+      timeSpan.style.cssText = 'font-weight:400;color:' + theme.timeColor + ';font-size:11px;';
+      timeSpan.textContent = ' ' + c.time + (c.edited ? ' • Edited' : '');
+      topLine.appendChild(timeSpan);
       body.appendChild(topLine);
 
       var textLine = document.createElement('div');
+      textLine.className = 'bubble-editable';
+      textLine.contentEditable = 'true';
+      textLine.spellcheck = false;
       textLine.style.cssText = 'font-size:13px;color:' + theme.text + ';line-height:1.35;margin-bottom:4px;word-break:break-word;';
       textLine.textContent = c.text;
+      textLine.addEventListener('blur', function() { c.text = this.textContent.trim() || c.text; });
       body.appendChild(textLine);
 
       var actions = document.createElement('div');
-      actions.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';font-weight:600;';
-      actions.textContent = 'Reply';
+      actions.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';font-weight:600;display:flex;align-items:center;gap:8px;';
+      var replySpan = document.createElement('span');
+      replySpan.textContent = 'Reply';
+      actions.appendChild(replySpan);
+      if (c.creatorLiked) {
+        var likedBadge = document.createElement('span');
+        likedBadge.style.cssText = 'display:inline-flex;align-items:center;gap:2px;color:' + theme.heartColor + ';font-weight:400;';
+        likedBadge.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="#ed4956" stroke="#ed4956"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg> creator liked';
+        actions.appendChild(likedBadge);
+      }
       body.appendChild(actions);
 
       if (c.replies > 0) {
@@ -1430,6 +1610,8 @@
     var inputBar = document.getElementById('cInputBar');
     inputBar.style.cssText = 'padding:8px 14px;display:flex;align-items:center;gap:8px;background:' + theme.inputBg + ';border-top:0.5px solid ' + theme.inputBorder + ';';
     inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + (isIG ? '#000' : '#f1f1f2') + ';border:' + (isIG ? '1px solid #333' : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isIG ? 'Add a comment...' : 'Add comment...') + '</div>';
+
+    document.getElementById('editHint').style.display = 'block';
   }
 
   function renderPhone() {
@@ -1743,14 +1925,20 @@
   document.getElementById('commentsPlatform').addEventListener('change', function() {
     if (currentComments.length > 0) { renderComments(); }
   });
+  document.getElementById('avatarStyle').addEventListener('change', function() {
+    if (currentComments.length > 0) { renderComments(); }
+  });
 
   document.getElementById('contentType').addEventListener('change', function() {
     var isComments = this.value === 'comments';
     document.getElementById('messagePlatformSection').style.display = isComments ? 'none' : 'block';
     document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
+    document.getElementById('avatarStyleSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('personFieldWrap').style.display = isComments ? 'none' : 'block';
-    document.getElementById('topicLabel').textContent = isComments ? 'What are you being roasted for? (optional)' : 'Topic / Context (optional)';
-    document.getElementById('topic').placeholder = isComments ? 'e.g. my big lips, my laugh, my accent...' : 'e.g. forgot my birthday, saw me at the club...';
+    document.getElementById('modeSection').style.display = isComments ? 'none' : 'block';
+    document.getElementById('commentCountSection').style.display = isComments ? 'block' : 'none';
+    document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : 'Topic / Context (optional)';
+    document.getElementById('topic').placeholder = isComments ? 'e.g. "hype up my fence like it\'s a girls comment section"' : 'e.g. forgot my birthday, saw me at the club...';
     document.getElementById('phoneFrame').style.display = isComments ? 'none' : 'block';
     document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
     document.getElementById('shortenBtn').style.display = isComments ? 'none' : '';
