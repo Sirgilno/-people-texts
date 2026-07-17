@@ -1523,16 +1523,21 @@
       } else {
         var avatarImg = document.createElement('img');
         avatarImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-        avatarImg.onload = function() { avatar.textContent = ''; };
+        // Isolate the fallback letter into its own text node. Setting
+        // avatar.textContent = '' on the PARENT div (the old bug) destroys
+        // ALL children — including the <img> that just finished loading and
+        // triggered onload in the first place. Removing only this specific
+        // text node leaves the image untouched.
+        var fallbackText = document.createTextNode(c.user.charAt(0).toUpperCase());
+        avatar.appendChild(fallbackText);
+        avatarImg.onload = function() { fallbackText.remove(); };
         if (effectiveKind === 'realistic') {
-          avatar.textContent = c.user.charAt(0).toUpperCase();
           avatarImg.src = 'https://i.pravatar.cc/64?img=' + c.avatarSeed;
           // If the realistic photo can't load (e.g. blocked network, offline,
           // or inside Claude's sandboxed artifact preview), fall back to a
           // generated avatar instead of leaving a bare letter.
           avatarImg.onerror = function() { this.onerror = null; this.src = generateProceduralAvatarDataUri(c.user); };
         } else {
-          avatar.textContent = c.user.charAt(0).toUpperCase();
           avatarImg.src = generateProceduralAvatarDataUri(c.user);
           avatarImg.onerror = function() { this.remove(); };
         }
@@ -1559,7 +1564,10 @@
       usernameSpan.textContent = c.user;
       usernameSpan.addEventListener('blur', function() {
         c.user = this.textContent.trim() || c.user;
-        if (effectiveKind !== 'blank') { avatar.textContent = c.user.charAt(0).toUpperCase(); }
+        // Note: deliberately NOT touching avatar.textContent here — the
+        // fallback letter is only a transient loading-state placeholder;
+        // once the avatar image has loaded, avatar.textContent would wipe
+        // it out (same destructive-DOM-mutation bug fixed above).
       });
       usernameSpan.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
       topLine.appendChild(usernameSpan);
