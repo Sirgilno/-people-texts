@@ -7,29 +7,31 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #f0f0f0; min-height: 100vh; padding: 20px; }
-  h1 { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 4px; color: #fff; }
-  .subtitle { text-align: center; font-size: 13px; color: #888; margin-bottom: 24px; }
-  .card { background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid #2a2a2a; }
-  .section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 14px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e8e8e8; min-height: 100vh; padding: 24px; letter-spacing: 0.01em; }
+  h1 { font-size: 19px; font-weight: 600; text-align: center; margin-bottom: 4px; color: #fff; }
+  .subtitle { text-align: center; font-size: 13px; color: #666; margin-bottom: 32px; font-weight: 400; }
+  .card { background: transparent; border-radius: 0; padding: 0 0 28px; margin-bottom: 28px; border: none; border-bottom: 1px solid #1c1c1c; }
+  .card:last-of-type { border-bottom: none; }
+  .section-title { font-size: 11px; font-weight: 500; text-transform: none; letter-spacing: 0.02em; color: #666; margin-bottom: 16px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-  label { font-size: 12px; color: #aaa; display: block; margin-bottom: 6px; }
-  input[type="text"], input[type="password"], select { width: 100%; background: #252525; border: 1px solid #333; border-radius: 10px; padding: 10px 12px; font-size: 14px; color: #f0f0f0; outline: none; }
-  select option { background: #252525; }
-  .mode-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .mode-tab { padding: 12px 8px; border-radius: 10px; border: 1px solid #333; background: #252525; color: #aaa; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; transition: all 0.2s; }
-  .mode-tab.active { background: #fff; color: #000; border-color: #fff; }
-  .mode-desc { font-size: 12px; color: #666; margin-bottom: 16px; text-align: center; }
-  .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
-  .btn-primary { background: #fff; color: #000; }
-  .btn-secondary { background: #252525; color: #f0f0f0; border: 1px solid #333; margin-top: 8px; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .api-status { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 12px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }
+  label { font-size: 12px; color: #888; display: block; margin-bottom: 6px; font-weight: 400; }
+  input[type="text"], input[type="password"], select { width: 100%; background: #131313; border: 1px solid #232323; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #e8e8e8; outline: none; transition: border-color 0.15s; }
+  input[type="text"]:focus, input[type="password"]:focus, select:focus { border-color: #444; }
+  select option { background: #131313; }
+  .mode-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+  .mode-tab { padding: 12px 8px; border-radius: 8px; border: 1px solid #232323; background: #131313; color: #777; font-size: 13px; font-weight: 400; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .mode-tab.active { background: #e8e8e8; color: #0a0a0a; border-color: #e8e8e8; }
+  .mode-desc { font-size: 12px; color: #555; margin-bottom: 16px; text-align: center; }
+  .btn { width: 100%; padding: 14px; border-radius: 8px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-primary { background: #e8e8e8; color: #0a0a0a; }
+  .btn-secondary { background: transparent; color: #ccc; border: 1px solid #2a2a2a; margin-top: 8px; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .api-status { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 12px; color: #777; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }
   .dot.green { background: #4ade80; }
   .key-row { display: flex; gap: 8px; margin-bottom: 8px; }
   .key-row input { flex: 1; }
-  .key-save-btn { padding: 10px 16px; border-radius: 10px; border: none; background: #fff; color: #000; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .key-save-btn { padding: 10px 16px; border-radius: 8px; border: 1px solid #2a2a2a; background: transparent; color: #ccc; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
   .preview-section { display: none; margin-top: 20px; }
   .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
   .phone { width: 300px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
@@ -59,53 +61,53 @@
   .p-typing-dot:nth-child(2) { animation-delay: 0.2s; }
   .p-typing-dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
-  .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-  .action-btn { padding: 12px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; }
-  .action-btn.primary { background: #fff; color: #000; border-color: #fff; }
+  .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .action-btn { padding: 12px; border-radius: 8px; border: 1px solid #232323; background: transparent; color: #ccc; font-size: 13px; font-weight: 400; cursor: pointer; text-align: center; }
+  .action-btn.primary { background: #e8e8e8; color: #0a0a0a; border-color: #e8e8e8; }
   .action-btn.full { grid-column: span 2; }
-  .action-btn.accent { background: #7c3aed; color: #fff; border-color: #7c3aed; }
-  .gem-text-box { display: none; background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px; font-size: 12px; font-family: 'Courier New', monospace; color: #aaa; white-space: pre-wrap; word-break: break-word; line-height: 1.6; margin-top: 10px; }
-  .copied-toast { display: none; text-align: center; font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: 500; }
-  .loading-div { display: none; text-align: center; padding: 16px; color: #888; font-size: 14px; }
-  .shorten-badge { display: none; text-align: center; font-size: 11px; color: #4ade80; margin-bottom: 8px; font-weight: 500; }
-  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  .action-btn.accent { background: transparent; color: #b794f6; border-color: #3d2f52; }
+  .gem-text-box { display: none; background: #0f0f0f; border: 1px solid #1c1c1c; border-radius: 8px; padding: 14px; font-size: 12px; font-family: 'Courier New', monospace; color: #999; white-space: pre-wrap; word-break: break-word; line-height: 1.6; margin-top: 10px; }
+  .copied-toast { display: none; text-align: center; font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: 400; }
+  .loading-div { display: none; text-align: center; padding: 16px; color: #666; font-size: 14px; }
+  .shorten-badge { display: none; text-align: center; font-size: 11px; color: #4ade80; margin-bottom: 8px; font-weight: 400; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #232323; border-top-color: #ccc; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .error-box { display: none; background: #2a1515; border: 1px solid #ef4444; border-radius: 10px; padding: 12px; font-size: 13px; color: #ef4444; margin-top: 10px; }
+  .error-box { display: none; background: #1a1010; border: 1px solid #4a2020; border-radius: 8px; padding: 12px; font-size: 13px; color: #f87171; margin-top: 10px; }
   .saved-convos { display: none; margin-top: 16px; }
-  .saved-title { font-size: 12px; color: #888; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
-  .saved-list { display: flex; flex-direction: column; gap: 8px; }
-  .saved-item { background: #252525; border: 1px solid #333; border-radius: 10px; padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-  .saved-item:hover { border-color: #555; }
-  .saved-item-preview { font-size: 12px; color: #aaa; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
-  .saved-item-label { font-size: 11px; color: #666; white-space: nowrap; }
-  .saved-del { font-size: 11px; color: #ef4444; cursor: pointer; margin-left: 8px; padding: 2px 6px; }
+  .saved-title { font-size: 11px; color: #666; margin-bottom: 8px; font-weight: 500; text-transform: none; letter-spacing: 0.02em; }
+  .saved-list { display: flex; flex-direction: column; gap: 6px; }
+  .saved-item { background: #131313; border: 1px solid #1c1c1c; border-radius: 8px; padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .saved-item:hover { border-color: #333; }
+  .saved-item-preview { font-size: 12px; color: #999; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
+  .saved-item-label { font-size: 11px; color: #555; white-space: nowrap; }
+  .saved-del { font-size: 11px; color: #ef4444; cursor: pointer; margin-left: 8px; padding: 2px 6px; opacity: 0.7; }
   .wallpaper-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
-  .wp-swatch { width: 100%; aspect-ratio: 1; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
-  .wp-swatch.active { border-color: #fff; }
-  .animate-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
+  .wp-swatch { width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
+  .wp-swatch.active { border-color: #e8e8e8; }
+  .animate-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
   .animate-phone-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
-  .animate-controls { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .animate-btn { padding: 12px 24px; border-radius: 12px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
-  .animate-btn.start { background: #7c3aed; color: white; }
-  .animate-btn.close { background: #252525; color: #f0f0f0; border: 1px solid #333; }
-  .animate-btn.rec { background: #ef4444; color: white; }
+  .animate-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .animate-btn { padding: 12px 22px; border-radius: 8px; border: 1px solid #333; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .animate-btn.start { background: #b794f6; color: #0a0a0a; border-color: #b794f6; }
+  .animate-btn.close { background: transparent; color: #ccc; border: 1px solid #333; }
+  .animate-btn.rec { background: #ef4444; color: white; border-color: #ef4444; }
   .animate-hint { font-size: 12px; color: #666; text-align: center; margin-top: 12px; }
   .compare-wrap { display: none; gap: 10px; margin-bottom: 12px; }
   .compare-wrap.visible { display: grid; grid-template-columns: 1fr 1fr; }
-  .compare-col { background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; }
-  .compare-col-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #666; margin-bottom: 8px; }
+  .compare-col { background: #0f0f0f; border: 1px solid #1c1c1c; border-radius: 8px; padding: 10px; }
+  .compare-col-title { font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0.02em; color: #666; margin-bottom: 8px; }
   .compare-msg { font-size: 11px; padding: 5px 7px; border-radius: 8px; margin-bottom: 4px; line-height: 1.4; }
-  .compare-msg.me { background: #1a2a3a; color: #7ab8f5; text-align: right; }
-  .compare-msg.them { background: #1a1a2a; color: #aaa; }
-  .compare-pick { width: 100%; margin-top: 8px; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; background: #7c3aed; color: white; }
+  .compare-msg.me { background: #16202e; color: #7ab8f5; text-align: right; }
+  .compare-msg.them { background: #17161f; color: #999; }
+  .compare-pick { width: 100%; margin-top: 8px; padding: 8px; border-radius: 8px; border: 1px solid #3d2f52; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: #b794f6; }
   .bubble-editable { outline: none; cursor: text; }
-  .bubble-editable:focus { box-shadow: 0 0 0 2px rgba(124,58,237,0.6); }
+  .bubble-editable:focus { box-shadow: 0 0 0 2px rgba(183,148,246,0.5); }
   .edit-hint { font-size: 11px; color: #555; text-align: center; margin-top: 4px; display: none; }
-  .name-gen-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #252525; color: #aaa; font-size: 12px; cursor: pointer; white-space: nowrap; margin-top: 6px; width: 100%; text-align: center; }
-  .name-gen-btn:hover { border-color: #555; color: #fff; }
+  .name-gen-btn { padding: 10px 12px; border-radius: 8px; border: 1px solid #232323; background: transparent; color: #888; font-size: 12px; cursor: pointer; white-space: nowrap; margin-top: 6px; width: 100%; text-align: center; }
+  .name-gen-btn:hover { border-color: #444; color: #e8e8e8; }
   .mood-row { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-bottom: 4px; }
-  .mood-slider { width: 100%; accent-color: #ef4444; margin-bottom: 4px; }
-  .mood-label { text-align: center; font-size: 12px; font-weight: 600; color: #ef4444; min-height: 18px; margin-bottom: 8px; }
+  .mood-slider { width: 100%; accent-color: #b794f6; margin-bottom: 4px; }
+  .mood-label { text-align: center; font-size: 12px; font-weight: 500; color: #b794f6; min-height: 18px; margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -238,9 +240,9 @@
     <div class="mood-label" id="moodLabel">😤 Heated — tension builds, things get spicy</div>
   </div>
 
-  <div class="section-title" style="display:flex;align-items:center;gap:8px;">🎵 Suno Campaign Presets <span style="font-size:10px;background:#7c3aed;color:#fff;padding:2px 7px;border-radius:6px;font-weight:600;letter-spacing:0.05em;">JUNE</span></div>
+  <div class="section-title" style="display:flex;align-items:center;gap:8px;">Suno Campaign Presets <span style="font-size:10px;background:transparent;border:1px solid #3d2f52;color:#b794f6;padding:2px 7px;border-radius:6px;font-weight:500;letter-spacing:0.05em;">JUNE</span></div>
   <div style="margin-bottom:8px;">
-    <select id="sunoPreset" style="width:100%;background:#252525;border:1px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:13px;color:#f0f0f0;outline:none;">
+    <select id="sunoPreset" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;">
       <option value="">— Pick a campaign format to auto-fill —</option>
       <optgroup label="💬 Text → Song Formats">
         <option value="comments">Format 5 — Viral Comments to Song</option>
@@ -254,6 +256,10 @@
         <option value="genz_intern">Format 9b — Employee / Intern Moment</option>
         <option value="lie">Format 1 — Biggest Lie You Ever Heard</option>
       </optgroup>
+      <optgroup label="🎧 July Formats">
+        <option value="heard_this_song">Have You Heard This Song?</option>
+        <option value="song_for_everything">Your Friend Has a Song for Everything</option>
+      </optgroup>
       <optgroup label="🏟️ Stadium Anthems (World Cup safe)">
         <option value="stadium_hype">Stadium — Hype Fan Texts</option>
         <option value="stadium_drama">Stadium — Match Drama Texts</option>
@@ -265,14 +271,14 @@
       </optgroup>
     </select>
   </div>
-  <div id="sunoPresetDesc" style="display:none;background:#1a1a2e;border:1px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:12px;color:#a78bfa;margin-bottom:10px;line-height:1.6;"></div>
-  <button class="btn" id="applyPresetBtn" style="display:none;background:#7c3aed;color:#fff;margin-bottom:16px;">Apply Preset ✨</button>
+  <div id="sunoPresetDesc" style="display:none;background:#131018;border:1px solid #2a2233;border-radius:8px;padding:10px 12px;font-size:12px;color:#b794f6;margin-bottom:10px;line-height:1.6;"></div>
+  <button class="btn" id="applyPresetBtn" style="display:none;background:#b794f6;color:#0a0a0a;margin-bottom:16px;">Apply Preset ✨</button>
 
   <div class="section-title">Chat Wallpaper</div>
   <div class="wallpaper-grid" id="wallpaperGrid"></div>
   <div style="margin-top:8px;margin-bottom:16px;">
     <label style="margin-bottom:4px;">Wallpaper Opacity</label>
-    <input type="range" id="wallpaperOpacity" min="0" max="100" value="40" style="width:100%;accent-color:#7c3aed;" />
+    <input type="range" id="wallpaperOpacity" min="0" max="100" value="40" style="width:100%;accent-color:#b794f6;" />
   </div>
 
   <div id="modeSection">
@@ -651,8 +657,8 @@
     btn.style.color = '#000';
     setTimeout(function() {
       btn.textContent = 'Apply Preset ✨';
-      btn.style.background = '#7c3aed';
-      btn.style.color = '#fff';
+      btn.style.background = '#b794f6';
+      btn.style.color = '#0a0a0a';
     }, 1800);
   });
 
@@ -931,6 +937,7 @@
       + vocabBank
       + 'TONE / INTENSITY: ' + vibeDescriptions[vibe] + '\n\n'
       + moodDesc + '\n\n'
+      + 'COMMENT LENGTH — STRICT: Real Instagram/TikTok comments are short. At least 80% of comments must be ONE short sentence or fragment, under 17 words — many should be even shorter (3-8 words). Maximum 1-2 comments in the entire batch may run to 2-3 sentences for variety, and even those should stay under 40 words total. Never write a comment longer than a short paragraph — no comment should read like a monologue or story.\n\n'
       + 'Generate exactly ' + count + ' distinct fake ' + (isIG ? 'Instagram' : 'TikTok') + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
       + 'Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful comedy, not actual bullying.\n\n'
       + 'Mark exactly ONE of the comments (the funniest/best one) by starting that line with [PINNED] before the username — this represents the top comment the algorithm surfaced. Mark exactly ONE different comment (can overlap logic-wise but must be a different line) by starting it with [LIKED] before the username — this represents a comment the creator personally liked. Every other line has no marker.\n\n'
@@ -1421,7 +1428,7 @@
       + '<circle cx="' + (32 + eyeOffsetX) + '" cy="' + eyeY + '" r="3" fill="rgba(0,0,0,0.55)"/>'
       + '<path d="' + mouthCurve + '" stroke="rgba(0,0,0,0.55)" stroke-width="3" fill="none" stroke-linecap="round"/>'
       + '</svg>';
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    return 'data:image/svg+xml;base64,' + btoa(svg);
   }
 
   function parseComments(text) {
@@ -1525,7 +1532,9 @@
           // generated avatar instead of leaving a bare letter.
           avatarImg.onerror = function() { this.onerror = null; this.src = generateProceduralAvatarDataUri(c.user); };
         } else {
+          avatar.textContent = c.user.charAt(0).toUpperCase();
           avatarImg.src = generateProceduralAvatarDataUri(c.user);
+          avatarImg.onerror = function() { this.remove(); };
         }
         avatar.appendChild(avatarImg);
         row.appendChild(avatar);
