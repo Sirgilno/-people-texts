@@ -920,7 +920,9 @@
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
         var data = await resp.json();
-        rawText = data.content[0].text.trim();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
+        rawText = textBlock.text.trim();
       }
 
       var parsed = parseConversation(rawText, myName, theirName);
@@ -1000,7 +1002,9 @@
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
         var data = await resp.json();
-        rawText = data.content[0].text.trim();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
+        rawText = textBlock.text.trim();
       }
 
       var parsed = parseComments(rawText);
@@ -2018,7 +2022,10 @@
     document.getElementById('compareWrap').classList.remove('visible');
     hideError();
 
-    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- GRAMMAR — CRITICAL: every shortened line must remain a complete, grammatically correct sentence or clause. Never drop a conjunction or connecting word (and, but, so, because) if removing it breaks the grammar. If a line cannot hit the target word count while staying grammatical, prioritize correct grammar over the exact count.\n- No merging messages. No adding or removing messages.\n- No emojis.\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
+    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- GRAMMAR — CRITICAL: every shortened line must remain a complete, grammatically correct sentence or clause. Never drop a conjunction or connecting word (and, but, so, because) if removing it breaks the grammar. If a line cannot hit the target word count while staying grammatical, prioritize correct grammar over the exact count.\n- No merging messages. No adding or removing messages.\n- ' + (person === 'mom' || person === 'dad'
+      ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
+      : 'EMOJI RULE: preserve the emojis from the original messages where they still fit the shortened line — do not strip them out. If a shortened line no longer has room for the emoji contextually, it is fine to drop just that one, but do not remove emojis as a blanket rule.'
+    ) + '\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
     try {
       var shortenModel = getModel();
       var shortenProvider = document.getElementById('providerSelect').value;
@@ -2046,7 +2053,9 @@
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error?e.error.message:'API error'); }
         var data = await resp.json();
-        rawShortenText = data.content[0].text.trim();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
+        rawShortenText = textBlock.text.trim();
       }
 
       var parsed = parseConversation(rawShortenText, myName, theirName);
