@@ -190,7 +190,7 @@
   <div id="avatarStyleSection" style="margin-bottom:12px;display:none;">
     <label>Avatar Style</label>
     <select id="avatarStyle">
-      <option value="mixed" selected>Mixed (a few real, some cartoon, some blank)</option>
+      <option value="mixed" selected>Mixed (mostly real photos, some cartoon, few blank)</option>
       <option value="procedural">All Generated Avatars (cartoon)</option>
       <option value="realistic">All Realistic Photos</option>
     </select>
@@ -671,11 +671,19 @@
 
     if (provider === 'auto') {
       if (isUnhinged) {
+        var opt0 = document.createElement('option');
+        opt0.value = 'grok-4.5';
+        opt0.textContent = 'grok-4.5 (xAI)';
+        modelSelect.appendChild(opt0);
         var opt = document.createElement('option');
         opt.value = 'grok-4.3';
         opt.textContent = 'grok-4.3 (xAI)';
         modelSelect.appendChild(opt);
       } else {
+        var opt0b = document.createElement('option');
+        opt0b.value = 'claude-sonnet-5';
+        opt0b.textContent = 'claude-sonnet-5 (Anthropic)';
+        modelSelect.appendChild(opt0b);
         var opt1 = document.createElement('option');
         opt1.value = 'claude-sonnet-4-6';
         opt1.textContent = 'claude-sonnet-4-6 (Anthropic)';
@@ -686,6 +694,10 @@
         modelSelect.appendChild(opt2);
       }
     } else if (provider === 'anthropic') {
+      var opt0c = document.createElement('option');
+      opt0c.value = 'claude-sonnet-5';
+      opt0c.textContent = 'claude-sonnet-5';
+      modelSelect.appendChild(opt0c);
       var opt1 = document.createElement('option');
       opt1.value = 'claude-sonnet-4-6';
       opt1.textContent = 'claude-sonnet-4-6';
@@ -695,6 +707,10 @@
       opt2.textContent = 'claude-opus-4-7';
       modelSelect.appendChild(opt2);
     } else if (provider === 'xai') {
+      var opt0d = document.createElement('option');
+      opt0d.value = 'grok-4.5';
+      opt0d.textContent = 'grok-4.5';
+      modelSelect.appendChild(opt0d);
       var opt = document.createElement('option');
       opt.value = 'grok-4.3';
       opt.textContent = 'grok-4.3';
@@ -857,7 +873,8 @@
       + '- Include at least one memorable detail, callback to something said earlier, small twist, misunderstanding that escalates, or punchline that lands at the end. Keep details universally relatable.\n'
       + '- Vary message length — some short fragments, some longer.\n'
       + '- The conversation must have ONE memorable quotable moment.\n\n'
-      + 'FORMAT: SPEAKER: message text only. No emojis. No extra text before or after.\n\n'
+      + 'FORMAT: SPEAKER: message text only. No extra text before or after.\n'
+      + '- Emojis are allowed but should be occasional, not on every line — the way real people actually text. Most messages should have none at all; only sprinkle one in here and there where it fits naturally (reacting, emphasis, a laugh). Never stack multiple emojis in one message.\n\n'
       + (isSongMode ? 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n' : '')
       + moodDesc + '\n\n'
       + 'Focus on natural, believable, internationally relatable dialogue with no regional flavour.';
@@ -1460,9 +1477,9 @@
     return out;
   }
 
-  // Assigns each comment an avatar "kind" so a batch reads as a natural mix
-  // of real-looking commenters, cartoon ones, and a few with no picture at
-  // all — instead of every comment looking the same.
+  // Assigns each comment an avatar "kind" so a batch reads like a real
+  // Instagram section — most people show a real profile photo, a handful
+  // are cartoon/default-icon accounts, and a few have no picture at all.
   function assignAvatarKinds(list) {
     if (list.length === 0) return;
     var indices = list.map(function(_, i) { return i; });
@@ -1470,8 +1487,12 @@
       var j = Math.floor(Math.random() * (i + 1));
       var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
     }
-    var realisticCount = Math.min(list.length, 3 + Math.round(Math.random()));
-    var blankCount = Math.min(list.length - realisticCount, Math.round(list.length * 0.2));
+    // Realistic photos are the majority (~60-75%), matching how most real
+    // IG accounts actually look. Blank stays a small minority (~10%).
+    // Cartoon fills whatever's left.
+    var realisticPct = 0.60 + Math.random() * 0.15;
+    var realisticCount = Math.max(1, Math.min(list.length, Math.round(list.length * realisticPct)));
+    var blankCount = Math.min(list.length - realisticCount, Math.round(list.length * 0.1));
     indices.forEach(function(idx, pos) {
       if (pos < realisticCount) list[idx].avatarKind = 'realistic';
       else if (pos < realisticCount + blankCount) list[idx].avatarKind = 'blank';
