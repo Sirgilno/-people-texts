@@ -2130,8 +2130,8 @@
     document.getElementById('person4NameWrap').style.display = size >= 4 ? 'block' : 'none';
   });
 
-  document.getElementById('contentType').addEventListener('change', function() {
-    var isComments = this.value === 'comments';
+  function updateContentTypeUI() {
+    var isComments = document.getElementById('contentType').value === 'comments';
     document.getElementById('messagePlatformSection').style.display = isComments ? 'none' : 'block';
     document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('avatarStyleSection').style.display = isComments ? 'block' : 'none';
@@ -2149,7 +2149,15 @@
     document.getElementById('shortenBtn').style.display = isComments ? 'none' : '';
     document.getElementById('animateBtn').style.display = isComments ? 'none' : '';
     document.getElementById('previewSection').style.display = 'none';
-  });
+  }
+  document.getElementById('contentType').addEventListener('change', updateContentTypeUI);
+  // Run once immediately on page load — without this, any section whose
+  // correct default state differs from its hardcoded HTML (like
+  // groupSizeSection defaulting to display:none in the markup even though
+  // it should be visible for the default "Messages" content type) stays
+  // wrong until the user manually changes Content Type once. This exact bug
+  // is why Group Size never appeared on the live site.
+  updateContentTypeUI();
 
   document.getElementById('shortenBtn').addEventListener('click', async function() {
     var key = getKey();
