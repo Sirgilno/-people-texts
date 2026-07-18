@@ -41,7 +41,7 @@
   .p-chat-header { padding: 8px 14px 10px; text-align: center; }
   .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; }
   .p-chat-name { font-size: 13px; font-weight: 600; }
-  .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 4px; }
+  .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 0; }
   .p-bubble-row { display: flex; flex-direction: column; }
   .p-bubble-row.me { align-items: flex-end; }
   .p-bubble-row.them { align-items: flex-start; }
@@ -156,6 +156,18 @@
       <button class="name-gen-btn" id="nameGenBtn">🎲 Generate international name</button>
     </div>
   </div>
+  <div id="groupSizeSection" style="margin-bottom:12px;display:none;">
+    <label>Group Size</label>
+    <select id="groupSize">
+      <option value="2">Just 2 people (normal DM)</option>
+      <option value="3">Group chat — 3 people</option>
+      <option value="4">Group chat — 4 people</option>
+    </select>
+  </div>
+  <div id="extraNamesRow" class="row" style="display:none;">
+    <div><label>Person 3 name</label><input type="text" id="person3Name" value="" placeholder="e.g. Uncle Chris" /></div>
+    <div id="person4NameWrap" style="display:none;"><label>Person 4 name</label><input type="text" id="person4Name" value="" placeholder="e.g. Cousin Zoe" /></div>
+  </div>
   <div style="margin-bottom:12px;">
     <label>Content Type</label>
     <select id="contentType">
@@ -185,6 +197,7 @@
     <select id="commentsPlatform">
       <option value="instagram_comments">Instagram Comments</option>
       <option value="tiktok_comments">TikTok Comments</option>
+      <option value="youtube_comments">YouTube Comments</option>
     </select>
   </div>
   <div id="avatarStyleSection" style="margin-bottom:12px;display:none;">
@@ -379,7 +392,7 @@
 </div>
 
 <div class="card saved-convos" id="savedConvosCard">
-  <div class="saved-title">Saved Conversations</div>
+  <div class="saved-title" id="savedListTitle">Saved Conversations</div>
   <div class="saved-list" id="savedList"></div>
 </div>
 
@@ -817,21 +830,14 @@
       var line = lines[i].trim();
       if (!line) continue;
       var lower = line.toLowerCase();
-      if (lower.startsWith('me:')) {
-        msgs.push({ f: 'me', t: line.substring(3).trim() });
-      } else if (lower.startsWith(theirName.toLowerCase() + ':')) {
-        msgs.push({ f: 'them', t: line.substring(theirName.length + 1).trim() });
-      } else if (lower.startsWith('them:') || lower.startsWith('her:') || lower.startsWith('him:')) {
-        msgs.push({ f: 'them', t: line.substring(line.indexOf(':') + 1).trim() });
+      if (lower.startsWith('me:') || lower.startsWith(myName.toLowerCase() + ':')) {
+        var prefixLen = lower.startsWith('me:') ? 3 : myName.length + 1;
+        msgs.push({ f: 'me', t: line.substring(prefixLen).trim() });
       } else if (line.includes(':')) {
         var parts = line.split(':');
-        var speaker = parts[0].trim().toLowerCase();
+        var speakerName = parts[0].trim();
         var content = parts.slice(1).join(':').trim();
-        if (speaker === 'me' || speaker === myName.toLowerCase()) {
-          msgs.push({ f: 'me', t: content });
-        } else {
-          msgs.push({ f: 'them', t: content });
-        }
+        msgs.push({ f: 'them', t: content, speaker: speakerName });
       }
     }
     return msgs;
@@ -853,6 +859,13 @@
       document.getElementById('theirName').value = theirName;
     }
 
+    var groupSize = parseInt(document.getElementById('groupSize').value) || 2;
+    var person3Name = document.getElementById('person3Name').value.trim();
+    var person4Name = document.getElementById('person4Name').value.trim();
+    var otherNames = [theirName];
+    if (groupSize >= 3) otherNames.push(person3Name || 'Chris');
+    if (groupSize >= 4) otherNames.push(person4Name || 'Zoe');
+
     showLoading(true);
 
     var msgCount = currentMode === 'short' ? 'exactly 6' : currentMode === 'song' ? 'between 6 and 10' : 'between 7 and 10';
@@ -870,18 +883,21 @@
       + '- Comedic timing often comes from a short punchy reply after a long one, or a one-word gut-punch line.\n'
       + '- Real arguments/banter escalate through specific call-backs and specific accusations, not vague ones ("you did the SAME thing at the wedding" beats "you always do this").\n'
       + '- Let personality-appropriate slang/expressions show up naturally where the VIBE and PERSON below call for it — do not force it if it does not fit, but do not sand it down into blandness either.\n\n'
-      + 'Generate a text message conversation with ' + msgCount + ' messages total.\n\n'
-      + 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n'
+      + 'Generate a text ' + (groupSize >= 3 ? 'group chat conversation' : 'message conversation') + ' with ' + msgCount + ' messages total.\n\n'
+      + (groupSize >= 3
+        ? 'THIS IS A GROUP CHAT with ' + groupSize + ' people: ' + myName + ' (the receiver/main character reading this) plus ' + otherNames.join(', ') + '. Give EACH of the ' + otherNames.length + ' other people their own distinct personality and voice — do not make them interchangeable. In a real group chat people talk over each other, react to different parts of the conversation, some go quiet then jump back in, some pile on a joke together. Format each line as "Name: message" using their exact name.\n\n'
+        : 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n')
       + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
-      + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic between ' + theirName + ' and ' + myName + ' directly.\n\n' : '')
-      + 'NAMES: ' + myName + ' is receiving. ' + theirName + ' is texting them.\n\n'
+      + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic.\n\n' : '')
+      + (groupSize >= 3 ? '' : 'NAMES: ' + myName + ' is receiving. ' + theirName + ' is texting them.\n\n')
       + 'RICHNESS RULES — CRITICAL:\n'
       + '- Every conversation must feel UNIQUE and SPECIFIC. No generic responses like "okay" or "I see".\n'
-      + '- BOTH people must have strong distinct personalities.\n'
+      + '- ' + (groupSize >= 3 ? 'EVERY person' : 'BOTH people') + ' must have strong distinct personalities.\n'
       + '- Include at least one memorable detail, callback to something said earlier, small twist, misunderstanding that escalates, or punchline that lands at the end.\n'
       + '- Vary message length — some short fragments, some longer.\n'
-      + '- The conversation must have ONE memorable quotable moment.\n\n'
-      + 'FORMAT: SPEAKER: message text only. No extra text before or after.\n'
+      + '- The conversation must have ONE memorable quotable moment.\n'
+      + '- DOUBLE-TEXTING: real people often send 2-4 messages in a row with no reply in between, especially when heated, anxious, excited, or venting. Include this occasionally where the mood calls for it — do not force strict back-and-forth alternation every single line.\n\n'
+      + 'FORMAT: ' + (groupSize >= 3 ? myName + ' is written as "' + myName + ':". Every other person is written using their EXACT name as given above, e.g. "' + otherNames[0] + ': message text".' : 'SPEAKER: message text only.') + ' No extra text before or after.\n'
       + (person === 'mom' || person === 'dad'
         ? '- EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — at least 1 emoji should appear somewhere in the conversation, but keep it simple and how an older person actually texts (❤️ 🙏 😊 👍), never stacked, never more than one per message.\n\n'
         : '- EMOJI RULE: emojis should be present throughout, multiple across the conversation (not just one), but every emoji must fit the specific line it is on — read the emotional context of that exact message and pick an emoji that actually matches it, not a random default. Do not force an emoji onto every single line, but do not go sparse either — most conversations should have several placed naturally across different messages.\n\n')
@@ -940,6 +956,8 @@
   async function doGenerateComments() {
     var platKey = document.getElementById('commentsPlatform').value;
     var isIG = platKey === 'instagram_comments';
+    var isYT = platKey === 'youtube_comments';
+    var platformLabel = isIG ? 'Instagram' : (isYT ? 'YouTube' : 'TikTok');
     var vibe = document.getElementById('vibe').value;
     var hook = document.getElementById('topic').value.trim();
     var mood = parseInt(document.getElementById('moodSlider').value);
@@ -961,17 +979,19 @@
       + '8. CREATIVE COMPARISON — when the hook asks for a comparison/description bait ("describe X as a Y"), commenters get genuinely witty and specific with the comparison, not generic.\n\n'
       + 'Read the HOOK below and decide which of these patterns (and mix of patterns) naturally fits what the hook is asking for. A roast-me hook pulls from patterns 1, 2, 3. A hype-me hook pulls from pattern 7. A confession/advice-bait hook pulls from real specific short answers. A comparison hook pulls from pattern 8. Always mix in at least one pattern 4 (low effort) and one pattern 5 (tag a friend) somewhere in the batch for realism, regardless of hook type.\n\n';
 
-    var prompt = 'You are writing a realistic ' + (isIG ? 'Instagram' : 'TikTok') + ' comment section under a video. This is for a "reading my own comments" reaction video format where the creator screenshots and reacts to real comment sections.\n\n'
+    var prompt = 'You are writing a realistic ' + platformLabel + ' comment section under a video. This is for a "reading my own comments" reaction video format where the creator screenshots and reacts to real comment sections.\n\n'
+      + (isYT ? 'YOUTUBE TONE NOTE: YouTube comments read differently than IG/TikTok — they run longer on average, more discussion/debate-style, more replies-to-replies arguing a point, timestamps referenced ("the part at 2:14"), more "this reminds me of" tangents. Still keep the 17-word-max rule below for most comments, but YouTube comments can lean toward the upper end of that range more often than IG/TikTok would.\n\n' : '')
       + 'THE HOOK / ON-SCREEN CAPTION OF THE VIDEO (this is what commenters are reacting to): "' + hook + '"\n\n'
       + vocabBank
       + 'TONE / INTENSITY: ' + vibeDescriptions[vibe] + '\n\n'
       + moodDesc + '\n\n'
       + 'COMMENT LENGTH — STRICT: Real Instagram/TikTok comments are short. At least 80% of comments must be ONE short sentence or fragment, under 17 words — many should be even shorter (3-8 words). Maximum 1-2 comments in the entire batch may run to 2-3 sentences for variety, and even those should stay under 40 words total. Never write a comment longer than a short paragraph — no comment should read like a monologue or story.\n\n'
-      + 'Generate exactly ' + count + ' distinct fake ' + (isIG ? 'Instagram' : 'TikTok') + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
+      + 'Generate exactly ' + count + ' distinct fake ' + platformLabel + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
       + 'Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful comedy, not actual bullying.\n\n'
       + 'Mark exactly ONE of the comments (the funniest/best one) by starting that line with [PINNED] before the username — this represents the top comment the algorithm surfaced. Mark exactly ONE different comment (can overlap logic-wise but must be a different line) by starting it with [LIKED] before the username — this represents a comment the creator personally liked. Every other line has no marker.\n\n'
+      + 'NESTED REPLIES: for exactly 2 of the comments in the batch (pick ones where a reply thread would feel natural — a joke someone builds on, a disagreement, a "wait what" reaction), write 2-3 short reply lines directly under that comment. Each reply line must start with ">" followed by a fake username, then the reply text — e.g. ">replyuser22: wait fr??". Replies should read like a real back-and-forth (agreeing, arguing, adding a joke, asking a follow-up) — not just more top-level comments. Every other comment in the batch has no replies attached.\n\n'
       + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid, victor.j1_, tonnyjayworld).\n\n'
-      + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nOne per line. No numbering. No extra commentary before or after this list.';
+      + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nNested reply (indented under the comment above it): >username: reply text\nOne per line. No numbering. No extra commentary before or after this list.';
 
     try {
       var rawText;
@@ -1030,6 +1050,17 @@
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var myName = document.getElementById('myName').value.trim() || 'Me';
+    var groupSizeEl = document.getElementById('groupSize');
+    var isGroupChat = groupSizeEl && parseInt(groupSizeEl.value) >= 3;
+    var groupSenderColors = {};
+    var groupPalette = ['#f56040', '#00b0f4', '#7c3aed', '#25d366', '#fe2c55', '#ffb300'];
+    function colorForSender(name) {
+      if (!groupSenderColors[name]) {
+        var keys = Object.keys(groupSenderColors);
+        groupSenderColors[name] = groupPalette[keys.length % groupPalette.length];
+      }
+      return groupSenderColors[name];
+    }
 
     for (var i = 0; i < messages.length; i++) {
       if (!showAll && i >= messages.length) break;
@@ -1038,6 +1069,15 @@
       var ts = timestamps[i];
       var row = document.createElement('div');
       row.className = 'p-bubble-row ' + (isMe ? 'me' : 'them');
+      var sameAsPrev = i > 0 && messages[i-1].f === msg.f && (msg.f === 'me' || !isGroupChat || messages[i-1].speaker === msg.speaker);
+      row.style.marginTop = i === 0 ? '0' : (sameAsPrev ? '2px' : '10px');
+
+      if (isGroupChat && !isMe && !theme.isDiscord && !sameAsPrev) {
+        var senderLabel = document.createElement('div');
+        senderLabel.style.cssText = 'font-size:11px;font-weight:600;color:' + colorForSender(msg.speaker || theirName) + ';margin:0 0 2px 4px;';
+        senderLabel.textContent = msg.speaker || theirName;
+        row.appendChild(senderLabel);
+      }
 
       if (theme.isDiscord) {
         var dm = document.createElement('div');
@@ -1053,11 +1093,48 @@
           var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
           quote.textContent = preview;
           row.appendChild(quote);
+        } else if (!theme.isDiscord && !sameAsPrev && Math.random() < 0.08) {
+          // Occasional "Replied to your story" style bubble — mocked with a
+          // small placeholder thumbnail since there's no real story image to
+          // reference. Purely decorative, separate from the real bubble.
+          var storyReply = document.createElement('div');
+          storyReply.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;opacity:0.75;margin-bottom:3px;color:' + bTheme.color + ';';
+          var storyThumb = document.createElement('div');
+          storyThumb.style.cssText = 'width:22px;height:32px;border-radius:4px;background:linear-gradient(135deg,#f56040,#833ab4);flex-shrink:0;';
+          var storyLabel = document.createElement('span');
+          storyLabel.textContent = 'Replied to ' + (isMe ? theirName + '\u2019s' : 'your') + ' story';
+          storyReply.appendChild(storyThumb);
+          storyReply.appendChild(storyLabel);
+          row.appendChild(storyReply);
         }
 
         var bubble = document.createElement('div');
         var bubbleStyle = 'max-width:75%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
         bubbleStyle += 'background:' + bTheme.bg + ';';
+
+        // Occasionally render a voice-note look above the real message. This
+        // is purely decorative and appended as a SEPARATE sibling element —
+        // never merged into `bubble` itself — because the click-to-edit
+        // logic below reads the entire bubble's textContent on blur, and
+        // mixing decorative waveform markup into that would corrupt the
+        // saved message text and also break the Gem's ability to read the
+        // literal line from the screenshot.
+        var isVoiceNote = !theme.isDiscord && Math.random() < 0.12;
+        if (isVoiceNote) {
+          var durationSec = 3 + Math.floor(Math.random() * 25);
+          var durLabel = '0:' + String(durationSec).padStart(2, '0');
+          var bars = '';
+          for (var wb = 0; wb < 18; wb++) {
+            var barH = 3 + Math.floor(Math.random() * 11);
+            bars += '<rect x="' + (wb * 3.3) + '" y="' + ((16 - barH) / 2) + '" width="1.6" height="' + barH + '" rx="1" fill="' + bTheme.color + '" opacity="0.85"/>';
+          }
+          var voicePill = document.createElement('div');
+          voicePill.style.cssText = 'display:flex;align-items:center;gap:8px;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';margin-bottom:3px;max-width:fit-content;' + (isMe ? 'align-self:flex-end;' : 'align-self:flex-start;');
+          voicePill.innerHTML = '<span style="font-size:13px;">▶</span><svg width="60" height="16" viewBox="0 0 60 16">' + bars + '</svg><span style="font-size:10px;opacity:0.8;white-space:nowrap;">' + durLabel + '</span>';
+          row.appendChild(voicePill);
+          bubbleStyle += 'font-size:11px;opacity:0.8;font-style:italic;';
+        }
+
         bubble.style.cssText = bubbleStyle;
         bubble.textContent = msg.t;
         bubble.dataset.msgIdx = i;
@@ -1397,6 +1474,14 @@
       inputBg: '#fff', inputBorder: '#f1f1f2', inputPlaceholder: '#8a8b91',
       avatarPalette: ['#fe2c55', '#25f4ee', '#7c3aed', '#f56040', '#0084ff', '#00b0f4'],
       headerLabel: null
+    },
+    youtube_comments: {
+      bg: '#0f0f0f', headerBg: '#0f0f0f', headerBorder: '#272727', headerText: '#fff',
+      text: '#f1f1f1', username: '#f1f1f1', timeColor: '#aaaaaa',
+      replyColor: '#3ea6ff', likeCountColor: '#aaaaaa', heartColor: '#aaaaaa',
+      inputBg: '#0f0f0f', inputBorder: '#272727', inputPlaceholder: '#717171',
+      avatarPalette: ['#c62828', '#1565c0', '#2e7d32', '#6a1b9a', '#ef6c00', '#00838f'],
+      headerLabel: 'Comments'
     }
   };
 
@@ -1466,6 +1551,16 @@
     var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
     var out = [];
     lines.forEach(function(line) {
+      // Nested reply — starts with ">", attaches to the most recent top-level comment.
+      if (line.charAt(0) === '>') {
+        var replyMatch = line.substring(1).trim().match(/^([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
+        if (replyMatch && out.length > 0) {
+          var parent = out[out.length - 1];
+          if (!parent.nestedReplies) parent.nestedReplies = [];
+          parent.nestedReplies.push({ user: replyMatch[1].replace(/^@/, ''), text: replyMatch[2].trim() });
+        }
+        return;
+      }
       var isPinned = false, isLiked = false;
       var cleanLine = line;
       var pinnedMatch = cleanLine.match(/^\[PINNED\]\s*/i);
@@ -1484,7 +1579,8 @@
         edited: Math.random() < 0.06,
         pinned: isPinned,
         creatorLiked: isLiked,
-        avatarSeed: Math.floor(Math.random() * 70) + 1
+        avatarSeed: Math.floor(Math.random() * 70) + 1,
+        nestedReplies: null
       });
     });
     assignAvatarKinds(out);
@@ -1518,6 +1614,7 @@
     var platKey = document.getElementById('commentsPlatform').value;
     var theme = commentThemes[platKey] || commentThemes.instagram_comments;
     var isIG = platKey === 'instagram_comments';
+    var isYT = platKey === 'youtube_comments';
 
     document.getElementById('commentsFrame').style.background = theme.bg;
     document.getElementById('cStatusBar').style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bg + ';color:' + theme.headerText + ';';
@@ -1542,7 +1639,7 @@
 
     currentComments.forEach(function(c) {
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;' + (c.pinned ? 'background:' + (isIG ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)') + ';border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;' : '');
+      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;' + (c.pinned ? 'background:' + ((isIG || isYT) ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)') + ';border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;' : '');
 
       var avatarStyle = (document.getElementById('avatarStyle') || {}).value || 'mixed';
       var effectiveKind = avatarStyle === 'mixed' ? (c.avatarKind || 'cartoon')
@@ -1606,12 +1703,15 @@
       });
       usernameSpan.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
       topLine.appendChild(usernameSpan);
-      if (c.verified) {
-        var verifiedBadge = document.createElement('span');
-        verifiedBadge.style.color = '#3897f0';
-        verifiedBadge.textContent = ' ✔';
-        topLine.appendChild(verifiedBadge);
-      }
+      var verifiedBadge = document.createElement('span');
+      verifiedBadge.title = 'Click to toggle verified badge';
+      verifiedBadge.style.cssText = 'cursor:pointer;margin-left:3px;color:' + (c.verified ? '#3897f0' : '#3a3a3a') + ';font-size:12px;';
+      verifiedBadge.textContent = '✔';
+      verifiedBadge.addEventListener('click', function() {
+        c.verified = !c.verified;
+        this.style.color = c.verified ? '#3897f0' : '#3a3a3a';
+      });
+      topLine.appendChild(verifiedBadge);
       var timeSpan = document.createElement('span');
       timeSpan.style.cssText = 'font-weight:400;color:' + theme.timeColor + ';font-size:11px;';
       timeSpan.textContent = ' ' + c.time + (c.edited ? ' • Edited' : '');
@@ -1639,6 +1739,22 @@
         actions.appendChild(likedBadge);
       }
       body.appendChild(actions);
+
+      if (c.nestedReplies && c.nestedReplies.length > 0) {
+        var repliesWrap = document.createElement('div');
+        repliesWrap.style.cssText = 'margin-top:8px;padding-left:16px;border-left:1px solid ' + theme.headerBorder + ';display:flex;flex-direction:column;gap:6px;';
+        c.nestedReplies.forEach(function(r) {
+          var replyRow = document.createElement('div');
+          replyRow.style.cssText = 'font-size:12px;color:' + theme.text + ';line-height:1.35;';
+          var replyUser = document.createElement('span');
+          replyUser.style.cssText = 'font-weight:600;color:' + theme.username + ';margin-right:5px;';
+          replyUser.textContent = r.user;
+          replyRow.appendChild(replyUser);
+          replyRow.appendChild(document.createTextNode(r.text));
+          repliesWrap.appendChild(replyRow);
+        });
+        body.appendChild(repliesWrap);
+      }
 
       if (c.replies > 0) {
         var repliesLine = document.createElement('div');
@@ -1673,7 +1789,7 @@
 
     var inputBar = document.getElementById('cInputBar');
     inputBar.style.cssText = 'padding:8px 14px;display:flex;align-items:center;gap:8px;background:' + theme.inputBg + ';border-top:0.5px solid ' + theme.inputBorder + ';';
-    inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + (isIG ? '#000' : '#f1f1f2') + ';border:' + (isIG ? '1px solid #333' : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isIG ? 'Add a comment...' : 'Add comment...') + '</div>';
+    inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + theme.inputBg + ';border:' + ((isIG || isYT) ? '1px solid ' + theme.inputBorder : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isYT ? 'Add a comment...' : (isIG ? 'Add a comment...' : 'Add comment...')) + '</div>';
 
     document.getElementById('editHint').style.display = 'block';
   }
@@ -1937,16 +2053,24 @@
   });
 
   document.getElementById('saveConvoBtn').addEventListener('click', function() {
-    if (!currentMessages.length) return;
-    var person = document.getElementById('person').value;
-    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
-    var preview = currentMessages[0].t.substring(0, 50) + (currentMessages[0].t.length > 50 ? '...' : '');
-    var item = { messages: JSON.parse(JSON.stringify(currentMessages)), label: theirName + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
-    savedConversations.unshift(item);
+    var isComments = document.getElementById('contentType').value === 'comments';
+    if (isComments) {
+      if (!currentComments.length) return;
+      var cPreview = currentComments[0].text.substring(0, 50) + (currentComments[0].text.length > 50 ? '...' : '');
+      var cItem = { type: 'comments', comments: JSON.parse(JSON.stringify(currentComments)), label: currentComments.length + ' comments — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: cPreview };
+      savedConversations.unshift(cItem);
+    } else {
+      if (!currentMessages.length) return;
+      var person = document.getElementById('person').value;
+      var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+      var preview = currentMessages[0].t.substring(0, 50) + (currentMessages[0].t.length > 50 ? '...' : '');
+      var item = { type: 'messages', messages: JSON.parse(JSON.stringify(currentMessages)), label: theirName + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
+      savedConversations.unshift(item);
+    }
     if (savedConversations.length > 5) savedConversations = savedConversations.slice(0, 5);
     renderSavedList();
     var badge = document.getElementById('shortenBadge');
-    badge.textContent = '✓ Conversation saved!';
+    badge.textContent = isComments ? '✓ Comment batch saved!' : '✓ Conversation saved!';
     badge.style.display = 'block';
     setTimeout(function(){ badge.style.display = 'none'; badge.textContent = '✓ Shortened for song lyrics'; }, 2000);
   });
@@ -1955,15 +2079,23 @@
     var card = document.getElementById('savedConvosCard');
     var list = document.getElementById('savedList');
     list.innerHTML = '';
-    if (savedConversations.length === 0) { card.style.display = 'none'; return; }
+    var currentType = document.getElementById('contentType').value === 'comments' ? 'comments' : 'messages';
+    var filtered = savedConversations.filter(function(item) { return item.type === currentType; });
+    if (filtered.length === 0) { card.style.display = 'none'; return; }
     card.style.display = 'block';
-    savedConversations.forEach(function(item, idx) {
+    filtered.forEach(function(item) {
+      var idx = savedConversations.indexOf(item);
       var el = document.createElement('div');
       el.className = 'saved-item';
       el.innerHTML = '<span class="saved-item-preview">' + item.preview + '</span><span class="saved-item-label">' + item.label + '</span><span class="saved-del" data-idx="' + idx + '">✕</span>';
       el.querySelector('.saved-item-preview').addEventListener('click', function() {
-        currentMessages = JSON.parse(JSON.stringify(item.messages));
-        renderPhone(); renderAnimatePhone();
+        if (item.type === 'comments') {
+          currentComments = JSON.parse(JSON.stringify(item.comments));
+          renderComments();
+        } else {
+          currentMessages = JSON.parse(JSON.stringify(item.messages));
+          renderPhone(); renderAnimatePhone();
+        }
         document.getElementById('previewSection').style.display = 'block';
         window.scrollTo({top:0,behavior:'smooth'});
       });
@@ -1992,12 +2124,21 @@
   document.getElementById('avatarStyle').addEventListener('change', function() {
     if (currentComments.length > 0) { renderComments(); }
   });
+  document.getElementById('groupSize').addEventListener('change', function() {
+    var size = parseInt(this.value);
+    document.getElementById('extraNamesRow').style.display = size >= 3 ? 'grid' : 'none';
+    document.getElementById('person4NameWrap').style.display = size >= 4 ? 'block' : 'none';
+  });
 
   document.getElementById('contentType').addEventListener('change', function() {
     var isComments = this.value === 'comments';
     document.getElementById('messagePlatformSection').style.display = isComments ? 'none' : 'block';
     document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('avatarStyleSection').style.display = isComments ? 'block' : 'none';
+    document.getElementById('groupSizeSection').style.display = isComments ? 'none' : 'block';
+    document.getElementById('saveConvoBtn').textContent = isComments ? '💾 Save This Comment Batch' : '💾 Save This Conversation';
+    document.getElementById('savedListTitle').textContent = isComments ? 'Saved Comment Batches' : 'Saved Conversations';
+    renderSavedList();
     document.getElementById('personFieldWrap').style.display = isComments ? 'none' : 'block';
     document.getElementById('modeSection').style.display = isComments ? 'none' : 'block';
     document.getElementById('commentCountSection').style.display = isComments ? 'block' : 'none';
@@ -2141,7 +2282,7 @@
       var person = document.getElementById('person').value;
       var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
       var myName = document.getElementById('myName').value.trim() || 'Me';
-      text = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+      text = currentMessages.map(function(m){ return (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t; }).join('\n');
     }
     var box = document.getElementById('gemTextBox'); box.textContent = text; box.style.display = 'block';
     navigator.clipboard.writeText(text).then(function() {
