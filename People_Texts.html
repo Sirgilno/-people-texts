@@ -2165,7 +2165,7 @@
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var myName = document.getElementById('myName').value.trim() || 'Me';
-    var originalText = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    var originalText = currentMessages.map(function(m){ return (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t; }).join('\n');
     document.getElementById('shortenLoadingDiv').style.display = 'block';
     document.getElementById('shortenBtn').disabled = true;
     document.getElementById('compareWrap').classList.remove('visible');
@@ -2218,7 +2218,7 @@
         msgs.forEach(function(m) {
           var d = document.createElement('div');
           d.className = 'compare-msg ' + m.f;
-          d.textContent = (m.f==='them'?theirName:myName) + ': ' + m.t;
+          d.textContent = (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t;
           el.appendChild(d);
         });
       }
