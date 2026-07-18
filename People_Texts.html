@@ -859,9 +859,17 @@
     var isSongMode = currentMode === 'song';
     var mood = parseInt(document.getElementById('moodSlider').value);
     var moodDesc = moodDescriptions[mood];
+    var providerEarly = document.getElementById('providerSelect').value;
+    var useGrokEarly = providerEarly === 'xai' || (providerEarly === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
 
     var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
-      + 'CONTEXT: This is a conversation between two real people from anywhere in the world. Write it as two distinct personalities talking naturally. Do NOT force any specific cultural references, slang, food, or location into the messages. Let the conversation feel like normal, everyday human dialogue between real people. Everything should feel universally relatable.\n\n'
+      + 'CONTEXT: This is a conversation between two real people. Write it as two distinct personalities talking naturally, with real texture — actual modern texting rhythm, natural contractions, realistic slang where it fits the personalities and vibe, genuine comedic timing. This should read like a real screenshot people would believe, not a sanitized generic paraphrase.\n\n'
+      + 'TEXTING VOICE — HOW REAL PEOPLE ACTUALLY WRITE:\n'
+      + '- Lowercase is common for casual/funny vibes; full caps for a sudden emotional spike or shouting a single word.\n'
+      + '- Real texters drop pronouns/words when the meaning is still clear ("not doing this rn" not "I am not doing this right now").\n'
+      + '- Comedic timing often comes from a short punchy reply after a long one, or a one-word gut-punch line.\n'
+      + '- Real arguments/banter escalate through specific call-backs and specific accusations, not vague ones ("you did the SAME thing at the wedding" beats "you always do this").\n'
+      + '- Let personality-appropriate slang/expressions show up naturally where the VIBE and PERSON below call for it — do not force it if it does not fit, but do not sand it down into blandness either.\n\n'
       + 'Generate a text message conversation with ' + msgCount + ' messages total.\n\n'
       + 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n'
       + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
@@ -870,14 +878,16 @@
       + 'RICHNESS RULES — CRITICAL:\n'
       + '- Every conversation must feel UNIQUE and SPECIFIC. No generic responses like "okay" or "I see".\n'
       + '- BOTH people must have strong distinct personalities.\n'
-      + '- Include at least one memorable detail, callback to something said earlier, small twist, misunderstanding that escalates, or punchline that lands at the end. Keep details universally relatable.\n'
+      + '- Include at least one memorable detail, callback to something said earlier, small twist, misunderstanding that escalates, or punchline that lands at the end.\n'
       + '- Vary message length — some short fragments, some longer.\n'
       + '- The conversation must have ONE memorable quotable moment.\n\n'
       + 'FORMAT: SPEAKER: message text only. No extra text before or after.\n'
-      + '- Emojis are allowed but should be occasional, not on every line — the way real people actually text. Most messages should have none at all; only sprinkle one in here and there where it fits naturally (reacting, emphasis, a laugh). Never stack multiple emojis in one message.\n\n'
+      + (person === 'mom' || person === 'dad'
+        ? '- EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — at least 1 emoji should appear somewhere in the conversation, but keep it simple and how an older person actually texts (❤️ 🙏 😊 👍), never stacked, never more than one per message.\n\n'
+        : '- EMOJI RULE: emojis should be present throughout, multiple across the conversation (not just one), but every emoji must fit the specific line it is on — read the emotional context of that exact message and pick an emoji that actually matches it, not a random default. Do not force an emoji onto every single line, but do not go sparse either — most conversations should have several placed naturally across different messages.\n\n')
       + (isSongMode ? 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n' : '')
-      + moodDesc + '\n\n'
-      + 'Focus on natural, believable, internationally relatable dialogue with no regional flavour.';
+      + (useGrokEarly ? 'UNRESTRICTED MODE — THIS VIBE HAS NO CONTENT LIMITS: this generation is running on a provider with no content restrictions. Full permission to write crude physical/body humor, explicit profanity, raunchy innuendo, dirty talk, and explicit sexual language/description where the VIBE calls for it, with zero softening or self-censorship. Match the intensity the vibe description above asks for exactly, do not tone it down.\n\n' : '')
+      + moodDesc;
 
     try {
       var rawText;
@@ -2008,7 +2018,7 @@
     document.getElementById('compareWrap').classList.remove('visible');
     hideError();
 
-    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- No merging messages. No adding or removing messages.\n- No emojis.\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
+    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- GRAMMAR — CRITICAL: every shortened line must remain a complete, grammatically correct sentence or clause. Never drop a conjunction or connecting word (and, but, so, because) if removing it breaks the grammar. If a line cannot hit the target word count while staying grammatical, prioritize correct grammar over the exact count.\n- No merging messages. No adding or removing messages.\n- No emojis.\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
     try {
       var shortenModel = getModel();
       var shortenProvider = document.getElementById('providerSelect').value;
