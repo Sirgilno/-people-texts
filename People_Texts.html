@@ -1156,7 +1156,7 @@
           voicePill.style.cssText = 'display:flex;align-items:center;gap:8px;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';margin-bottom:3px;max-width:fit-content;' + (isMe ? 'align-self:flex-end;' : 'align-self:flex-start;');
           voicePill.innerHTML = '<span style="font-size:13px;">▶</span><svg width="60" height="16" viewBox="0 0 60 16">' + bars + '</svg><span style="font-size:10px;opacity:0.8;white-space:nowrap;">' + durLabel + '</span>';
           row.appendChild(voicePill);
-          bubbleStyle += 'font-size:11px;opacity:0.8;font-style:italic;';
+          bubbleStyle += 'font-size:11px;opacity:0.8;';
         }
 
         bubble.style.cssText = bubbleStyle;
