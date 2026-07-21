@@ -81,9 +81,6 @@
   .saved-item-preview { font-size: 12px; color: #999; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
   .saved-item-label { font-size: 11px; color: #555; white-space: nowrap; }
   .saved-del { font-size: 11px; color: #ef4444; cursor: pointer; margin-left: 8px; padding: 2px 6px; opacity: 0.7; }
-  .wallpaper-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
-  .wp-swatch { width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
-  .wp-swatch.active { border-color: #e8e8e8; }
   .animate-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
   .animate-phone-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
   .animate-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -288,14 +285,9 @@
   <button class="btn" id="applyPresetBtn" style="display:none;background:#b794f6;color:#0a0a0a;margin-bottom:16px;">Apply Preset ✨</button>
 
   <div class="section-title">Chat Wallpaper</div>
-  <div style="margin-bottom:10px;">
-    <select id="wallpaperCategory">
-      <option value="all">All Wallpapers</option>
-      <option value="solid">Solid & Simple Gradients</option>
-      <option value="artistic">Artistic / Abstract</option>
-    </select>
+  <div style="margin-bottom:12px;">
+    <select id="wallpaperSelect"><!-- Populated by createWallpaperOptions() --></select>
   </div>
-  <div class="wallpaper-grid" id="wallpaperGrid"></div>
   <div style="margin-top:8px;margin-bottom:16px;">
     <label style="margin-bottom:4px;">Wallpaper Opacity</label>
     <input type="range" id="wallpaperOpacity" min="0" max="100" value="40" style="width:100%;accent-color:#b794f6;" />
@@ -1417,6 +1409,40 @@
     }
   };
 
+  // Doodle pattern generator — builds tileable monoline-icon SVG backgrounds,
+  // matching the real spec found in research: simple flat silhouette icons,
+  // no shading, low opacity (8-15%), densely interlocked tiling for the
+  // "classic" style, or sparse/rotated for the "scattered" style.
+  function doodleTile(iconPaths, tileSize, baseColor) {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + tileSize + '" height="' + tileSize + '" viewBox="0 0 ' + tileSize + ' ' + tileSize + '">'
+      + iconPaths
+      + '</svg>';
+    var dataUri = 'data:image/svg+xml,' + encodeURIComponent(svg);
+    return baseColor + ' url("' + dataUri + '") repeat';
+  }
+  var ICONS = {
+    heart: function(x, y, s, rot) { return '<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" d="M0,6 C0,3 -3,0 -6,0 C-9,0 -11,2 -11,5 C-11,9 -6,13 0,18 C6,13 11,9 11,5 C11,2 9,0 6,0 C3,0 0,3 0,6 Z" fill="none" stroke="STROKE" stroke-width="1.5"/>'; },
+    star: function(x, y, s, rot) { return '<polygon transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" points="0,-10 2.4,-3 10,-3 4,1.5 6,9 0,4.5 -6,9 -4,1.5 -10,-3 -2.4,-3" fill="none" stroke="STROKE" stroke-width="1.3"/>'; },
+    envelope: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.3"><rect x="-11" y="-8" width="22" height="16" rx="1.5"/><path d="M-11,-8 L0,2 L11,-8"/></g>'; },
+    note: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.4"><circle cx="-6" cy="9" r="4"/><line x1="-2" y1="9" x2="-2" y2="-10"/><path d="M-2,-10 L8,-7 L8,-1 L-2,-4"/></g>'; },
+    plane: function(x, y, s, rot) { return '<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" d="M-11,3 L11,-9 L2,5 L4,11 L-1,6 L-6,8 Z" fill="none" stroke="STROKE" stroke-width="1.3" stroke-linejoin="round"/>'; },
+    cat: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.5" stroke-linejoin="round"><path d="M-9,10 C-9,2 -6,-6 0,-6 C6,-6 9,2 9,10 Z"/><path d="M-6,-5 L-8,-11 L-3,-7 Z"/><path d="M6,-5 L8,-11 L3,-7 Z"/></g>'; }
+  };
+  function buildDoodleSVG(iconFns, tileSize, count, strokeColor, sparse) {
+    var out = '';
+    var seed = 42;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < count; i++) {
+      var fn = iconFns[Math.floor(rnd() * iconFns.length)];
+      var x = rnd() * tileSize;
+      var y = rnd() * tileSize;
+      var s = sparse ? (0.9 + rnd() * 0.6) : (0.65 + rnd() * 0.25);
+      var rot = sparse ? Math.floor(rnd() * 360) : Math.floor(rnd() * 40 - 20);
+      out += fn(x, y, s, rot).split('STROKE').join(strokeColor);
+    }
+    return out;
+  }
+
   function applyWallpaper() {
     var opacity = parseInt(document.getElementById('wallpaperOpacity').value) / 100;
     var phone = document.getElementById('phoneFrame');
@@ -1438,56 +1464,69 @@
       'solid3': '#2d132c',
       'solid4': '#0f3460',
       'solid5': '#1e3a5f',
-      'artsy1': 'radial-gradient(circle at 20% 20%, #ff6b6b, transparent 50%), radial-gradient(circle at 80% 30%, #feca57, transparent 50%), radial-gradient(circle at 50% 80%, #ff9ff3, transparent 50%), #1a1a2e',
-      'artsy2': 'radial-gradient(circle at 15% 25%, #00d2ff, transparent 45%), radial-gradient(circle at 85% 20%, #7c3aed, transparent 45%), radial-gradient(circle at 50% 85%, #00ff9d, transparent 45%), #0a0a1a',
-      'artsy3': 'radial-gradient(circle at 30% 70%, #f72585, transparent 50%), radial-gradient(circle at 70% 20%, #4361ee, transparent 50%), radial-gradient(circle at 20% 20%, #4cc9f0, transparent 40%), #10002b',
-      'artsy4': 'conic-gradient(from 180deg at 50% 50%, #ff9a00, #ff165d, #7b2ff7, #00c2ff, #ff9a00)',
-      'artsy5': 'radial-gradient(circle at 25% 15%, #43e97b, transparent 50%), radial-gradient(circle at 75% 25%, #38f9d7, transparent 50%), radial-gradient(circle at 50% 90%, #667eea, transparent 55%), #071021',
-      'artsy6': 'radial-gradient(circle at 40% 30%, #f5576c, transparent 45%), radial-gradient(circle at 75% 70%, #f093fb, transparent 45%), radial-gradient(circle at 15% 80%, #4facfe, transparent 40%), #150a1f'
+      // Classic Monoline style — dense, interlocked, low opacity (~10-12%),
+      // matches the exact spec found in research for WhatsApp-style doodles.
+      'doodle1': doodleTile(buildDoodleSVG([ICONS.heart], 140, 9, 'rgba(255,255,255,0.11)', false), 140, '#161b22'),
+      'doodle2': doodleTile(buildDoodleSVG([ICONS.star, ICONS.envelope], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#14181f'),
+      'doodle3': doodleTile(buildDoodleSVG([ICONS.note, ICONS.plane], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#171a24'),
+      // Vector Overlay style — sparse, rotated, larger tile, matches
+      // Telegram's "themed" pattern approach found in the research.
+      'doodle4': doodleTile(buildDoodleSVG([ICONS.cat], 220, 5, 'rgba(255,255,255,0.15)', true), 220, '#12141c'),
+      // Abstract Geometric style — under 10% opacity, tiny mathematical
+      // micro-pattern, exactly matching the research's spec for this style.
+      'geo1': '#14181f url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="1.4" fill="rgba(255,255,255,0.09)"/></svg>') + '") repeat',
+      'geo2': '#161616 url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><path d="M0,13 L6.5,6.5 L13,13 L19.5,6.5 L26,13" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/></svg>') + '") repeat'
     };
     var bg = colors[currentWallpaper] || '#222';
     phone.style.background = bg;
     if (animatePhone) animatePhone.style.background = bg;
   }
 
-  function createWallpaperSwatches() {
-    var grid = document.getElementById('wallpaperGrid');
-    grid.innerHTML = '';
-    var catFilter = (document.getElementById('wallpaperCategory') || {}).value || 'all';
-    var options = [
-      { id: 'none', label: 'None', color: '#222', cat: 'solid' },
-      { id: 'gradient1', label: 'Deep Blue', color: 'linear-gradient(135deg, #1a1a2e, #16213e)', cat: 'solid' },
-      { id: 'gradient2', label: 'Purple', color: 'linear-gradient(135deg, #0f3460, #533483)', cat: 'solid' },
-      { id: 'gradient3', label: 'Wine', color: 'linear-gradient(135deg, #2d132c, #801336)', cat: 'solid' },
-      { id: 'gradient4', label: 'Navy', color: 'linear-gradient(135deg, #1e3a5f, #2e5a7e)', cat: 'solid' },
-      { id: 'gradient5', label: 'Burgundy', color: 'linear-gradient(135deg, #3d1a1a, #6b2d2d)', cat: 'solid' },
-      { id: 'solid1', label: 'Dark', color: '#1a1a1a', cat: 'solid' },
-      { id: 'solid2', label: 'Midnight', color: '#16213e', cat: 'solid' },
-      { id: 'solid3', label: 'Plum', color: '#2d132c', cat: 'solid' },
-      { id: 'solid4', label: 'Ocean', color: '#0f3460', cat: 'solid' },
-      { id: 'solid5', label: 'Steel', color: '#1e3a5f', cat: 'solid' },
-      { id: 'artsy1', label: 'Sunset Mesh', color: 'radial-gradient(circle at 20% 20%, #ff6b6b, transparent 50%), radial-gradient(circle at 80% 30%, #feca57, transparent 50%), radial-gradient(circle at 50% 80%, #ff9ff3, transparent 50%), #1a1a2e', cat: 'artistic' },
-      { id: 'artsy2', label: 'Aurora', color: 'radial-gradient(circle at 15% 25%, #00d2ff, transparent 45%), radial-gradient(circle at 85% 20%, #7c3aed, transparent 45%), radial-gradient(circle at 50% 85%, #00ff9d, transparent 45%), #0a0a1a', cat: 'artistic' },
-      { id: 'artsy3', label: 'Cosmic Dust', color: 'radial-gradient(circle at 30% 70%, #f72585, transparent 50%), radial-gradient(circle at 70% 20%, #4361ee, transparent 50%), radial-gradient(circle at 20% 20%, #4cc9f0, transparent 40%), #10002b', cat: 'artistic' },
-      { id: 'artsy4', label: 'Molten Glass', color: 'conic-gradient(from 180deg at 50% 50%, #ff9a00, #ff165d, #7b2ff7, #00c2ff, #ff9a00)', cat: 'artistic' },
-      { id: 'artsy5', label: 'Northern Lights', color: 'radial-gradient(circle at 25% 15%, #43e97b, transparent 50%), radial-gradient(circle at 75% 25%, #38f9d7, transparent 50%), radial-gradient(circle at 50% 90%, #667eea, transparent 55%), #071021', cat: 'artistic' },
-      { id: 'artsy6', label: 'Ember Field', color: 'radial-gradient(circle at 40% 30%, #f5576c, transparent 45%), radial-gradient(circle at 75% 70%, #f093fb, transparent 45%), radial-gradient(circle at 15% 80%, #4facfe, transparent 40%), #150a1f', cat: 'artistic' }
+  function createWallpaperOptions() {
+    var select = document.getElementById('wallpaperSelect');
+    select.innerHTML = '';
+    var groups = [
+      { label: 'Basic', options: [
+        { id: 'none', label: 'None' }
+      ]},
+      { label: 'Solid & Simple Gradients', options: [
+        { id: 'gradient1', label: 'Deep Blue' },
+        { id: 'gradient2', label: 'Purple' },
+        { id: 'gradient3', label: 'Wine' },
+        { id: 'gradient4', label: 'Navy' },
+        { id: 'gradient5', label: 'Burgundy' },
+        { id: 'solid1', label: 'Dark' },
+        { id: 'solid2', label: 'Midnight' },
+        { id: 'solid3', label: 'Plum' },
+        { id: 'solid4', label: 'Ocean' },
+        { id: 'solid5', label: 'Steel' }
+      ]},
+      { label: 'Doodle Patterns', options: [
+        { id: 'doodle1', label: 'Hearts' },
+        { id: 'doodle2', label: 'Stars & Envelopes' },
+        { id: 'doodle3', label: 'Music & Paper Planes' },
+        { id: 'doodle4', label: 'Scattered Cats' }
+      ]},
+      { label: 'Subtle Texture', options: [
+        { id: 'geo1', label: 'Dot Grid' },
+        { id: 'geo2', label: 'Soft Zigzag' }
+      ]}
     ];
-    options.filter(function(opt) { return catFilter === 'all' || opt.cat === catFilter; }).forEach(function(opt) {
-      var swatch = document.createElement('div');
-      swatch.className = 'wp-swatch';
-      swatch.style.background = opt.color;
-      if (opt.id === currentWallpaper) swatch.classList.add('active');
-      swatch.title = opt.label;
-      swatch.addEventListener('click', function() {
-        currentWallpaper = opt.id;
-        document.querySelectorAll('.wp-swatch').forEach(function(s){ s.classList.remove('active'); });
-        swatch.classList.add('active');
-        if (currentMessages.length > 0) {
-          applyWallpaper();
-        }
+    groups.forEach(function(group) {
+      var optgroup = document.createElement('optgroup');
+      optgroup.label = group.label;
+      group.options.forEach(function(opt) {
+        var option = document.createElement('option');
+        option.value = opt.id;
+        option.textContent = opt.label;
+        if (opt.id === currentWallpaper) option.selected = true;
+        optgroup.appendChild(option);
       });
-      grid.appendChild(swatch);
+      select.appendChild(optgroup);
+    });
+    select.addEventListener('change', function() {
+      currentWallpaper = select.value;
+      if (currentMessages.length > 0) { applyWallpaper(); }
     });
     document.getElementById('wallpaperOpacity').addEventListener('input', function() {
       if (currentMessages.length > 0) applyWallpaper();
@@ -2336,8 +2375,7 @@
     });
   });
 
-  document.getElementById('wallpaperCategory').addEventListener('change', createWallpaperSwatches);
-  createWallpaperSwatches();
+  createWallpaperOptions();
   updateKeyStatus();
   document.getElementById('theirName').placeholder = 'e.g. Mum';
 })();
