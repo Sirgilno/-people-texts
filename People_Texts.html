@@ -288,6 +288,13 @@
   <button class="btn" id="applyPresetBtn" style="display:none;background:#b794f6;color:#0a0a0a;margin-bottom:16px;">Apply Preset ✨</button>
 
   <div class="section-title">Chat Wallpaper</div>
+  <div style="margin-bottom:10px;">
+    <select id="wallpaperCategory">
+      <option value="all">All Wallpapers</option>
+      <option value="solid">Solid & Simple Gradients</option>
+      <option value="artistic">Artistic / Abstract</option>
+    </select>
+  </div>
   <div class="wallpaper-grid" id="wallpaperGrid"></div>
   <div style="margin-top:8px;margin-bottom:16px;">
     <label style="margin-bottom:4px;">Wallpaper Opacity</label>
@@ -794,11 +801,28 @@
   function generateTimestamps(count) {
     var now = new Date();
     var timestamps = [];
-    for (var i = 0; i < count; i++) {
-      var t = new Date(now.getTime() - (count - i) * 180000);
+    // Build gaps backward from "now" so the last message is always current.
+    // Real conversations don't tick at a fixed interval — mix quick-fire
+    // replies, normal pacing, and the occasional longer pause where someone
+    // got distracted and came back to it.
+    var gapsMs = [];
+    for (var i = 0; i < count - 1; i++) {
+      var roll = Math.random();
+      var gap;
+      if (roll < 0.35) { gap = 20000 + Math.random() * 100000; }        // 20s - 2min: quick-fire
+      else if (roll < 0.75) { gap = 120000 + Math.random() * 360000; }  // 2-8min: normal pacing
+      else if (roll < 0.92) { gap = 480000 + Math.random() * 900000; }  // 8-23min: slower back-and-forth
+      else { gap = 900000 + Math.random() * 1800000; }                 // 15-45min: distracted/came back later
+      gapsMs.push(gap);
+    }
+    var totalMs = gapsMs.reduce(function(a, b) { return a + b; }, 0);
+    var cursor = now.getTime() - totalMs;
+    for (var j = 0; j < count; j++) {
+      var t = new Date(cursor);
       var h = t.getHours();
       var m = String(t.getMinutes()).padStart(2, '0');
       timestamps.push(h + ':' + m);
+      if (j < gapsMs.length) cursor += gapsMs[j];
     }
     return timestamps;
   }
@@ -1206,10 +1230,10 @@
       bgInput: '#1a1a1a', bgFakeInput: '#252525', colorFakeInput: '#888', fakePlaceholder: 'Message',
       floatInput: true, floatInputBg: '#1a1a1a',
       bubbleMe: { bg: '#005c4b', color: '#fff', radius: '18px 18px 4px 18px' },
-      bubbleThem: { bg: '#1f2c34', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleThem: { bg: '#202c33', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'inside',
       timeColor: '#888', timeBubble: '#ffffff',
-      readReceipt: '✓✓', readColor: '#4ade80', readAllSent: true,
+      readReceipt: '✓✓', readColor: '#34b7f1', readAllSent: true,
       sendBg: '#005c4b', sendStroke: '#fff',
       avatarBg: '#005c4b', avatarColor: '#fff',
       nameColor: '#f0f0f0',
@@ -1225,7 +1249,7 @@
       bubbleThem: { bg: '#e5e5ea', color: '#000', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: 'Read', readColor: '#007AFF', readAllSent: false,
+      readReceipt: 'Read', readColor: '#8e8e93', readAllSent: false,
       sendBg: '#007AFF', sendStroke: '#fff',
       avatarBg: '#007AFF', avatarColor: '#fff',
       nameColor: '#000',
@@ -1237,13 +1261,13 @@
       bgMessages: '#000',
       bgInput: '#000', bgFakeInput: '#1a1a1a', colorFakeInput: '#888', fakePlaceholder: 'Message',
       floatInput: false,
-      bubbleMe: { bg: 'linear-gradient(135deg, #7c3aed, #3b82f6)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
-      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleMe: { bg: 'linear-gradient(135deg, #ff8fb2, #a797ff, #00e5ff)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
+      bubbleThem: { bg: '#262626', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
-      sendBg: '#7c3aed', sendStroke: '#fff',
-      avatarBg: 'linear-gradient(135deg, #7c3aed, #3b82f6)', avatarColor: '#fff',
+      readReceipt: '✓', readColor: '#0084ff', readAllSent: false,
+      sendBg: '#0084ff', sendStroke: '#fff',
+      avatarBg: 'linear-gradient(135deg, #ff8fb2, #a797ff, #00e5ff)', avatarColor: '#fff',
       nameColor: '#fff',
       typingBg: '#1a1a1a', typingDot: '#888'
     },
@@ -1269,13 +1293,13 @@
       bgMessages: '#0f0a1f',
       bgInput: '#1a1033', bgFakeInput: '#2a1f4a', colorFakeInput: '#888', fakePlaceholder: 'Message',
       floatInput: false,
-      bubbleMe: { bg: '#e17055', color: '#fff', radius: '18px 18px 4px 18px' },
-      bubbleThem: { bg: '#2a1f4a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleMe: { bg: '#3390ec', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#182533', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
-      sendBg: '#e17055', sendStroke: '#fff',
-      avatarBg: '#e17055', avatarColor: '#fff',
+      readReceipt: '✓', readColor: '#3390ec', readAllSent: false,
+      sendBg: '#3390ec', sendStroke: '#fff',
+      avatarBg: '#3390ec', avatarColor: '#fff',
       nameColor: '#fff',
       typingBg: '#2a1f4a', typingDot: '#888'
     },
@@ -1285,13 +1309,13 @@
       bgMessages: '#000',
       bgInput: '#1a1a1a', bgFakeInput: '#262626', colorFakeInput: '#888', fakePlaceholder: 'Message...',
       floatInput: false,
-      bubbleMe: { bg: 'linear-gradient(135deg, #f56040, #c13584, #833ab4)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
-      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleMe: { bg: 'linear-gradient(135deg, #4f5bd5, #962fbf, #d62976)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
+      bubbleThem: { bg: '#262626', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
-      sendBg: '#f56040', sendStroke: '#fff',
-      avatarBg: 'linear-gradient(135deg, #f56040, #c13584, #833ab4)', avatarColor: '#fff',
+      readReceipt: 'Seen', readColor: '#8e8e8e', readAllSent: false,
+      sendBg: '#833ab4', sendStroke: '#fff',
+      avatarBg: 'linear-gradient(135deg, #4f5bd5, #962fbf, #d62976)', avatarColor: '#fff',
       nameColor: '#fff',
       typingBg: '#1a1a1a', typingDot: '#888'
     },
@@ -1413,7 +1437,13 @@
       'solid2': '#16213e',
       'solid3': '#2d132c',
       'solid4': '#0f3460',
-      'solid5': '#1e3a5f'
+      'solid5': '#1e3a5f',
+      'artsy1': 'radial-gradient(circle at 20% 20%, #ff6b6b, transparent 50%), radial-gradient(circle at 80% 30%, #feca57, transparent 50%), radial-gradient(circle at 50% 80%, #ff9ff3, transparent 50%), #1a1a2e',
+      'artsy2': 'radial-gradient(circle at 15% 25%, #00d2ff, transparent 45%), radial-gradient(circle at 85% 20%, #7c3aed, transparent 45%), radial-gradient(circle at 50% 85%, #00ff9d, transparent 45%), #0a0a1a',
+      'artsy3': 'radial-gradient(circle at 30% 70%, #f72585, transparent 50%), radial-gradient(circle at 70% 20%, #4361ee, transparent 50%), radial-gradient(circle at 20% 20%, #4cc9f0, transparent 40%), #10002b',
+      'artsy4': 'conic-gradient(from 180deg at 50% 50%, #ff9a00, #ff165d, #7b2ff7, #00c2ff, #ff9a00)',
+      'artsy5': 'radial-gradient(circle at 25% 15%, #43e97b, transparent 50%), radial-gradient(circle at 75% 25%, #38f9d7, transparent 50%), radial-gradient(circle at 50% 90%, #667eea, transparent 55%), #071021',
+      'artsy6': 'radial-gradient(circle at 40% 30%, #f5576c, transparent 45%), radial-gradient(circle at 75% 70%, #f093fb, transparent 45%), radial-gradient(circle at 15% 80%, #4facfe, transparent 40%), #150a1f'
     };
     var bg = colors[currentWallpaper] || '#222';
     phone.style.background = bg;
@@ -1423,20 +1453,27 @@
   function createWallpaperSwatches() {
     var grid = document.getElementById('wallpaperGrid');
     grid.innerHTML = '';
+    var catFilter = (document.getElementById('wallpaperCategory') || {}).value || 'all';
     var options = [
-      { id: 'none', label: 'None', color: '#222' },
-      { id: 'gradient1', label: 'Deep Blue', color: 'linear-gradient(135deg, #1a1a2e, #16213e)' },
-      { id: 'gradient2', label: 'Purple', color: 'linear-gradient(135deg, #0f3460, #533483)' },
-      { id: 'gradient3', label: 'Wine', color: 'linear-gradient(135deg, #2d132c, #801336)' },
-      { id: 'gradient4', label: 'Navy', color: 'linear-gradient(135deg, #1e3a5f, #2e5a7e)' },
-      { id: 'gradient5', label: 'Burgundy', color: 'linear-gradient(135deg, #3d1a1a, #6b2d2d)' },
-      { id: 'solid1', label: 'Dark', color: '#1a1a1a' },
-      { id: 'solid2', label: 'Midnight', color: '#16213e' },
-      { id: 'solid3', label: 'Plum', color: '#2d132c' },
-      { id: 'solid4', label: 'Ocean', color: '#0f3460' },
-      { id: 'solid5', label: 'Steel', color: '#1e3a5f' }
+      { id: 'none', label: 'None', color: '#222', cat: 'solid' },
+      { id: 'gradient1', label: 'Deep Blue', color: 'linear-gradient(135deg, #1a1a2e, #16213e)', cat: 'solid' },
+      { id: 'gradient2', label: 'Purple', color: 'linear-gradient(135deg, #0f3460, #533483)', cat: 'solid' },
+      { id: 'gradient3', label: 'Wine', color: 'linear-gradient(135deg, #2d132c, #801336)', cat: 'solid' },
+      { id: 'gradient4', label: 'Navy', color: 'linear-gradient(135deg, #1e3a5f, #2e5a7e)', cat: 'solid' },
+      { id: 'gradient5', label: 'Burgundy', color: 'linear-gradient(135deg, #3d1a1a, #6b2d2d)', cat: 'solid' },
+      { id: 'solid1', label: 'Dark', color: '#1a1a1a', cat: 'solid' },
+      { id: 'solid2', label: 'Midnight', color: '#16213e', cat: 'solid' },
+      { id: 'solid3', label: 'Plum', color: '#2d132c', cat: 'solid' },
+      { id: 'solid4', label: 'Ocean', color: '#0f3460', cat: 'solid' },
+      { id: 'solid5', label: 'Steel', color: '#1e3a5f', cat: 'solid' },
+      { id: 'artsy1', label: 'Sunset Mesh', color: 'radial-gradient(circle at 20% 20%, #ff6b6b, transparent 50%), radial-gradient(circle at 80% 30%, #feca57, transparent 50%), radial-gradient(circle at 50% 80%, #ff9ff3, transparent 50%), #1a1a2e', cat: 'artistic' },
+      { id: 'artsy2', label: 'Aurora', color: 'radial-gradient(circle at 15% 25%, #00d2ff, transparent 45%), radial-gradient(circle at 85% 20%, #7c3aed, transparent 45%), radial-gradient(circle at 50% 85%, #00ff9d, transparent 45%), #0a0a1a', cat: 'artistic' },
+      { id: 'artsy3', label: 'Cosmic Dust', color: 'radial-gradient(circle at 30% 70%, #f72585, transparent 50%), radial-gradient(circle at 70% 20%, #4361ee, transparent 50%), radial-gradient(circle at 20% 20%, #4cc9f0, transparent 40%), #10002b', cat: 'artistic' },
+      { id: 'artsy4', label: 'Molten Glass', color: 'conic-gradient(from 180deg at 50% 50%, #ff9a00, #ff165d, #7b2ff7, #00c2ff, #ff9a00)', cat: 'artistic' },
+      { id: 'artsy5', label: 'Northern Lights', color: 'radial-gradient(circle at 25% 15%, #43e97b, transparent 50%), radial-gradient(circle at 75% 25%, #38f9d7, transparent 50%), radial-gradient(circle at 50% 90%, #667eea, transparent 55%), #071021', cat: 'artistic' },
+      { id: 'artsy6', label: 'Ember Field', color: 'radial-gradient(circle at 40% 30%, #f5576c, transparent 45%), radial-gradient(circle at 75% 70%, #f093fb, transparent 45%), radial-gradient(circle at 15% 80%, #4facfe, transparent 40%), #150a1f', cat: 'artistic' }
     ];
-    options.forEach(function(opt) {
+    options.filter(function(opt) { return catFilter === 'all' || opt.cat === catFilter; }).forEach(function(opt) {
       var swatch = document.createElement('div');
       swatch.className = 'wp-swatch';
       swatch.style.background = opt.color;
@@ -2299,6 +2336,7 @@
     });
   });
 
+  document.getElementById('wallpaperCategory').addEventListener('change', createWallpaperSwatches);
   createWallpaperSwatches();
   updateKeyStatus();
   document.getElementById('theirName').placeholder = 'e.g. Mum';
