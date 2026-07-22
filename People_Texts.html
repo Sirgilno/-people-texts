@@ -34,7 +34,7 @@
   .key-save-btn { padding: 10px 16px; border-radius: 8px; border: 1px solid #2a2a2a; background: transparent; color: #ccc; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
   .preview-section { display: none; margin-top: 20px; }
   .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
-  .phone { width: 300px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
+  .phone { width: 448px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
   .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .phone > * { position: relative; z-index: 1; }
   .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
@@ -1105,7 +1105,7 @@
           var prevMsg = messages[i-1];
           var quote = document.createElement('div');
           quote.className = 'p-reply-quote';
-          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
+          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
           var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
           quote.textContent = preview;
           row.appendChild(quote);
@@ -1125,7 +1125,7 @@
         }
 
         var bubble = document.createElement('div');
-        var bubbleStyle = 'max-width:75%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        var bubbleStyle = 'max-width:82%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
         bubbleStyle += 'background:' + bTheme.bg + ';';
 
         // Occasionally render a voice-note look above the real message. This
@@ -1148,7 +1148,9 @@
           voicePill.style.cssText = 'display:flex;align-items:center;gap:8px;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';margin-bottom:3px;max-width:fit-content;' + (isMe ? 'align-self:flex-end;' : 'align-self:flex-start;');
           voicePill.innerHTML = '<span style="font-size:13px;">▶</span><svg width="60" height="16" viewBox="0 0 60 16">' + bars + '</svg><span style="font-size:10px;opacity:0.8;white-space:nowrap;">' + durLabel + '</span>';
           row.appendChild(voicePill);
-          bubbleStyle += 'font-size:11px;opacity:0.8;';
+          // Deliberately NOT changing bubbleStyle's font-size/opacity here
+          // anymore — this text should read exactly like every other
+          // message bubble, full size, full opacity, no visual distinction.
         }
 
         bubble.style.cssText = bubbleStyle;
@@ -2064,12 +2066,12 @@
         if (animReplyIndices.has(i) && i > 0) {
           var prevMsg = currentMessages[i-1];
           var quote = document.createElement('div');
-          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:rgba(128,128,128,0.1);color:' + bTheme.color + ';';
+          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:rgba(128,128,128,0.1);color:' + bTheme.color + ';';
           quote.textContent = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40)+'...' : prevMsg.t;
           row.appendChild(quote);
         }
         var bubble = document.createElement('div');
-        bubble.style.cssText = 'max-width:75%;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        bubble.style.cssText = 'max-width:82%;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
         bubble.textContent = msg.t;
         var timeSpan = document.createElement('div');
         timeSpan.className = 'p-bubble-time';
