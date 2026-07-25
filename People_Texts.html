@@ -170,7 +170,17 @@
     <select id="contentType">
       <option value="messages">Messages / DM Thread</option>
       <option value="comments">Comments (Roast Me 🔥)</option>
+      <option value="songformats">Song Formats</option>
     </select>
+  </div>
+  <div id="songFormatSection" style="margin-bottom:12px;display:none;">
+    <label>Song Format</label>
+    <select id="songFormat">
+      <option value="heard_this_song">Have You Heard This Song?</option>
+      <option value="song_for_everything">Your Friend Has a Song for Everything</option>
+      <option value="say_it_in_a_song">Say It In A Song</option>
+    </select>
+    <div id="songFormatHint" style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;"></div>
   </div>
   <div id="messagePlatformSection" style="margin-bottom:12px;">
     <label>Message Platform</label>
@@ -266,10 +276,6 @@
         <option value="genz_intern">Format 9b — Employee / Intern Moment</option>
         <option value="lie">Format 1 — Biggest Lie You Ever Heard</option>
       </optgroup>
-      <optgroup label="🎧 July Formats">
-        <option value="heard_this_song">Have You Heard This Song?</option>
-        <option value="song_for_everything">Your Friend Has a Song for Everything</option>
-      </optgroup>
       <optgroup label="🏟️ Stadium Anthems (World Cup safe)">
         <option value="stadium_hype">Stadium — Hype Fan Texts</option>
         <option value="stadium_drama">Stadium — Match Drama Texts</option>
@@ -311,8 +317,24 @@
     </select>
   </div>
   <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
+  <button class="btn btn-primary" id="generateSayItBtn" style="display:none;">Generate Story + Song 🎬</button>
   <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
+  <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the story and song...</div>
   <div class="error-box" id="errorBox"></div>
+</div>
+
+<div class="card" id="sayItOutputCard" style="display:none;">
+  <div class="section-title">Narration Script</div>
+  <div class="gem-text-box" id="sayItScriptBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItScriptBtn" style="margin-top:8px;">📋 Copy Narration Script</button>
+
+  <div class="section-title" style="margin-top:20px;">Song — Description Prompt (for Suno auto-mode)</div>
+  <div class="gem-text-box" id="sayItSongPromptBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItSongPromptBtn" style="margin-top:8px;">📋 Copy Song Description</button>
+
+  <div class="section-title" style="margin-top:20px;">Song — Backup Written Lyrics</div>
+  <div class="gem-text-box" id="sayItLyricsBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItLyricsBtn" style="margin-top:8px;">📋 Copy Backup Lyrics</button>
 </div>
 
 <div class="preview-section" id="previewSection">
@@ -653,15 +675,18 @@
     btnEl.style.display = 'block';
   });
 
-  document.getElementById('applyPresetBtn').addEventListener('click', function() {
-    var val = document.getElementById('sunoPreset').value;
-    if (!val || !sunoPresets[val]) return;
-    var p = sunoPresets[val];
+  function applyPresetFields(p) {
+    if (!p) return;
     if (p.person) document.getElementById('person').value = p.person;
     if (p.vibe) { document.getElementById('vibe').value = p.vibe; updateModelOptions(); }
     if (p.msgStyle) document.getElementById('msgStyle').value = p.msgStyle;
     if (p.topic) document.getElementById('topic').value = p.topic;
     if (p.mode) setMode(p.mode);
+  }
+  document.getElementById('applyPresetBtn').addEventListener('click', function() {
+    var val = document.getElementById('sunoPreset').value;
+    if (!val || !sunoPresets[val]) return;
+    applyPresetFields(sunoPresets[val]);
     // Visual feedback
     var btn = document.getElementById('applyPresetBtn');
     btn.textContent = '✓ Preset Applied!';
@@ -857,6 +882,79 @@
       }
     }
     return msgs;
+  }
+
+  async function doGenerateSayIt() {
+    hideError();
+    var person = document.getElementById('person').value;
+    var vibe = document.getElementById('vibe').value;
+    var topic = document.getElementById('topic').value.trim();
+    var model = document.getElementById('modelSelect').value;
+    document.getElementById('sayItLoadingDiv').style.display = 'block';
+    document.getElementById('generateSayItBtn').disabled = true;
+
+    var provider = document.getElementById('providerSelect').value;
+    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+    var prompt = 'You are writing content for a viral short-form video format called "Say It In A Song." A creator talks directly to camera, telling a short THIRD-PERSON anecdote about someone they know who had an awkward/bad/uncomfortable thing to say — and instead of saying it normally, that person sent it as a Suno-generated song. The creator then plays the song as the reveal/payoff.\n\n'
+      + 'CRITICAL SETTING RULE: Never reference a car, sitting in a car, or driving anywhere in the script. The creator does NOT film in a car. Keep the setting completely unspecified/neutral — do not mention any location at all.\n\n'
+      + 'WHO THE STORY IS ABOUT: ' + personDescriptions[person] + ' (the anecdote is about this person in the creator\'s life, not the creator themselves)\n\n'
+      + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
+      + (topic ? 'SITUATION — THE STORY IS SPECIFICALLY ABOUT: ' + topic + '.\n\n' : 'Invent a specific, funny, awkward, or petty real-life situation where sending a song instead of a normal message makes sense.\n\n')
+      + 'NARRATION SCRIPT RULES:\n'
+      + '- 60-100 words, written as natural spoken word-of-mouth storytelling, not written prose. Include verbal filler that sounds natural when spoken aloud (like "so", "and I said", "apparently") — not scripted-sounding.\n'
+      + '- VARY THE OPENING — do not always start the same way. Mix it up between styles like: quoting dialogue first, starting mid-story, starting with the punchline then rewinding, or a direct address to camera.\n'
+      + '- Build to the reveal that the person sent a song instead of confronting/replying normally, then hand off naturally into the song with something like "listen to this" or similar — but vary the exact handoff phrase each time, do not always use the same words.\n'
+      + '- End with ONE short reaction line after the handoff (like the creator reacting after the song plays), 5-12 words.\n\n'
+      + 'SONG RULES:\n'
+      + '- The song must be thematically specific to the exact situation in the narration — not generic.\n\n'
+      + (useGrok ? 'UNRESTRICTED MODE: this generation has no content restrictions. Full permission to match the vibe\'s intensity exactly, including crude humor or profanity if the vibe calls for it.\n\n' : '')
+      + 'OUTPUT FORMAT — use exactly these three markers, nothing else before/after/between them:\n\n'
+      + 'NARRATION:\n[the narration script here]\n\n'
+      + 'SONG_DESCRIPTION:\n[a short 2-3 sentence description of the song\'s theme, mood, and genre, written as a prompt for Suno\'s own auto-songwriting to generate music and lyrics from]\n\n'
+      + 'BACKUP_LYRICS:\n[a short backup Verse 1 + Chorus, in case the auto-generated version from the description above isn\'t good — written lyrics, literal and specific to the situation, singable]';
+
+    try {
+      var rawText;
+      if (useGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: model, messages: [{ role: 'user', content: prompt }], max_tokens: 1200, temperature: 0.9 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        var key = getKey();
+        if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response — the model may have returned only a thinking block.'); }
+        rawText = textBlock.text.trim();
+      }
+
+      if (!rawText) throw new Error('Empty response. Try again.');
+      var narrMatch = rawText.match(/NARRATION:\s*([\s\S]*?)(?=SONG_DESCRIPTION:|$)/i);
+      var descMatch = rawText.match(/SONG_DESCRIPTION:\s*([\s\S]*?)(?=BACKUP_LYRICS:|$)/i);
+      var lyricsMatch = rawText.match(/BACKUP_LYRICS:\s*([\s\S]*)$/i);
+      document.getElementById('sayItScriptBox').textContent = narrMatch ? narrMatch[1].trim() : rawText;
+      document.getElementById('sayItSongPromptBox').textContent = descMatch ? descMatch[1].trim() : '';
+      document.getElementById('sayItLyricsBox').textContent = lyricsMatch ? lyricsMatch[1].trim() : '';
+      document.getElementById('sayItOutputCard').style.display = 'block';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally {
+      document.getElementById('sayItLoadingDiv').style.display = 'none';
+      document.getElementById('generateSayItBtn').disabled = false;
+    }
   }
 
   async function doGenerate() {
@@ -2209,26 +2307,71 @@
   });
 
   function updateContentTypeUI() {
-    var isComments = document.getElementById('contentType').value === 'comments';
-    document.getElementById('messagePlatformSection').style.display = isComments ? 'none' : 'block';
+    var ct = document.getElementById('contentType').value;
+    var isComments = ct === 'comments';
+    var isSongFormats = ct === 'songformats';
+    var songFmt = document.getElementById('songFormat').value;
+    var isSayIt = isSongFormats && songFmt === 'say_it_in_a_song';
+
+    document.getElementById('songFormatSection').style.display = isSongFormats ? 'block' : 'none';
+    document.getElementById('messagePlatformSection').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('avatarStyleSection').style.display = isComments ? 'block' : 'none';
-    document.getElementById('groupSizeSection').style.display = isComments ? 'none' : 'block';
+    document.getElementById('groupSizeSection').style.display = (isComments || isSongFormats) ? 'none' : 'block';
+    document.getElementById('saveConvoBtn').style.display = isSongFormats ? 'none' : '';
     document.getElementById('saveConvoBtn').textContent = isComments ? '💾 Save This Comment Batch' : '💾 Save This Conversation';
     document.getElementById('savedListTitle').textContent = isComments ? 'Saved Comment Batches' : 'Saved Conversations';
     renderSavedList();
     document.getElementById('personFieldWrap').style.display = isComments ? 'none' : 'block';
-    document.getElementById('modeSection').style.display = isComments ? 'none' : 'block';
+    document.getElementById('modeSection').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentCountSection').style.display = isComments ? 'block' : 'none';
-    document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : 'Topic / Context (optional)';
-    document.getElementById('topic').placeholder = isComments ? 'e.g. "hype up my fence like it\'s a girls comment section"' : 'e.g. forgot my birthday, saw me at the club...';
-    document.getElementById('phoneFrame').style.display = isComments ? 'none' : 'block';
+    document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : (isSongFormats ? 'Situation / Topic (optional)' : 'Topic / Context (optional)');
+    document.getElementById('topic').placeholder = isComments ? 'e.g. "hype up my fence like it\'s a girls comment section"' : (isSongFormats ? 'e.g. got wrongly accused of stealing at work' : 'e.g. forgot my birthday, saw me at the club...');
+    document.getElementById('phoneFrame').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
-    document.getElementById('shortenBtn').style.display = isComments ? 'none' : '';
-    document.getElementById('animateBtn').style.display = isComments ? 'none' : '';
+    document.getElementById('shortenBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
+    document.getElementById('animateBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
+    document.getElementById('generateBtn').style.display = isSongFormats ? 'none' : 'block';
+    document.getElementById('generateSayItBtn').style.display = isSayIt ? 'block' : 'none';
+    document.getElementById('sayItOutputCard').style.display = 'none';
     document.getElementById('previewSection').style.display = 'none';
+
+    if (isSongFormats) {
+      var hint = document.getElementById('songFormatHint');
+      if (songFmt === 'say_it_in_a_song') {
+        hint.textContent = 'Generates a spoken narration script + matching song (description prompt + backup lyrics) — no screenshot, uses the relationship/vibe/topic fields below.';
+      } else {
+        hint.textContent = 'Picking this switches you to Messages mode with the format pre-filled — same as before.';
+      }
+    }
   }
   document.getElementById('contentType').addEventListener('change', updateContentTypeUI);
+  document.getElementById('songFormat').addEventListener('change', function() {
+    var val = this.value;
+    if (val === 'heard_this_song' || val === 'song_for_everything') {
+      applyPresetFields(sunoPresets[val]);
+      document.getElementById('contentType').value = 'messages';
+      updateContentTypeUI();
+    } else {
+      updateContentTypeUI();
+    }
+  });
+  document.getElementById('generateSayItBtn').addEventListener('click', doGenerateSayIt);
+  document.getElementById('copySayItScriptBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItScriptBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy Narration Script'; }, 1500, this);
+  });
+  document.getElementById('copySayItSongPromptBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItSongPromptBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy Song Description'; }, 1500, this);
+  });
+  document.getElementById('copySayItLyricsBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItLyricsBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy Backup Lyrics'; }, 1500, this);
+  });
   // Run once immediately on page load — without this, any section whose
   // correct default state differs from its hardcoded HTML (like
   // groupSizeSection defaulting to display:none in the markup even though
