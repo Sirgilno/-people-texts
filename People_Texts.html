@@ -34,14 +34,14 @@
   .key-save-btn { padding: 10px 16px; border-radius: 8px; border: 1px solid #2a2a2a; background: transparent; color: #ccc; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
   .preview-section { display: none; margin-top: 20px; }
   .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
-  .phone { width: 300px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
+  .phone { width: 448px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
   .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .phone > * { position: relative; z-index: 1; }
   .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
   .p-chat-header { padding: 8px 14px 10px; text-align: center; }
   .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; }
   .p-chat-name { font-size: 13px; font-weight: 600; }
-  .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 4px; }
+  .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 0; }
   .p-bubble-row { display: flex; flex-direction: column; }
   .p-bubble-row.me { align-items: flex-end; }
   .p-bubble-row.them { align-items: flex-start; }
@@ -81,9 +81,6 @@
   .saved-item-preview { font-size: 12px; color: #999; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
   .saved-item-label { font-size: 11px; color: #555; white-space: nowrap; }
   .saved-del { font-size: 11px; color: #ef4444; cursor: pointer; margin-left: 8px; padding: 2px 6px; opacity: 0.7; }
-  .wallpaper-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
-  .wp-swatch { width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
-  .wp-swatch.active { border-color: #e8e8e8; }
   .animate-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
   .animate-phone-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
   .animate-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -156,12 +153,42 @@
       <button class="name-gen-btn" id="nameGenBtn">🎲 Generate international name</button>
     </div>
   </div>
+  <div id="groupSizeSection" style="margin-bottom:12px;display:none;">
+    <label>Group Size</label>
+    <select id="groupSize">
+      <option value="2">Just 2 people (normal DM)</option>
+      <option value="3">Group chat — 3 people</option>
+      <option value="4">Group chat — 4 people</option>
+    </select>
+  </div>
+  <div id="extraNamesRow" class="row" style="display:none;">
+    <div><label>Person 3 name</label><input type="text" id="person3Name" value="" placeholder="e.g. Uncle Chris" /></div>
+    <div id="person4NameWrap" style="display:none;"><label>Person 4 name</label><input type="text" id="person4Name" value="" placeholder="e.g. Cousin Zoe" /></div>
+  </div>
   <div style="margin-bottom:12px;">
     <label>Content Type</label>
     <select id="contentType">
       <option value="messages">Messages / DM Thread</option>
       <option value="comments">Comments (Roast Me 🔥)</option>
+      <option value="songformats">Song Formats</option>
+      <option value="paste">Paste Your Own Conversation</option>
     </select>
+  </div>
+  <div id="pasteSection" style="margin-bottom:12px;display:none;">
+    <label>Paste your conversation — one message per line</label>
+    <textarea id="pasteInput" rows="10" placeholder="Me: yo did you see what she posted&#10;Them: no what happened&#10;Them: wait send it&#10;Me: check her story&#10;Me: the third one&#10;Them: NO WAY" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;font-family:inherit;line-height:1.6;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;">
+      Use <strong>Me:</strong> for your messages and <strong>Them:</strong> (or any name) for theirs. Same speaker twice in a row = double-texting, works automatically. Pick any platform + wallpaper above, then hit Render.
+    </div>
+  </div>
+  <div id="songFormatSection" style="margin-bottom:12px;display:none;">
+    <label>Song Format</label>
+    <select id="songFormat">
+      <option value="heard_this_song">Have You Heard This Song?</option>
+      <option value="song_for_everything">Your Friend Has a Song for Everything</option>
+      <option value="say_it_in_a_song">Say It In A Song</option>
+    </select>
+    <div id="songFormatHint" style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;"></div>
   </div>
   <div id="messagePlatformSection" style="margin-bottom:12px;">
     <label>Message Platform</label>
@@ -185,12 +212,13 @@
     <select id="commentsPlatform">
       <option value="instagram_comments">Instagram Comments</option>
       <option value="tiktok_comments">TikTok Comments</option>
+      <option value="youtube_comments">YouTube Comments</option>
     </select>
   </div>
   <div id="avatarStyleSection" style="margin-bottom:12px;display:none;">
     <label>Avatar Style</label>
     <select id="avatarStyle">
-      <option value="mixed" selected>Mixed (a few real, some cartoon, some blank)</option>
+      <option value="mixed" selected>Mixed (mostly real photos, some cartoon, few blank)</option>
       <option value="procedural">All Generated Avatars (cartoon)</option>
       <option value="realistic">All Realistic Photos</option>
     </select>
@@ -256,10 +284,6 @@
         <option value="genz_intern">Format 9b — Employee / Intern Moment</option>
         <option value="lie">Format 1 — Biggest Lie You Ever Heard</option>
       </optgroup>
-      <optgroup label="🎧 July Formats">
-        <option value="heard_this_song">Have You Heard This Song?</option>
-        <option value="song_for_everything">Your Friend Has a Song for Everything</option>
-      </optgroup>
       <optgroup label="🏟️ Stadium Anthems (World Cup safe)">
         <option value="stadium_hype">Stadium — Hype Fan Texts</option>
         <option value="stadium_drama">Stadium — Match Drama Texts</option>
@@ -275,7 +299,9 @@
   <button class="btn" id="applyPresetBtn" style="display:none;background:#b794f6;color:#0a0a0a;margin-bottom:16px;">Apply Preset ✨</button>
 
   <div class="section-title">Chat Wallpaper</div>
-  <div class="wallpaper-grid" id="wallpaperGrid"></div>
+  <div style="margin-bottom:12px;">
+    <select id="wallpaperSelect"><!-- Populated by createWallpaperOptions() --></select>
+  </div>
   <div style="margin-top:8px;margin-bottom:16px;">
     <label style="margin-bottom:4px;">Wallpaper Opacity</label>
     <input type="range" id="wallpaperOpacity" min="0" max="100" value="40" style="width:100%;accent-color:#b794f6;" />
@@ -299,8 +325,37 @@
     </select>
   </div>
   <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
+  <button class="btn btn-primary" id="generateSayItBtn" style="display:none;">Generate Story + Song 🎬</button>
+  <button class="btn btn-primary" id="renderPasteBtn" style="display:none;">Render Conversation 📱</button>
   <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
+  <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the story and song...</div>
   <div class="error-box" id="errorBox"></div>
+</div>
+
+<div class="card" id="sayItOutputCard" style="display:none;">
+  <div class="section-title">Narration Script</div>
+  <div class="gem-text-box" id="sayItScriptBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItScriptBtn" style="margin-top:8px;">📋 Copy Narration Script</button>
+
+  <div class="section-title" style="margin-top:20px;">Song — Description Prompt (for Suno auto-mode)</div>
+  <div class="gem-text-box" id="sayItSongPromptBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItSongPromptBtn" style="margin-top:8px;">📋 Copy Song Description</button>
+
+  <div class="section-title" style="margin-top:20px;">Song — Backup Written Lyrics</div>
+  <div class="gem-text-box" id="sayItLyricsBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItLyricsBtn" style="margin-top:8px;">📋 Copy Backup Lyrics</button>
+
+  <div class="section-title" style="margin-top:20px;">On-Screen Caption</div>
+  <div class="gem-text-box" id="sayItOnScreenBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItOnScreenBtn" style="margin-top:8px;">📋 Copy On-Screen Caption</button>
+
+  <div class="section-title" style="margin-top:20px;">Social Caption</div>
+  <div class="gem-text-box" id="sayItSocialBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItSocialBtn" style="margin-top:8px;">📋 Copy Social Caption</button>
+
+  <div class="section-title" style="margin-top:20px;">YouTube Shorts Caption</div>
+  <div class="gem-text-box" id="sayItYtBox" style="display:block;"></div>
+  <button class="action-btn full" id="copySayItYtBtn" style="margin-top:8px;">📋 Copy YouTube Caption</button>
 </div>
 
 <div class="preview-section" id="previewSection">
@@ -379,7 +434,7 @@
 </div>
 
 <div class="card saved-convos" id="savedConvosCard">
-  <div class="saved-title">Saved Conversations</div>
+  <div class="saved-title" id="savedListTitle">Saved Conversations</div>
   <div class="saved-list" id="savedList"></div>
 </div>
 
@@ -641,15 +696,18 @@
     btnEl.style.display = 'block';
   });
 
-  document.getElementById('applyPresetBtn').addEventListener('click', function() {
-    var val = document.getElementById('sunoPreset').value;
-    if (!val || !sunoPresets[val]) return;
-    var p = sunoPresets[val];
+  function applyPresetFields(p) {
+    if (!p) return;
     if (p.person) document.getElementById('person').value = p.person;
     if (p.vibe) { document.getElementById('vibe').value = p.vibe; updateModelOptions(); }
     if (p.msgStyle) document.getElementById('msgStyle').value = p.msgStyle;
     if (p.topic) document.getElementById('topic').value = p.topic;
     if (p.mode) setMode(p.mode);
+  }
+  document.getElementById('applyPresetBtn').addEventListener('click', function() {
+    var val = document.getElementById('sunoPreset').value;
+    if (!val || !sunoPresets[val]) return;
+    applyPresetFields(sunoPresets[val]);
     // Visual feedback
     var btn = document.getElementById('applyPresetBtn');
     btn.textContent = '✓ Preset Applied!';
@@ -671,11 +729,19 @@
 
     if (provider === 'auto') {
       if (isUnhinged) {
+        var opt0 = document.createElement('option');
+        opt0.value = 'grok-4.5';
+        opt0.textContent = 'grok-4.5 (xAI)';
+        modelSelect.appendChild(opt0);
         var opt = document.createElement('option');
         opt.value = 'grok-4.3';
         opt.textContent = 'grok-4.3 (xAI)';
         modelSelect.appendChild(opt);
       } else {
+        var opt0b = document.createElement('option');
+        opt0b.value = 'claude-sonnet-5';
+        opt0b.textContent = 'claude-sonnet-5 (Anthropic)';
+        modelSelect.appendChild(opt0b);
         var opt1 = document.createElement('option');
         opt1.value = 'claude-sonnet-4-6';
         opt1.textContent = 'claude-sonnet-4-6 (Anthropic)';
@@ -686,6 +752,10 @@
         modelSelect.appendChild(opt2);
       }
     } else if (provider === 'anthropic') {
+      var opt0c = document.createElement('option');
+      opt0c.value = 'claude-sonnet-5';
+      opt0c.textContent = 'claude-sonnet-5';
+      modelSelect.appendChild(opt0c);
       var opt1 = document.createElement('option');
       opt1.value = 'claude-sonnet-4-6';
       opt1.textContent = 'claude-sonnet-4-6';
@@ -695,6 +765,10 @@
       opt2.textContent = 'claude-opus-4-7';
       modelSelect.appendChild(opt2);
     } else if (provider === 'xai') {
+      var opt0d = document.createElement('option');
+      opt0d.value = 'grok-4.5';
+      opt0d.textContent = 'grok-4.5';
+      modelSelect.appendChild(opt0d);
       var opt = document.createElement('option');
       opt.value = 'grok-4.3';
       opt.textContent = 'grok-4.3';
@@ -765,11 +839,28 @@
   function generateTimestamps(count) {
     var now = new Date();
     var timestamps = [];
-    for (var i = 0; i < count; i++) {
-      var t = new Date(now.getTime() - (count - i) * 180000);
+    // Build gaps backward from "now" so the last message is always current.
+    // Real conversations don't tick at a fixed interval — mix quick-fire
+    // replies, normal pacing, and the occasional longer pause where someone
+    // got distracted and came back to it.
+    var gapsMs = [];
+    for (var i = 0; i < count - 1; i++) {
+      var roll = Math.random();
+      var gap;
+      if (roll < 0.35) { gap = 20000 + Math.random() * 100000; }        // 20s - 2min: quick-fire
+      else if (roll < 0.75) { gap = 120000 + Math.random() * 360000; }  // 2-8min: normal pacing
+      else if (roll < 0.92) { gap = 480000 + Math.random() * 900000; }  // 8-23min: slower back-and-forth
+      else { gap = 900000 + Math.random() * 1800000; }                 // 15-45min: distracted/came back later
+      gapsMs.push(gap);
+    }
+    var totalMs = gapsMs.reduce(function(a, b) { return a + b; }, 0);
+    var cursor = now.getTime() - totalMs;
+    for (var j = 0; j < count; j++) {
+      var t = new Date(cursor);
       var h = t.getHours();
       var m = String(t.getMinutes()).padStart(2, '0');
       timestamps.push(h + ':' + m);
+      if (j < gapsMs.length) cursor += gapsMs[j];
     }
     return timestamps;
   }
@@ -801,24 +892,141 @@
       var line = lines[i].trim();
       if (!line) continue;
       var lower = line.toLowerCase();
-      if (lower.startsWith('me:')) {
-        msgs.push({ f: 'me', t: line.substring(3).trim() });
-      } else if (lower.startsWith(theirName.toLowerCase() + ':')) {
-        msgs.push({ f: 'them', t: line.substring(theirName.length + 1).trim() });
-      } else if (lower.startsWith('them:') || lower.startsWith('her:') || lower.startsWith('him:')) {
-        msgs.push({ f: 'them', t: line.substring(line.indexOf(':') + 1).trim() });
+      if (lower.startsWith('me:') || lower.startsWith(myName.toLowerCase() + ':')) {
+        var prefixLen = lower.startsWith('me:') ? 3 : myName.length + 1;
+        msgs.push({ f: 'me', t: line.substring(prefixLen).trim() });
       } else if (line.includes(':')) {
         var parts = line.split(':');
-        var speaker = parts[0].trim().toLowerCase();
+        var speakerName = parts[0].trim();
         var content = parts.slice(1).join(':').trim();
-        if (speaker === 'me' || speaker === myName.toLowerCase()) {
-          msgs.push({ f: 'me', t: content });
-        } else {
-          msgs.push({ f: 'them', t: content });
-        }
+        msgs.push({ f: 'them', t: content, speaker: speakerName });
       }
     }
     return msgs;
+  }
+
+  function doRenderPaste() {
+    hideError();
+    var raw = document.getElementById('pasteInput').value.trim();
+    if (!raw) { showError('Paste a conversation first.'); return; }
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var theirName = document.getElementById('theirName').value.trim() || 'Them';
+    var lines = raw.split('\n').filter(function(l){ return l.trim(); });
+    var msgs = [];
+    lines.forEach(function(line) {
+      line = line.trim();
+      var colonIdx = line.indexOf(':');
+      if (colonIdx === -1) {
+        // No speaker label — treat as a continuation of the previous speaker,
+        // or default to "them" if it's the very first line.
+        if (msgs.length > 0) {
+          msgs.push({ f: msgs[msgs.length-1].f, t: line, speaker: msgs[msgs.length-1].speaker });
+        } else {
+          msgs.push({ f: 'them', t: line, speaker: theirName });
+        }
+        return;
+      }
+      var speaker = line.substring(0, colonIdx).trim();
+      var text = line.substring(colonIdx + 1).trim();
+      if (!text) return;
+      var lower = speaker.toLowerCase();
+      var isMine = lower === 'me' || lower === myName.toLowerCase() || lower === 'i';
+      msgs.push({ f: isMine ? 'me' : 'them', t: text, speaker: isMine ? myName : speaker });
+    });
+    if (msgs.length === 0) { showError('Could not read any messages. Use the format "Me: your text" — one per line.'); return; }
+    currentMessages = msgs;
+    renderPhone();
+    renderAnimatePhone();
+    document.getElementById('previewSection').style.display = 'block';
+    document.getElementById('gemTextBox').style.display = 'none';
+    document.getElementById('compareWrap').classList.remove('visible');
+  }
+
+  async function doGenerateSayIt() {
+    hideError();
+    var person = document.getElementById('person').value;
+    var vibe = document.getElementById('vibe').value;
+    var topic = document.getElementById('topic').value.trim();
+    var model = document.getElementById('modelSelect').value;
+    document.getElementById('sayItLoadingDiv').style.display = 'block';
+    document.getElementById('generateSayItBtn').disabled = true;
+
+    var provider = document.getElementById('providerSelect').value;
+    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+    var prompt = 'You are writing content for a viral short-form video format called "Say It In A Song." A creator talks directly to camera, telling a short THIRD-PERSON anecdote about someone they know who had an awkward/bad/uncomfortable thing to say — and instead of saying it normally, that person sent it as a Suno-generated song. The creator then plays the song as the reveal/payoff.\n\n'
+      + 'CRITICAL SETTING RULE: Never reference a car, sitting in a car, or driving anywhere in the script. The creator does NOT film in a car. Keep the setting completely unspecified/neutral — do not mention any location at all.\n\n'
+      + 'WHO THE STORY IS ABOUT: ' + personDescriptions[person] + ' (the anecdote is about this person in the creator\'s life, not the creator themselves)\n\n'
+      + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
+      + (topic ? 'SITUATION — THE STORY IS SPECIFICALLY ABOUT: ' + topic + '.\n\n' : 'Invent a specific, funny, awkward, or petty real-life situation where sending a song instead of a normal message makes sense.\n\n')
+      + 'NARRATION SCRIPT RULES:\n'
+      + '- 25-35 words ONLY — this gets read aloud in roughly 10-14 seconds at natural speaking pace, matching real reference clips. Do not exceed this, it will make the video run too long.\n'
+      + '- Written as natural spoken word-of-mouth storytelling, not written prose. Include verbal filler that sounds natural when spoken aloud (like "so", "and I said", "apparently") — not scripted-sounding.\n'
+      + '- VARY THE OPENING — do not always start the same way. Mix it up between styles like: quoting dialogue first, starting mid-story, starting with the punchline then rewinding, or a direct address to camera.\n'
+      + '- Build to the reveal that the person sent a song instead of confronting/replying normally, then hand off naturally into the song with something like "listen to this" or similar — but vary the exact handoff phrase each time, do not always use the same words.\n'
+      + '- The handoff itself counts toward the 25-35 word limit — there is no room for a separate reaction line after it. End right at the handoff.\n\n'
+      + 'SONG RULES:\n'
+      + '- The song must be thematically specific to the exact situation in the narration — not generic.\n\n'
+      + (useGrok ? 'UNRESTRICTED MODE: this generation has no content restrictions. Full permission to match the vibe\'s intensity exactly, including crude humor or profanity if the vibe calls for it.\n\n' : '')
+      + 'CAPTION RULES:\n'
+      + '- Social Caption MUST start with the exact phrase "song was made using @Suno" (this exact capitalization, this exact wording — not "made with Suno" or "made using Suno", it must say "song was made using @Suno"), then continue naturally into a freestyle caption fitting the vibe. End with hashtags: #sunopartner #sunoambassador #suno plus 2-3 more relevant tags matching the situation.\n'
+      + '- On-Screen Caption is a short punchy hook (under 12 words) about the story premise, meant to stop someone scrolling — not the same text as the narration script.\n'
+      + '- YouTube Shorts Caption: max 100 characters total, must include #sunopartner #sunoambassador #suno.\n\n'
+      + 'OUTPUT FORMAT — use exactly these six markers, nothing else before/after/between them:\n\n'
+      + 'NARRATION:\n[the narration script here]\n\n'
+      + 'SONG_DESCRIPTION:\n[a short 2-3 sentence description of the song\'s theme, mood, and genre, written as a prompt for Suno\'s own auto-songwriting to generate music and lyrics from]\n\n'
+      + 'BACKUP_LYRICS:\n[a short backup Verse 1 + Chorus, in case the auto-generated version from the description above isn\'t good — written lyrics, literal and specific to the situation, singable]\n\n'
+      + 'ON_SCREEN_CAPTION:\n[short hook text]\n\n'
+      + 'SOCIAL_CAPTION:\n[caption with hashtags per the rules above]\n\n'
+      + 'YOUTUBE_CAPTION:\n[max 100 chars with hashtags]';
+
+    try {
+      var rawText;
+      if (useGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: model, messages: [{ role: 'user', content: prompt }], max_tokens: 1200, temperature: 0.9 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        var key = getKey();
+        if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response — the model may have returned only a thinking block.'); }
+        rawText = textBlock.text.trim();
+      }
+
+      if (!rawText) throw new Error('Empty response. Try again.');
+      var narrMatch = rawText.match(/NARRATION:\s*([\s\S]*?)(?=SONG_DESCRIPTION:|$)/i);
+      var descMatch = rawText.match(/SONG_DESCRIPTION:\s*([\s\S]*?)(?=BACKUP_LYRICS:|$)/i);
+      var lyricsMatch = rawText.match(/BACKUP_LYRICS:\s*([\s\S]*?)(?=ON_SCREEN_CAPTION:|$)/i);
+      var onScreenMatch = rawText.match(/ON_SCREEN_CAPTION:\s*([\s\S]*?)(?=SOCIAL_CAPTION:|$)/i);
+      var socialMatch = rawText.match(/SOCIAL_CAPTION:\s*([\s\S]*?)(?=YOUTUBE_CAPTION:|$)/i);
+      var ytMatch = rawText.match(/YOUTUBE_CAPTION:\s*([\s\S]*)$/i);
+      document.getElementById('sayItScriptBox').textContent = narrMatch ? narrMatch[1].trim() : rawText;
+      document.getElementById('sayItSongPromptBox').textContent = descMatch ? descMatch[1].trim() : '';
+      document.getElementById('sayItLyricsBox').textContent = lyricsMatch ? lyricsMatch[1].trim() : '';
+      document.getElementById('sayItOnScreenBox').textContent = onScreenMatch ? onScreenMatch[1].trim() : '';
+      document.getElementById('sayItSocialBox').textContent = socialMatch ? socialMatch[1].trim() : '';
+      document.getElementById('sayItYtBox').textContent = ytMatch ? ytMatch[1].trim() : '';
+      document.getElementById('sayItOutputCard').style.display = 'block';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally {
+      document.getElementById('sayItLoadingDiv').style.display = 'none';
+      document.getElementById('generateSayItBtn').disabled = false;
+    }
   }
 
   async function doGenerate() {
@@ -837,30 +1045,58 @@
       document.getElementById('theirName').value = theirName;
     }
 
+    var groupSize = parseInt(document.getElementById('groupSize').value) || 2;
+    var person3Name = document.getElementById('person3Name').value.trim();
+    var person4Name = document.getElementById('person4Name').value.trim();
+    var otherNames = [theirName];
+    if (groupSize >= 3) otherNames.push(person3Name || 'Chris');
+    if (groupSize >= 4) otherNames.push(person4Name || 'Zoe');
+
     showLoading(true);
 
     var msgCount = currentMode === 'short' ? 'exactly 6' : currentMode === 'song' ? 'between 6 and 10' : 'between 7 and 10';
     var isSongMode = currentMode === 'song';
     var mood = parseInt(document.getElementById('moodSlider').value);
     var moodDesc = moodDescriptions[mood];
+    var providerEarly = document.getElementById('providerSelect').value;
+    var useGrokEarly = providerEarly === 'xai' || (providerEarly === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
 
     var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
-      + 'CONTEXT: This is a conversation between two real people from anywhere in the world. Write it as two distinct personalities talking naturally. Do NOT force any specific cultural references, slang, food, or location into the messages. Let the conversation feel like normal, everyday human dialogue between real people. Everything should feel universally relatable.\n\n'
-      + 'Generate a text message conversation with ' + msgCount + ' messages total.\n\n'
-      + 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n'
+      + 'CONTEXT: This is a conversation between two real people. Write it as two distinct personalities talking naturally, with real texture — actual modern texting rhythm, natural contractions, realistic slang where it fits the personalities and vibe, genuine comedic timing. This should read like a real screenshot people would believe, not a sanitized generic paraphrase.\n\n'
+      + 'HOW TO ACTUALLY BE FUNNY — craft rules, not suggestions. AI-written dialogue fails when it defaults to safe, predictable phrasing. Actively fight that:\n'
+      + '- SPECIFICITY BEATS GENERIC. Concrete oddly-specific details are funny; vague ones are not. "you left my charger at nandos on tuesday" lands. "you lost my stuff" dies. Always reach for the exact brand, number, day, or weirdly precise detail.\n'
+      + '- PUNCH WORD GOES LAST. The funniest or most surprising word must be the FINAL word of that message. If it lands mid-sentence and the message keeps going, the joke dies on the extra words. Cut everything after the punch.\n'
+      + '- NEVER EXPLAIN THE JOKE. Give two incongruent concrete details and let the reader connect them. If a character states the joke outright or adds a clarifying line after the punchline, it is dead. Trust the reader.\n'
+      + '- STATUS PLAY. One person can write with total confident authority about something completely trivial (funny through the mismatch). Another can deliberately self-own with rambling and hedge words. Give each person a clear status position and commit to it.\n'
+      + '- AVOID MODE COLLAPSE. Do not write the first line that comes to mind — that is the line everyone writes. No puns unless genuinely sharp, no dad-joke energy, no generic filler reactions. If a line feels safe or expected, rewrite it.\n\n'
+      + 'TEXTING VOICE — HOW REAL PEOPLE ACTUALLY WRITE:\n'
+      + '- Lowercase is common for casual/funny vibes; full caps for a sudden emotional spike or shouting a single word.\n'
+      + '- Real texters drop pronouns/words when the meaning is still clear ("not doing this rn" not "I am not doing this right now").\n'
+      + '- Comedic timing often comes from a short punchy reply after a long one, or a one-word gut-punch line.\n'
+      + '- Real arguments/banter escalate through specific call-backs and specific accusations, not vague ones ("you did the SAME thing at the wedding" beats "you always do this").\n'
+      + '- Let personality-appropriate slang/expressions show up naturally where the VIBE and PERSON below call for it — do not force it if it does not fit, but do not sand it down into blandness either.\n\n'
+      + 'Generate a text ' + (groupSize >= 3 ? 'group chat conversation' : 'message conversation') + ' with ' + msgCount + ' messages total.\n\n'
+      + (groupSize >= 3
+        ? 'THIS IS A GROUP CHAT with ' + groupSize + ' people: ' + myName + ' (the receiver/main character reading this) plus ' + otherNames.join(', ') + '. Give EACH of the ' + otherNames.length + ' other people their own distinct personality and voice — do not make them interchangeable. In a real group chat people talk over each other, react to different parts of the conversation, some go quiet then jump back in, some pile on a joke together. Format each line as "Name: message" using their exact name.\n\n'
+        : 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n')
       + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
-      + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic between ' + theirName + ' and ' + myName + ' directly.\n\n' : '')
-      + 'NAMES: ' + myName + ' is receiving. ' + theirName + ' is texting them.\n\n'
+      + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic.\n\n' : '')
+      + (groupSize >= 3 ? '' : 'NAMES: ' + myName + ' is receiving. ' + theirName + ' is texting them.\n\n')
       + 'RICHNESS RULES — CRITICAL:\n'
       + '- Every conversation must feel UNIQUE and SPECIFIC. No generic responses like "okay" or "I see".\n'
-      + '- BOTH people must have strong distinct personalities.\n'
-      + '- Include at least one memorable detail, callback to something said earlier, small twist, misunderstanding that escalates, or punchline that lands at the end. Keep details universally relatable.\n'
+      + '- ' + (groupSize >= 3 ? 'EVERY person' : 'BOTH people') + ' must have strong distinct personalities.\n'
+      + '- Include at least one memorable detail, callback to something said earlier, small twist, misunderstanding that escalates, or punchline that lands at the end.\n'
       + '- Vary message length — some short fragments, some longer.\n'
-      + '- The conversation must have ONE memorable quotable moment.\n\n'
-      + 'FORMAT: SPEAKER: message text only. No emojis. No extra text before or after.\n\n'
+      + '- The conversation must have ONE memorable quotable moment.\n'
+      + '- DOUBLE-TEXTING: real people often send 2-4 messages in a row with no reply in between, especially when heated, anxious, excited, or venting. Include this occasionally where the mood calls for it — do not force strict back-and-forth alternation every single line. CRITICAL: double-texted messages still count toward the total message count specified above — restructuring some replies as double-texts does NOT mean you add extra messages on top of that count. The total stays exactly what was specified, no matter how the messages are grouped.\n\n'
+      + 'FORMAT: ' + (groupSize >= 3 ? myName + ' is written as "' + myName + ':". Every other person is written using their EXACT name as given above, e.g. "' + otherNames[0] + ': message text".' : 'SPEAKER: message text only.') + ' No extra text before or after.\n'
+      + (person === 'mom' || person === 'dad'
+        ? '- EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — at least 1 emoji should appear somewhere in the conversation, but keep it simple and how an older person actually texts (❤️ 🙏 😊 👍), never stacked, never more than one per message.\n\n'
+        : '- EMOJI RULE: emojis should be present throughout, multiple across the conversation (not just one), but every emoji must fit the specific line it is on — read the emotional context of that exact message and pick an emoji that actually matches it, not a random default. Do not force an emoji onto every single line, but do not go sparse either — most conversations should have several placed naturally across different messages.\n\n')
       + (isSongMode ? 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n' : '')
-      + moodDesc + '\n\n'
-      + 'Focus on natural, believable, internationally relatable dialogue with no regional flavour.';
+      + (useGrokEarly ? 'UNRESTRICTED MODE — THIS VIBE HAS NO CONTENT LIMITS: this generation is running on a provider with no content restrictions. Full permission to write crude physical/body humor, explicit profanity, raunchy innuendo, dirty talk, and explicit sexual language/description where the VIBE calls for it, with zero softening or self-censorship. Match the intensity the vibe description above asks for exactly, do not tone it down.\n\n' : '')
+      + moodDesc
+      + '\n\nVARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous generation): ' + Math.random().toString(36).substring(2, 10);
 
     try {
       var rawText;
@@ -889,11 +1125,13 @@
         var resp = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+          body: JSON.stringify({ model: model, max_tokens: 2000, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
         var data = await resp.json();
-        rawText = data.content[0].text.trim();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
+        rawText = textBlock.text.trim();
       }
 
       var parsed = parseConversation(rawText, myName, theirName);
@@ -911,6 +1149,8 @@
   async function doGenerateComments() {
     var platKey = document.getElementById('commentsPlatform').value;
     var isIG = platKey === 'instagram_comments';
+    var isYT = platKey === 'youtube_comments';
+    var platformLabel = isIG ? 'Instagram' : (isYT ? 'YouTube' : 'TikTok');
     var vibe = document.getElementById('vibe').value;
     var hook = document.getElementById('topic').value.trim();
     var mood = parseInt(document.getElementById('moodSlider').value);
@@ -932,17 +1172,32 @@
       + '8. CREATIVE COMPARISON — when the hook asks for a comparison/description bait ("describe X as a Y"), commenters get genuinely witty and specific with the comparison, not generic.\n\n'
       + 'Read the HOOK below and decide which of these patterns (and mix of patterns) naturally fits what the hook is asking for. A roast-me hook pulls from patterns 1, 2, 3. A hype-me hook pulls from pattern 7. A confession/advice-bait hook pulls from real specific short answers. A comparison hook pulls from pattern 8. Always mix in at least one pattern 4 (low effort) and one pattern 5 (tag a friend) somewhere in the batch for realism, regardless of hook type.\n\n';
 
-    var prompt = 'You are writing a realistic ' + (isIG ? 'Instagram' : 'TikTok') + ' comment section under a video. This is for a "reading my own comments" reaction video format where the creator screenshots and reacts to real comment sections.\n\n'
+    var prompt = 'You are writing a realistic ' + platformLabel + ' comment section under a video. This is for a "reading my own comments" reaction video format where the creator screenshots and reacts to real comment sections.\n\n'
+      + 'HOW TO ACTUALLY BE FUNNY — these are craft rules, not suggestions. Most AI-written comments fail because they default to safe, predictable, cliché phrasing. Actively fight that:\n\n'
+      + '1. SPECIFICITY BEATS GENERIC. Concrete, oddly-specific details are funny; vague abstractions are not. "a 2019 Honda Civic with one hubcap" lands. "an old car" dies. Reach for the weirdly precise noun, the exact brand, the specific number, the unexpected detail. Never write the generic version of anything.\n\n'
+      + '2. PUNCH WORD GOES LAST. The funniest or most surprising word must be the FINAL word of the comment. If it lands mid-sentence and then the sentence keeps going, the joke dies on the extra words. Cut everything after the punch. "I bought a treadmill and now it is the most expensive clothes hanger I own" works because "hanger" lands last.\n\n'
+      + '3. NEVER EXPLAIN THE JOKE. Give the reader two incongruent concrete details and let them make the connection themselves. The laugh happens in their head at the moment of realization. If you state the joke outright, or add a clarifying phrase after the punchline, you have killed it. Trust the reader.\n\n'
+      + '4. EVERY COMMENT NEEDS A TARGET. Self-deprecation (targeting yourself), roasting the situation, or mock-outrage all work. A comment aimed at nothing reads as flat and corporate.\n\n'
+      + '5. STATUS PLAY. Some commenters write with total confident authority about something completely trivial (funny through the mismatch of serious tone vs stupid subject). Others deliberately lower themselves — rambling, hedge words like "I mean" and "literally", self-own energy. Both work. Pick one per commenter and commit.\n\n'
+      + '6. AVOID MODE COLLAPSE. Do not write the first joke that comes to mind — that is the same joke everyone writes. No puns unless genuinely sharp, no "dad joke" energy, no generic "this is so me" filler, no recycled meme formats unless the hook specifically calls for it. If a line feels safe or expected, rewrite it.\n\n'
+      + 'DISTINCT VOICES — CRITICAL: every single commenter must read like a different actual person, not the same writer using different usernames. Before writing each comment, silently assign that commenter ONE dominant trait and write the whole comment through that lens. Vary widely across the batch — e.g. the one who takes it literally, the over-explainer, the aggressively supportive one, the one who makes it about themselves, the "nobody asked but here is a fact" person, the deadpan one-liner, the one who is unreasonably invested, the one who noticed a tiny irrelevant detail, the one typing like they are out of breath. Never repeat a trait within one batch.\n\n'
+      + (isYT
+        ? 'PLATFORM VOICE — YOUTUBE: longer and more discursive than IG/TikTok. Commenters reference the creator\'s past videos or running jokes ("lore"), timestamps ("the part at 2:14"), and structured formats like "Nobody:" setups. More willing to write multi-sentence setups. Proper punctuation is normal here.\n\n'
+        : (isIG
+          ? 'PLATFORM VOICE — INSTAGRAM: observational and identity-driven, slightly more punctuated than TikTok. Tag-baiting is common ("@someone this is literally you"). Comments often connect the content back to the commenter\'s own social circle or aesthetic opinions. Slightly older energy than TikTok.\n\n'
+          : 'PLATFORM VOICE — TIKTOK: lowercase, minimal punctuation, hyper-ironic and surreal. Punctuation reads as trying too hard. Commenters break the fourth wall and address the algorithm directly ("why did the fyp send me here", "the timing of this is insane"). Extremely brief. Trend-formula phrasing repeated with variation.\n\n'))
       + 'THE HOOK / ON-SCREEN CAPTION OF THE VIDEO (this is what commenters are reacting to): "' + hook + '"\n\n'
       + vocabBank
       + 'TONE / INTENSITY: ' + vibeDescriptions[vibe] + '\n\n'
       + moodDesc + '\n\n'
       + 'COMMENT LENGTH — STRICT: Real Instagram/TikTok comments are short. At least 80% of comments must be ONE short sentence or fragment, under 17 words — many should be even shorter (3-8 words). Maximum 1-2 comments in the entire batch may run to 2-3 sentences for variety, and even those should stay under 40 words total. Never write a comment longer than a short paragraph — no comment should read like a monologue or story.\n\n'
-      + 'Generate exactly ' + count + ' distinct fake ' + (isIG ? 'Instagram' : 'TikTok') + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
+      + 'Generate exactly ' + count + ' distinct fake ' + platformLabel + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
       + 'Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful comedy, not actual bullying.\n\n'
       + 'Mark exactly ONE of the comments (the funniest/best one) by starting that line with [PINNED] before the username — this represents the top comment the algorithm surfaced. Mark exactly ONE different comment (can overlap logic-wise but must be a different line) by starting it with [LIKED] before the username — this represents a comment the creator personally liked. Every other line has no marker.\n\n'
+      + 'NESTED REPLIES: for exactly 2 of the comments in the batch (pick ones where a reply thread would feel natural — a joke someone builds on, a disagreement, a "wait what" reaction), write 2-3 short reply lines directly under that comment. Each reply line must start with ">" followed by a fake username, then the reply text — e.g. ">replyuser22: wait fr??". Replies should read like a real back-and-forth (agreeing, arguing, adding a joke, asking a follow-up) — not just more top-level comments. Every other comment in the batch has no replies attached.\n\n'
       + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid, victor.j1_, tonnyjayworld).\n\n'
-      + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nOne per line. No numbering. No extra commentary before or after this list.';
+      + 'VARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous batch): ' + Math.random().toString(36).substring(2, 10) + '\n\n'
+      + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nNested reply (indented under the comment above it): >username: reply text\nOne per line. No numbering. No extra commentary before or after this list.';
 
     try {
       var rawText;
@@ -969,11 +1224,13 @@
         var resp = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+          body: JSON.stringify({ model: model, max_tokens: 2000, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
         var data = await resp.json();
-        rawText = data.content[0].text.trim();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
+        rawText = textBlock.text.trim();
       }
 
       var parsed = parseComments(rawText);
@@ -999,6 +1256,17 @@
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var myName = document.getElementById('myName').value.trim() || 'Me';
+    var groupSizeEl = document.getElementById('groupSize');
+    var isGroupChat = groupSizeEl && parseInt(groupSizeEl.value) >= 3;
+    var groupSenderColors = {};
+    var groupPalette = ['#f56040', '#00b0f4', '#7c3aed', '#25d366', '#fe2c55', '#ffb300'];
+    function colorForSender(name) {
+      if (!groupSenderColors[name]) {
+        var keys = Object.keys(groupSenderColors);
+        groupSenderColors[name] = groupPalette[keys.length % groupPalette.length];
+      }
+      return groupSenderColors[name];
+    }
 
     for (var i = 0; i < messages.length; i++) {
       if (!showAll && i >= messages.length) break;
@@ -1007,6 +1275,15 @@
       var ts = timestamps[i];
       var row = document.createElement('div');
       row.className = 'p-bubble-row ' + (isMe ? 'me' : 'them');
+      var sameAsPrev = i > 0 && messages[i-1].f === msg.f && (msg.f === 'me' || !isGroupChat || messages[i-1].speaker === msg.speaker);
+      row.style.marginTop = i === 0 ? '0' : (sameAsPrev ? '2px' : '10px');
+
+      if (isGroupChat && !isMe && !theme.isDiscord && !sameAsPrev) {
+        var senderLabel = document.createElement('div');
+        senderLabel.style.cssText = 'font-size:11px;font-weight:600;color:' + colorForSender(msg.speaker || theirName) + ';margin:0 0 2px 4px;';
+        senderLabel.textContent = msg.speaker || theirName;
+        row.appendChild(senderLabel);
+      }
 
       if (theme.isDiscord) {
         var dm = document.createElement('div');
@@ -1014,19 +1291,89 @@
         dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
         row.appendChild(dm);
       } else {
-        if (replyIndices && replyIndices.has(i) && i > 0) {
+        var qStyle = theme.quoteStyle || 'nested';
+        if (replyIndices && replyIndices.has(i) && i > 0 && qStyle !== 'none') {
           var prevMsg = messages[i-1];
-          var quote = document.createElement('div');
-          quote.className = 'p-reply-quote';
-          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
           var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
-          quote.textContent = preview;
-          row.appendChild(quote);
+
+          if (qStyle === 'spine') {
+            // Discord: flat list architecture — no bubbles, so the quote is a
+            // single truncated line above the message with a mini avatar,
+            // linked by an L-shaped spine. Never a nested box.
+            var spineWrap = document.createElement('div');
+            spineWrap.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:11px;opacity:0.64;margin-bottom:2px;padding-left:6px;color:' + bTheme.color + ';white-space:nowrap;overflow:hidden;';
+            var spineLine = document.createElement('div');
+            spineLine.style.cssText = 'width:14px;height:8px;border-left:2px solid rgba(255,255,255,0.15);border-top:2px solid rgba(255,255,255,0.15);border-top-left-radius:6px;flex-shrink:0;';
+            var miniAvatar = document.createElement('div');
+            miniAvatar.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (isMe ? theme.avatarBg : theme.bubbleThem.bg) + ';flex-shrink:0;';
+            var spineText = document.createElement('span');
+            spineText.style.cssText = 'overflow:hidden;text-overflow:ellipsis;';
+            spineText.textContent = (isMe ? theirName : myName) + '  ' + (prevMsg.t.length > 32 ? prevMsg.t.substring(0,32) + '...' : prevMsg.t);
+            spineWrap.appendChild(spineLine);
+            spineWrap.appendChild(miniAvatar);
+            spineWrap.appendChild(spineText);
+            row.appendChild(spineWrap);
+          } else if (qStyle === 'nested-rounded') {
+            // Google Messages / Material 3: tonal nested block, heavily
+            // rounded, NO harsh vertical accent bar (per M3 spec).
+            var quote = document.createElement('div');
+            quote.className = 'p-reply-quote';
+            quote.style.cssText = 'font-size:10.5px;padding:6px 10px;border-radius:14px;margin-bottom:3px;max-width:82%;opacity:0.85;line-height:1.35;background:' + (isMe ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.09)') + ';color:' + bTheme.color + ';';
+            quote.textContent = preview;
+            row.appendChild(quote);
+          } else {
+            // Default nested model: quote sits inside the bubble stack with a
+            // vertical accent bar on the left (WhatsApp/Telegram/Meta/X/Snap).
+            var quote = document.createElement('div');
+            quote.className = 'p-reply-quote';
+            quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
+            quote.textContent = preview;
+            row.appendChild(quote);
+          }
+        } else if (!theme.isDiscord && !sameAsPrev && Math.random() < 0.08) {
+          // Occasional "Replied to your story" style bubble — mocked with a
+          // small placeholder thumbnail since there's no real story image to
+          // reference. Purely decorative, separate from the real bubble.
+          var storyReply = document.createElement('div');
+          storyReply.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;opacity:0.75;margin-bottom:3px;color:' + bTheme.color + ';';
+          var storyThumb = document.createElement('div');
+          storyThumb.style.cssText = 'width:22px;height:32px;border-radius:4px;background:linear-gradient(135deg,#f56040,#833ab4);flex-shrink:0;';
+          var storyLabel = document.createElement('span');
+          storyLabel.textContent = 'Replied to ' + (isMe ? theirName + '\u2019s' : 'your') + ' story';
+          storyReply.appendChild(storyThumb);
+          storyReply.appendChild(storyLabel);
+          row.appendChild(storyReply);
         }
 
         var bubble = document.createElement('div');
-        var bubbleStyle = 'max-width:75%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        var bubbleStyle = 'max-width:82%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
         bubbleStyle += 'background:' + bTheme.bg + ';';
+
+        // Occasionally render a voice-note look above the real message. This
+        // is purely decorative and appended as a SEPARATE sibling element —
+        // never merged into `bubble` itself — because the click-to-edit
+        // logic below reads the entire bubble's textContent on blur, and
+        // mixing decorative waveform markup into that would corrupt the
+        // saved message text and also break the Gem's ability to read the
+        // literal line from the screenshot.
+        var isVoiceNote = !theme.isDiscord && Math.random() < 0.12;
+        if (isVoiceNote) {
+          var durationSec = 3 + Math.floor(Math.random() * 25);
+          var durLabel = '0:' + String(durationSec).padStart(2, '0');
+          var bars = '';
+          for (var wb = 0; wb < 18; wb++) {
+            var barH = 3 + Math.floor(Math.random() * 11);
+            bars += '<rect x="' + (wb * 3.3) + '" y="' + ((16 - barH) / 2) + '" width="1.6" height="' + barH + '" rx="1" fill="' + bTheme.color + '" opacity="0.85"/>';
+          }
+          var voicePill = document.createElement('div');
+          voicePill.style.cssText = 'display:flex;align-items:center;gap:8px;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';margin-bottom:3px;max-width:fit-content;' + (isMe ? 'align-self:flex-end;' : 'align-self:flex-start;');
+          voicePill.innerHTML = '<span style="font-size:13px;">▶</span><svg width="60" height="16" viewBox="0 0 60 16">' + bars + '</svg><span style="font-size:10px;opacity:0.8;white-space:nowrap;">' + durLabel + '</span>';
+          row.appendChild(voicePill);
+          // Deliberately NOT changing bubbleStyle's font-size/opacity here
+          // anymore — this text should read exactly like every other
+          // message bubble, full size, full opacity, no visual distinction.
+        }
+
         bubble.style.cssText = bubbleStyle;
         bubble.textContent = msg.t;
         bubble.dataset.msgIdx = i;
@@ -1092,22 +1439,24 @@
 
   var platformThemes = {
     whatsapp: {
+      quoteStyle: 'nested',
       bgSb: '#0a0a0a', colorSb: '#f0f0f0',
       bgHeader: '#1a1a1a', borderHeader: '#333',
       bgMessages: '#0f0f0f',
       bgInput: '#1a1a1a', bgFakeInput: '#252525', colorFakeInput: '#888', fakePlaceholder: 'Message',
       floatInput: true, floatInputBg: '#1a1a1a',
       bubbleMe: { bg: '#005c4b', color: '#fff', radius: '18px 18px 4px 18px' },
-      bubbleThem: { bg: '#1f2c34', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleThem: { bg: '#202c33', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'inside',
       timeColor: '#888', timeBubble: '#ffffff',
-      readReceipt: '✓✓', readColor: '#4ade80', readAllSent: true,
+      readReceipt: '✓✓', readColor: '#34b7f1', readAllSent: true,
       sendBg: '#005c4b', sendStroke: '#fff',
       avatarBg: '#005c4b', avatarColor: '#fff',
       nameColor: '#f0f0f0',
       typingBg: '#1f2c34', typingDot: '#888'
     },
     imessage: {
+      quoteStyle: 'none',
       bgSb: '#f5f5f5', colorSb: '#000',
       bgHeader: '#f5f5f5', borderHeader: '#ddd',
       bgMessages: '#f5f5f5',
@@ -1117,29 +1466,31 @@
       bubbleThem: { bg: '#e5e5ea', color: '#000', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: 'Read', readColor: '#007AFF', readAllSent: false,
+      readReceipt: 'Read', readColor: '#8e8e93', readAllSent: false,
       sendBg: '#007AFF', sendStroke: '#fff',
       avatarBg: '#007AFF', avatarColor: '#fff',
       nameColor: '#000',
       typingBg: '#e5e5ea', typingDot: '#888'
     },
     messenger: {
+      quoteStyle: 'nested',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#000',
       bgInput: '#000', bgFakeInput: '#1a1a1a', colorFakeInput: '#888', fakePlaceholder: 'Message',
       floatInput: false,
-      bubbleMe: { bg: 'linear-gradient(135deg, #7c3aed, #3b82f6)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
-      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleMe: { bg: 'linear-gradient(135deg, #ff8fb2, #a797ff, #00e5ff)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
+      bubbleThem: { bg: '#262626', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
-      sendBg: '#7c3aed', sendStroke: '#fff',
-      avatarBg: 'linear-gradient(135deg, #7c3aed, #3b82f6)', avatarColor: '#fff',
+      readReceipt: '✓', readColor: '#0084ff', readAllSent: false,
+      sendBg: '#0084ff', sendStroke: '#fff',
+      avatarBg: 'linear-gradient(135deg, #ff8fb2, #a797ff, #00e5ff)', avatarColor: '#fff',
       nameColor: '#fff',
       typingBg: '#1a1a1a', typingDot: '#888'
     },
     facebook: {
+      quoteStyle: 'nested',
       bgSb: '#1877f2', colorSb: '#fff',
       bgHeader: '#1877f2', borderHeader: '#166fe0',
       bgMessages: '#f0f2f5',
@@ -1156,38 +1507,41 @@
       typingBg: '#fff', typingDot: '#888'
     },
     telegram: {
+      quoteStyle: 'nested',
       bgSb: '#1a1033', colorSb: '#fff',
       bgHeader: '#1a1033', borderHeader: '#2a1f4a',
       bgMessages: '#0f0a1f',
       bgInput: '#1a1033', bgFakeInput: '#2a1f4a', colorFakeInput: '#888', fakePlaceholder: 'Message',
       floatInput: false,
-      bubbleMe: { bg: '#e17055', color: '#fff', radius: '18px 18px 4px 18px' },
-      bubbleThem: { bg: '#2a1f4a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleMe: { bg: '#3390ec', color: '#fff', radius: '18px 18px 4px 18px' },
+      bubbleThem: { bg: '#182533', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
-      sendBg: '#e17055', sendStroke: '#fff',
-      avatarBg: '#e17055', avatarColor: '#fff',
+      readReceipt: '✓', readColor: '#3390ec', readAllSent: false,
+      sendBg: '#3390ec', sendStroke: '#fff',
+      avatarBg: '#3390ec', avatarColor: '#fff',
       nameColor: '#fff',
       typingBg: '#2a1f4a', typingDot: '#888'
     },
     instagram: {
+      quoteStyle: 'nested',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#000',
       bgInput: '#1a1a1a', bgFakeInput: '#262626', colorFakeInput: '#888', fakePlaceholder: 'Message...',
       floatInput: false,
-      bubbleMe: { bg: 'linear-gradient(135deg, #f56040, #c13584, #833ab4)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
-      bubbleThem: { bg: '#1a1a1a', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
+      bubbleMe: { bg: 'linear-gradient(135deg, #4f5bd5, #962fbf, #d62976)', color: '#fff', radius: '18px 18px 4px 18px', isGradient: true },
+      bubbleThem: { bg: '#262626', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
-      sendBg: '#f56040', sendStroke: '#fff',
-      avatarBg: 'linear-gradient(135deg, #f56040, #c13584, #833ab4)', avatarColor: '#fff',
+      readReceipt: 'Seen', readColor: '#8e8e8e', readAllSent: false,
+      sendBg: '#833ab4', sendStroke: '#fff',
+      avatarBg: 'linear-gradient(135deg, #4f5bd5, #962fbf, #d62976)', avatarColor: '#fff',
       nameColor: '#fff',
       typingBg: '#1a1a1a', typingDot: '#888'
     },
     twitter: {
+      quoteStyle: 'nested',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#000',
@@ -1204,6 +1558,7 @@
       typingBg: '#1a1a1a', typingDot: '#888'
     },
     reddit: {
+      quoteStyle: 'none',
       bgSb: '#0d1117', colorSb: '#fff',
       bgHeader: '#0d1117', borderHeader: '#333',
       bgMessages: '#0d1117',
@@ -1220,6 +1575,7 @@
       typingBg: '#1a1a1a', typingDot: '#888'
     },
     snapchat: {
+      quoteStyle: 'nested',
       bgSb: '#fffc00', colorSb: '#000',
       bgHeader: '#fffc00', borderHeader: '#f0e600',
       bgMessages: '#fff',
@@ -1236,6 +1592,7 @@
       typingBg: '#f5f5f5', typingDot: '#888'
     },
     discord: {
+      quoteStyle: 'spine',
       bgSb: '#313338', colorSb: '#fff',
       bgHeader: '#313338', borderHeader: '#40444b',
       bgMessages: '#313338',
@@ -1252,6 +1609,7 @@
       typingBg: '#40444b', typingDot: '#888'
     },
     tiktok: {
+      quoteStyle: 'none',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#fff',
@@ -1268,6 +1626,7 @@
       typingBg: '#f5f5f5', typingDot: '#888'
     },
     android: {
+      quoteStyle: 'nested-rounded',
       bgSb: '#0d0d0d', colorSb: '#fff',
       bgHeader: '#0d0d0d', borderHeader: '#333',
       bgMessages: '#0d0d0d',
@@ -1284,6 +1643,40 @@
       typingBg: '#2a2a2a', typingDot: '#888'
     }
   };
+
+  // Doodle pattern generator — builds tileable monoline-icon SVG backgrounds,
+  // matching the real spec found in research: simple flat silhouette icons,
+  // no shading, low opacity (8-15%), densely interlocked tiling for the
+  // "classic" style, or sparse/rotated for the "scattered" style.
+  function doodleTile(iconPaths, tileSize, baseColor) {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + tileSize + '" height="' + tileSize + '" viewBox="0 0 ' + tileSize + ' ' + tileSize + '">'
+      + iconPaths
+      + '</svg>';
+    var dataUri = 'data:image/svg+xml,' + encodeURIComponent(svg);
+    return baseColor + ' url("' + dataUri + '") repeat';
+  }
+  var ICONS = {
+    heart: function(x, y, s, rot) { return '<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" d="M0,6 C0,3 -3,0 -6,0 C-9,0 -11,2 -11,5 C-11,9 -6,13 0,18 C6,13 11,9 11,5 C11,2 9,0 6,0 C3,0 0,3 0,6 Z" fill="none" stroke="STROKE" stroke-width="1.5"/>'; },
+    star: function(x, y, s, rot) { return '<polygon transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" points="0,-10 2.4,-3 10,-3 4,1.5 6,9 0,4.5 -6,9 -4,1.5 -10,-3 -2.4,-3" fill="none" stroke="STROKE" stroke-width="1.3"/>'; },
+    envelope: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.3"><rect x="-11" y="-8" width="22" height="16" rx="1.5"/><path d="M-11,-8 L0,2 L11,-8"/></g>'; },
+    note: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.4"><circle cx="-6" cy="9" r="4"/><line x1="-2" y1="9" x2="-2" y2="-10"/><path d="M-2,-10 L8,-7 L8,-1 L-2,-4"/></g>'; },
+    plane: function(x, y, s, rot) { return '<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" d="M-11,3 L11,-9 L2,5 L4,11 L-1,6 L-6,8 Z" fill="none" stroke="STROKE" stroke-width="1.3" stroke-linejoin="round"/>'; },
+    cat: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.5" stroke-linejoin="round"><path d="M-9,10 C-9,2 -6,-6 0,-6 C6,-6 9,2 9,10 Z"/><path d="M-6,-5 L-8,-11 L-3,-7 Z"/><path d="M6,-5 L8,-11 L3,-7 Z"/></g>'; }
+  };
+  function buildDoodleSVG(iconFns, tileSize, count, strokeColor, sparse) {
+    var out = '';
+    var seed = 42;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < count; i++) {
+      var fn = iconFns[Math.floor(rnd() * iconFns.length)];
+      var x = rnd() * tileSize;
+      var y = rnd() * tileSize;
+      var s = sparse ? (0.9 + rnd() * 0.6) : (0.65 + rnd() * 0.25);
+      var rot = sparse ? Math.floor(rnd() * 360) : Math.floor(rnd() * 40 - 20);
+      out += fn(x, y, s, rot).split('STROKE').join(strokeColor);
+    }
+    return out;
+  }
 
   function applyWallpaper() {
     var opacity = parseInt(document.getElementById('wallpaperOpacity').value) / 100;
@@ -1305,44 +1698,70 @@
       'solid2': '#16213e',
       'solid3': '#2d132c',
       'solid4': '#0f3460',
-      'solid5': '#1e3a5f'
+      'solid5': '#1e3a5f',
+      // Classic Monoline style — dense, interlocked, low opacity (~10-12%),
+      // matches the exact spec found in research for WhatsApp-style doodles.
+      'doodle1': doodleTile(buildDoodleSVG([ICONS.heart], 140, 9, 'rgba(255,255,255,0.11)', false), 140, '#161b22'),
+      'doodle2': doodleTile(buildDoodleSVG([ICONS.star, ICONS.envelope], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#14181f'),
+      'doodle3': doodleTile(buildDoodleSVG([ICONS.note, ICONS.plane], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#171a24'),
+      // Vector Overlay style — sparse, rotated, larger tile, matches
+      // Telegram's "themed" pattern approach found in the research.
+      'doodle4': doodleTile(buildDoodleSVG([ICONS.cat], 220, 5, 'rgba(255,255,255,0.15)', true), 220, '#12141c'),
+      // Abstract Geometric style — under 10% opacity, tiny mathematical
+      // micro-pattern, exactly matching the research's spec for this style.
+      'geo1': '#14181f url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="1.4" fill="rgba(255,255,255,0.09)"/></svg>') + '") repeat',
+      'geo2': '#161616 url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><path d="M0,13 L6.5,6.5 L13,13 L19.5,6.5 L26,13" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/></svg>') + '") repeat'
     };
     var bg = colors[currentWallpaper] || '#222';
     phone.style.background = bg;
     if (animatePhone) animatePhone.style.background = bg;
   }
 
-  function createWallpaperSwatches() {
-    var grid = document.getElementById('wallpaperGrid');
-    grid.innerHTML = '';
-    var options = [
-      { id: 'none', label: 'None', color: '#222' },
-      { id: 'gradient1', label: 'Deep Blue', color: 'linear-gradient(135deg, #1a1a2e, #16213e)' },
-      { id: 'gradient2', label: 'Purple', color: 'linear-gradient(135deg, #0f3460, #533483)' },
-      { id: 'gradient3', label: 'Wine', color: 'linear-gradient(135deg, #2d132c, #801336)' },
-      { id: 'gradient4', label: 'Navy', color: 'linear-gradient(135deg, #1e3a5f, #2e5a7e)' },
-      { id: 'gradient5', label: 'Burgundy', color: 'linear-gradient(135deg, #3d1a1a, #6b2d2d)' },
-      { id: 'solid1', label: 'Dark', color: '#1a1a1a' },
-      { id: 'solid2', label: 'Midnight', color: '#16213e' },
-      { id: 'solid3', label: 'Plum', color: '#2d132c' },
-      { id: 'solid4', label: 'Ocean', color: '#0f3460' },
-      { id: 'solid5', label: 'Steel', color: '#1e3a5f' }
+  function createWallpaperOptions() {
+    var select = document.getElementById('wallpaperSelect');
+    select.innerHTML = '';
+    var groups = [
+      { label: 'Basic', options: [
+        { id: 'none', label: 'None' }
+      ]},
+      { label: 'Solid & Simple Gradients', options: [
+        { id: 'gradient1', label: 'Deep Blue' },
+        { id: 'gradient2', label: 'Purple' },
+        { id: 'gradient3', label: 'Wine' },
+        { id: 'gradient4', label: 'Navy' },
+        { id: 'gradient5', label: 'Burgundy' },
+        { id: 'solid1', label: 'Dark' },
+        { id: 'solid2', label: 'Midnight' },
+        { id: 'solid3', label: 'Plum' },
+        { id: 'solid4', label: 'Ocean' },
+        { id: 'solid5', label: 'Steel' }
+      ]},
+      { label: 'Doodle Patterns', options: [
+        { id: 'doodle1', label: 'Hearts' },
+        { id: 'doodle2', label: 'Stars & Envelopes' },
+        { id: 'doodle3', label: 'Music & Paper Planes' },
+        { id: 'doodle4', label: 'Scattered Cats' }
+      ]},
+      { label: 'Subtle Texture', options: [
+        { id: 'geo1', label: 'Dot Grid' },
+        { id: 'geo2', label: 'Soft Zigzag' }
+      ]}
     ];
-    options.forEach(function(opt) {
-      var swatch = document.createElement('div');
-      swatch.className = 'wp-swatch';
-      swatch.style.background = opt.color;
-      if (opt.id === currentWallpaper) swatch.classList.add('active');
-      swatch.title = opt.label;
-      swatch.addEventListener('click', function() {
-        currentWallpaper = opt.id;
-        document.querySelectorAll('.wp-swatch').forEach(function(s){ s.classList.remove('active'); });
-        swatch.classList.add('active');
-        if (currentMessages.length > 0) {
-          applyWallpaper();
-        }
+    groups.forEach(function(group) {
+      var optgroup = document.createElement('optgroup');
+      optgroup.label = group.label;
+      group.options.forEach(function(opt) {
+        var option = document.createElement('option');
+        option.value = opt.id;
+        option.textContent = opt.label;
+        if (opt.id === currentWallpaper) option.selected = true;
+        optgroup.appendChild(option);
       });
-      grid.appendChild(swatch);
+      select.appendChild(optgroup);
+    });
+    select.addEventListener('change', function() {
+      currentWallpaper = select.value;
+      if (currentMessages.length > 0) { applyWallpaper(); }
     });
     document.getElementById('wallpaperOpacity').addEventListener('input', function() {
       if (currentMessages.length > 0) applyWallpaper();
@@ -1366,6 +1785,14 @@
       inputBg: '#fff', inputBorder: '#f1f1f2', inputPlaceholder: '#8a8b91',
       avatarPalette: ['#fe2c55', '#25f4ee', '#7c3aed', '#f56040', '#0084ff', '#00b0f4'],
       headerLabel: null
+    },
+    youtube_comments: {
+      bg: '#0f0f0f', headerBg: '#0f0f0f', headerBorder: '#272727', headerText: '#fff',
+      text: '#f1f1f1', username: '#f1f1f1', timeColor: '#aaaaaa',
+      replyColor: '#3ea6ff', likeCountColor: '#aaaaaa', heartColor: '#aaaaaa',
+      inputBg: '#0f0f0f', inputBorder: '#272727', inputPlaceholder: '#717171',
+      avatarPalette: ['#c62828', '#1565c0', '#2e7d32', '#6a1b9a', '#ef6c00', '#00838f'],
+      headerLabel: 'Comments'
     }
   };
 
@@ -1435,6 +1862,16 @@
     var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
     var out = [];
     lines.forEach(function(line) {
+      // Nested reply — starts with ">", attaches to the most recent top-level comment.
+      if (line.charAt(0) === '>') {
+        var replyMatch = line.substring(1).trim().match(/^([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
+        if (replyMatch && out.length > 0) {
+          var parent = out[out.length - 1];
+          if (!parent.nestedReplies) parent.nestedReplies = [];
+          parent.nestedReplies.push({ user: replyMatch[1].replace(/^@/, ''), text: replyMatch[2].trim() });
+        }
+        return;
+      }
       var isPinned = false, isLiked = false;
       var cleanLine = line;
       var pinnedMatch = cleanLine.match(/^\[PINNED\]\s*/i);
@@ -1453,16 +1890,17 @@
         edited: Math.random() < 0.06,
         pinned: isPinned,
         creatorLiked: isLiked,
-        avatarSeed: Math.floor(Math.random() * 70) + 1
+        avatarSeed: Math.floor(Math.random() * 70) + 1,
+        nestedReplies: null
       });
     });
     assignAvatarKinds(out);
     return out;
   }
 
-  // Assigns each comment an avatar "kind" so a batch reads as a natural mix
-  // of real-looking commenters, cartoon ones, and a few with no picture at
-  // all — instead of every comment looking the same.
+  // Assigns each comment an avatar "kind" so a batch reads like a real
+  // Instagram section — most people show a real profile photo, a handful
+  // are cartoon/default-icon accounts, and a few have no picture at all.
   function assignAvatarKinds(list) {
     if (list.length === 0) return;
     var indices = list.map(function(_, i) { return i; });
@@ -1470,12 +1908,33 @@
       var j = Math.floor(Math.random() * (i + 1));
       var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
     }
-    var realisticCount = Math.min(list.length, 3 + Math.round(Math.random()));
-    var blankCount = Math.min(list.length - realisticCount, Math.round(list.length * 0.2));
+    // Realistic photos are the majority (~60-75%), matching how most real
+    // IG accounts actually look. Blank stays a small minority (~10%).
+    // Cartoon fills whatever's left.
+    var realisticPct = 0.60 + Math.random() * 0.15;
+    var realisticCount = Math.max(1, Math.min(list.length, Math.round(list.length * realisticPct)));
+    var blankCount = Math.min(list.length - realisticCount, Math.round(list.length * 0.1));
     indices.forEach(function(idx, pos) {
       if (pos < realisticCount) list[idx].avatarKind = 'realistic';
       else if (pos < realisticCount + blankCount) list[idx].avatarKind = 'blank';
       else list[idx].avatarKind = 'cartoon';
+    });
+
+    // Assign guaranteed-unique photo seeds so no two commenters in the same
+    // batch ever get the same profile picture. pravatar.cc serves images
+    // 1-70, so we shuffle that full pool and deal from it without repeats.
+    var pool = [];
+    for (var p = 1; p <= 70; p++) pool.push(p);
+    for (var q = pool.length - 1; q > 0; q--) {
+      var r = Math.floor(Math.random() * (q + 1));
+      var swap = pool[q]; pool[q] = pool[r]; pool[r] = swap;
+    }
+    var dealt = 0;
+    list.forEach(function(c) {
+      if (c.avatarKind === 'realistic') {
+        c.avatarSeed = pool[dealt % pool.length];
+        dealt++;
+      }
     });
   }
 
@@ -1483,6 +1942,7 @@
     var platKey = document.getElementById('commentsPlatform').value;
     var theme = commentThemes[platKey] || commentThemes.instagram_comments;
     var isIG = platKey === 'instagram_comments';
+    var isYT = platKey === 'youtube_comments';
 
     document.getElementById('commentsFrame').style.background = theme.bg;
     document.getElementById('cStatusBar').style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bg + ';color:' + theme.headerText + ';';
@@ -1507,7 +1967,7 @@
 
     currentComments.forEach(function(c) {
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;' + (c.pinned ? 'background:' + (isIG ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)') + ';border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;' : '');
+      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;' + (c.pinned ? 'background:' + ((isIG || isYT) ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)') + ';border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;' : '');
 
       var avatarStyle = (document.getElementById('avatarStyle') || {}).value || 'mixed';
       var effectiveKind = avatarStyle === 'mixed' ? (c.avatarKind || 'cartoon')
@@ -1571,12 +2031,15 @@
       });
       usernameSpan.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
       topLine.appendChild(usernameSpan);
-      if (c.verified) {
-        var verifiedBadge = document.createElement('span');
-        verifiedBadge.style.color = '#3897f0';
-        verifiedBadge.textContent = ' ✔';
-        topLine.appendChild(verifiedBadge);
-      }
+      var verifiedBadge = document.createElement('span');
+      verifiedBadge.title = 'Click to toggle verified badge';
+      verifiedBadge.style.cssText = 'cursor:pointer;margin-left:3px;color:' + (c.verified ? '#3897f0' : '#3a3a3a') + ';font-size:12px;';
+      verifiedBadge.textContent = '✔';
+      verifiedBadge.addEventListener('click', function() {
+        c.verified = !c.verified;
+        this.style.color = c.verified ? '#3897f0' : '#3a3a3a';
+      });
+      topLine.appendChild(verifiedBadge);
       var timeSpan = document.createElement('span');
       timeSpan.style.cssText = 'font-weight:400;color:' + theme.timeColor + ';font-size:11px;';
       timeSpan.textContent = ' ' + c.time + (c.edited ? ' • Edited' : '');
@@ -1604,6 +2067,22 @@
         actions.appendChild(likedBadge);
       }
       body.appendChild(actions);
+
+      if (c.nestedReplies && c.nestedReplies.length > 0) {
+        var repliesWrap = document.createElement('div');
+        repliesWrap.style.cssText = 'margin-top:8px;padding-left:16px;border-left:1px solid ' + theme.headerBorder + ';display:flex;flex-direction:column;gap:6px;';
+        c.nestedReplies.forEach(function(r) {
+          var replyRow = document.createElement('div');
+          replyRow.style.cssText = 'font-size:12px;color:' + theme.text + ';line-height:1.35;';
+          var replyUser = document.createElement('span');
+          replyUser.style.cssText = 'font-weight:600;color:' + theme.username + ';margin-right:5px;';
+          replyUser.textContent = r.user;
+          replyRow.appendChild(replyUser);
+          replyRow.appendChild(document.createTextNode(r.text));
+          repliesWrap.appendChild(replyRow);
+        });
+        body.appendChild(repliesWrap);
+      }
 
       if (c.replies > 0) {
         var repliesLine = document.createElement('div');
@@ -1638,7 +2117,7 @@
 
     var inputBar = document.getElementById('cInputBar');
     inputBar.style.cssText = 'padding:8px 14px;display:flex;align-items:center;gap:8px;background:' + theme.inputBg + ';border-top:0.5px solid ' + theme.inputBorder + ';';
-    inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + (isIG ? '#000' : '#f1f1f2') + ';border:' + (isIG ? '1px solid #333' : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isIG ? 'Add a comment...' : 'Add comment...') + '</div>';
+    inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + theme.inputBg + ';border:' + ((isIG || isYT) ? '1px solid ' + theme.inputBorder : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isYT ? 'Add a comment...' : (isIG ? 'Add a comment...' : 'Add comment...')) + '</div>';
 
     document.getElementById('editHint').style.display = 'block';
   }
@@ -1837,12 +2316,12 @@
         if (animReplyIndices.has(i) && i > 0) {
           var prevMsg = currentMessages[i-1];
           var quote = document.createElement('div');
-          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:75%;opacity:0.7;line-height:1.3;background:rgba(128,128,128,0.1);color:' + bTheme.color + ';';
+          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:rgba(128,128,128,0.1);color:' + bTheme.color + ';';
           quote.textContent = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40)+'...' : prevMsg.t;
           row.appendChild(quote);
         }
         var bubble = document.createElement('div');
-        bubble.style.cssText = 'max-width:75%;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        bubble.style.cssText = 'max-width:82%;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
         bubble.textContent = msg.t;
         var timeSpan = document.createElement('div');
         timeSpan.className = 'p-bubble-time';
@@ -1902,16 +2381,24 @@
   });
 
   document.getElementById('saveConvoBtn').addEventListener('click', function() {
-    if (!currentMessages.length) return;
-    var person = document.getElementById('person').value;
-    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
-    var preview = currentMessages[0].t.substring(0, 50) + (currentMessages[0].t.length > 50 ? '...' : '');
-    var item = { messages: JSON.parse(JSON.stringify(currentMessages)), label: theirName + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
-    savedConversations.unshift(item);
+    var isComments = document.getElementById('contentType').value === 'comments';
+    if (isComments) {
+      if (!currentComments.length) return;
+      var cPreview = currentComments[0].text.substring(0, 50) + (currentComments[0].text.length > 50 ? '...' : '');
+      var cItem = { type: 'comments', comments: JSON.parse(JSON.stringify(currentComments)), label: currentComments.length + ' comments — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: cPreview };
+      savedConversations.unshift(cItem);
+    } else {
+      if (!currentMessages.length) return;
+      var person = document.getElementById('person').value;
+      var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+      var preview = currentMessages[0].t.substring(0, 50) + (currentMessages[0].t.length > 50 ? '...' : '');
+      var item = { type: 'messages', messages: JSON.parse(JSON.stringify(currentMessages)), label: theirName + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
+      savedConversations.unshift(item);
+    }
     if (savedConversations.length > 5) savedConversations = savedConversations.slice(0, 5);
     renderSavedList();
     var badge = document.getElementById('shortenBadge');
-    badge.textContent = '✓ Conversation saved!';
+    badge.textContent = isComments ? '✓ Comment batch saved!' : '✓ Conversation saved!';
     badge.style.display = 'block';
     setTimeout(function(){ badge.style.display = 'none'; badge.textContent = '✓ Shortened for song lyrics'; }, 2000);
   });
@@ -1920,15 +2407,23 @@
     var card = document.getElementById('savedConvosCard');
     var list = document.getElementById('savedList');
     list.innerHTML = '';
-    if (savedConversations.length === 0) { card.style.display = 'none'; return; }
+    var currentType = document.getElementById('contentType').value === 'comments' ? 'comments' : 'messages';
+    var filtered = savedConversations.filter(function(item) { return item.type === currentType; });
+    if (filtered.length === 0) { card.style.display = 'none'; return; }
     card.style.display = 'block';
-    savedConversations.forEach(function(item, idx) {
+    filtered.forEach(function(item) {
+      var idx = savedConversations.indexOf(item);
       var el = document.createElement('div');
       el.className = 'saved-item';
       el.innerHTML = '<span class="saved-item-preview">' + item.preview + '</span><span class="saved-item-label">' + item.label + '</span><span class="saved-del" data-idx="' + idx + '">✕</span>';
       el.querySelector('.saved-item-preview').addEventListener('click', function() {
-        currentMessages = JSON.parse(JSON.stringify(item.messages));
-        renderPhone(); renderAnimatePhone();
+        if (item.type === 'comments') {
+          currentComments = JSON.parse(JSON.stringify(item.comments));
+          renderComments();
+        } else {
+          currentMessages = JSON.parse(JSON.stringify(item.messages));
+          renderPhone(); renderAnimatePhone();
+        }
         document.getElementById('previewSection').style.display = 'block';
         window.scrollTo({top:0,behavior:'smooth'});
       });
@@ -1957,23 +2452,105 @@
   document.getElementById('avatarStyle').addEventListener('change', function() {
     if (currentComments.length > 0) { renderComments(); }
   });
+  document.getElementById('groupSize').addEventListener('change', function() {
+    var size = parseInt(this.value);
+    document.getElementById('extraNamesRow').style.display = size >= 3 ? 'grid' : 'none';
+    document.getElementById('person4NameWrap').style.display = size >= 4 ? 'block' : 'none';
+  });
 
-  document.getElementById('contentType').addEventListener('change', function() {
-    var isComments = this.value === 'comments';
-    document.getElementById('messagePlatformSection').style.display = isComments ? 'none' : 'block';
+  function updateContentTypeUI() {
+    var ct = document.getElementById('contentType').value;
+    var isComments = ct === 'comments';
+    var isSongFormats = ct === 'songformats';
+    var isPaste = ct === 'paste';
+    var songFmt = document.getElementById('songFormat').value;
+    var isSayIt = isSongFormats && songFmt === 'say_it_in_a_song';
+
+    document.getElementById('pasteSection').style.display = isPaste ? 'block' : 'none';
+    document.getElementById('songFormatSection').style.display = isSongFormats ? 'block' : 'none';
+    document.getElementById('messagePlatformSection').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('avatarStyleSection').style.display = isComments ? 'block' : 'none';
-    document.getElementById('personFieldWrap').style.display = isComments ? 'none' : 'block';
-    document.getElementById('modeSection').style.display = isComments ? 'none' : 'block';
+    document.getElementById('groupSizeSection').style.display = (isComments || isSongFormats || isPaste) ? 'none' : 'block';
+    document.getElementById('saveConvoBtn').style.display = isSongFormats ? 'none' : '';
+    document.getElementById('saveConvoBtn').textContent = isComments ? '💾 Save This Comment Batch' : '💾 Save This Conversation';
+    document.getElementById('savedListTitle').textContent = isComments ? 'Saved Comment Batches' : 'Saved Conversations';
+    renderSavedList();
+    document.getElementById('personFieldWrap').style.display = (isComments || isPaste) ? 'none' : 'block';
+    document.getElementById('modeSection').style.display = (isComments || isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('commentCountSection').style.display = isComments ? 'block' : 'none';
-    document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : 'Topic / Context (optional)';
-    document.getElementById('topic').placeholder = isComments ? 'e.g. "hype up my fence like it\'s a girls comment section"' : 'e.g. forgot my birthday, saw me at the club...';
-    document.getElementById('phoneFrame').style.display = isComments ? 'none' : 'block';
+    document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : (isSongFormats ? 'Situation / Topic (optional)' : 'Topic / Context (optional)');
+    document.getElementById('topic').placeholder = isComments ? 'e.g. "hype up my fence like it\'s a girls comment section"' : (isSongFormats ? 'e.g. got wrongly accused of stealing at work' : 'e.g. forgot my birthday, saw me at the club...');
+    document.getElementById('topic').parentElement.style.display = isPaste ? 'none' : 'block';
+    document.getElementById('phoneFrame').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
-    document.getElementById('shortenBtn').style.display = isComments ? 'none' : '';
-    document.getElementById('animateBtn').style.display = isComments ? 'none' : '';
+    document.getElementById('shortenBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
+    document.getElementById('animateBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
+    document.getElementById('generateBtn').style.display = (isSongFormats || isPaste) ? 'none' : 'block';
+    document.getElementById('generateSayItBtn').style.display = isSayIt ? 'block' : 'none';
+    document.getElementById('renderPasteBtn').style.display = isPaste ? 'block' : 'none';
+    document.getElementById('sayItOutputCard').style.display = 'none';
     document.getElementById('previewSection').style.display = 'none';
+
+    if (isSongFormats) {
+      var hint = document.getElementById('songFormatHint');
+      if (songFmt === 'say_it_in_a_song') {
+        hint.textContent = 'Generates a spoken narration script + matching song (description prompt + backup lyrics) — no screenshot, uses the relationship/vibe/topic fields below.';
+      } else {
+        hint.textContent = 'Picking this switches you to Messages mode with the format pre-filled — same as before.';
+      }
+    }
+  }
+  document.getElementById('contentType').addEventListener('change', updateContentTypeUI);
+  document.getElementById('songFormat').addEventListener('change', function() {
+    var val = this.value;
+    if (val === 'heard_this_song' || val === 'song_for_everything') {
+      applyPresetFields(sunoPresets[val]);
+      document.getElementById('contentType').value = 'messages';
+      updateContentTypeUI();
+    } else {
+      updateContentTypeUI();
+    }
   });
+  document.getElementById('generateSayItBtn').addEventListener('click', doGenerateSayIt);
+  document.getElementById('renderPasteBtn').addEventListener('click', doRenderPaste);
+  document.getElementById('copySayItScriptBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItScriptBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy Narration Script'; }, 1500, this);
+  });
+  document.getElementById('copySayItSongPromptBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItSongPromptBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy Song Description'; }, 1500, this);
+  });
+  document.getElementById('copySayItLyricsBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItLyricsBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy Backup Lyrics'; }, 1500, this);
+  });
+  document.getElementById('copySayItOnScreenBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItOnScreenBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy On-Screen Caption'; }, 1500, this);
+  });
+  document.getElementById('copySayItSocialBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItSocialBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy Social Caption'; }, 1500, this);
+  });
+  document.getElementById('copySayItYtBtn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('sayItYtBox').textContent);
+    this.textContent = '✓ Copied!';
+    setTimeout(function(btn){ btn.textContent = '📋 Copy YouTube Caption'; }, 1500, this);
+  });
+  // Run once immediately on page load — without this, any section whose
+  // correct default state differs from its hardcoded HTML (like
+  // groupSizeSection defaulting to display:none in the markup even though
+  // it should be visible for the default "Messages" content type) stays
+  // wrong until the user manually changes Content Type once. This exact bug
+  // is why Group Size never appeared on the live site.
+  updateContentTypeUI();
 
   document.getElementById('shortenBtn').addEventListener('click', async function() {
     var key = getKey();
@@ -1981,13 +2558,16 @@
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var myName = document.getElementById('myName').value.trim() || 'Me';
-    var originalText = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+    var originalText = currentMessages.map(function(m){ return (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t; }).join('\n');
     document.getElementById('shortenLoadingDiv').style.display = 'block';
     document.getElementById('shortenBtn').disabled = true;
     document.getElementById('compareWrap').classList.remove('visible');
     hideError();
 
-    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- No merging messages. No adding or removing messages.\n- No emojis.\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
+    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- GRAMMAR — CRITICAL: every shortened line must remain a complete, grammatically correct sentence or clause. Never drop a conjunction or connecting word (and, but, so, because) if removing it breaks the grammar. If a line cannot hit the target word count while staying grammatical, prioritize correct grammar over the exact count.\n- No merging messages. No adding or removing messages.\n- ' + (person === 'mom' || person === 'dad'
+      ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
+      : 'EMOJI RULE: preserve the emojis from the original messages where they still fit the shortened line — do not strip them out. If a shortened line no longer has room for the emoji contextually, it is fine to drop just that one, but do not remove emojis as a blanket rule.'
+    ) + '\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
     try {
       var shortenModel = getModel();
       var shortenProvider = document.getElementById('providerSelect').value;
@@ -2015,7 +2595,9 @@
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error?e.error.message:'API error'); }
         var data = await resp.json();
-        rawShortenText = data.content[0].text.trim();
+        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
+        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
+        rawShortenText = textBlock.text.trim();
       }
 
       var parsed = parseConversation(rawShortenText, myName, theirName);
@@ -2029,7 +2611,7 @@
         msgs.forEach(function(m) {
           var d = document.createElement('div');
           d.className = 'compare-msg ' + m.f;
-          d.textContent = (m.f==='them'?theirName:myName) + ': ' + m.t;
+          d.textContent = (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t;
           el.appendChild(d);
         });
       }
@@ -2101,7 +2683,7 @@
       var person = document.getElementById('person').value;
       var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
       var myName = document.getElementById('myName').value.trim() || 'Me';
-      text = currentMessages.map(function(m){ return (m.f==='them'?theirName:myName)+': '+m.t; }).join('\n');
+      text = currentMessages.map(function(m){ return (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t; }).join('\n');
     }
     var box = document.getElementById('gemTextBox'); box.textContent = text; box.style.display = 'block';
     navigator.clipboard.writeText(text).then(function() {
@@ -2110,7 +2692,7 @@
     });
   });
 
-  createWallpaperSwatches();
+  createWallpaperOptions();
   updateKeyStatus();
   document.getElementById('theirName').placeholder = 'e.g. Mum';
 })();
