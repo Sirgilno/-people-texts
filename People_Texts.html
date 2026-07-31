@@ -1017,6 +1017,12 @@
 
     var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
       + 'CONTEXT: This is a conversation between two real people. Write it as two distinct personalities talking naturally, with real texture — actual modern texting rhythm, natural contractions, realistic slang where it fits the personalities and vibe, genuine comedic timing. This should read like a real screenshot people would believe, not a sanitized generic paraphrase.\n\n'
+      + 'HOW TO ACTUALLY BE FUNNY — craft rules, not suggestions. AI-written dialogue fails when it defaults to safe, predictable phrasing. Actively fight that:\n'
+      + '- SPECIFICITY BEATS GENERIC. Concrete oddly-specific details are funny; vague ones are not. "you left my charger at nandos on tuesday" lands. "you lost my stuff" dies. Always reach for the exact brand, number, day, or weirdly precise detail.\n'
+      + '- PUNCH WORD GOES LAST. The funniest or most surprising word must be the FINAL word of that message. If it lands mid-sentence and the message keeps going, the joke dies on the extra words. Cut everything after the punch.\n'
+      + '- NEVER EXPLAIN THE JOKE. Give two incongruent concrete details and let the reader connect them. If a character states the joke outright or adds a clarifying line after the punchline, it is dead. Trust the reader.\n'
+      + '- STATUS PLAY. One person can write with total confident authority about something completely trivial (funny through the mismatch). Another can deliberately self-own with rambling and hedge words. Give each person a clear status position and commit to it.\n'
+      + '- AVOID MODE COLLAPSE. Do not write the first line that comes to mind — that is the line everyone writes. No puns unless genuinely sharp, no dad-joke energy, no generic filler reactions. If a line feels safe or expected, rewrite it.\n\n'
       + 'TEXTING VOICE — HOW REAL PEOPLE ACTUALLY WRITE:\n'
       + '- Lowercase is common for casual/funny vibes; full caps for a sudden emotional spike or shouting a single word.\n'
       + '- Real texters drop pronouns/words when the meaning is still clear ("not doing this rn" not "I am not doing this right now").\n'
@@ -1043,7 +1049,8 @@
         : '- EMOJI RULE: emojis should be present throughout, multiple across the conversation (not just one), but every emoji must fit the specific line it is on — read the emotional context of that exact message and pick an emoji that actually matches it, not a random default. Do not force an emoji onto every single line, but do not go sparse either — most conversations should have several placed naturally across different messages.\n\n')
       + (isSongMode ? 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n' : '')
       + (useGrokEarly ? 'UNRESTRICTED MODE — THIS VIBE HAS NO CONTENT LIMITS: this generation is running on a provider with no content restrictions. Full permission to write crude physical/body humor, explicit profanity, raunchy innuendo, dirty talk, and explicit sexual language/description where the VIBE calls for it, with zero softening or self-censorship. Match the intensity the vibe description above asks for exactly, do not tone it down.\n\n' : '')
-      + moodDesc;
+      + moodDesc
+      + '\n\nVARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous generation): ' + Math.random().toString(36).substring(2, 10);
 
     try {
       var rawText;
@@ -1072,7 +1079,7 @@
         var resp = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+          body: JSON.stringify({ model: model, max_tokens: 2000, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
         var data = await resp.json();
@@ -1120,7 +1127,19 @@
       + 'Read the HOOK below and decide which of these patterns (and mix of patterns) naturally fits what the hook is asking for. A roast-me hook pulls from patterns 1, 2, 3. A hype-me hook pulls from pattern 7. A confession/advice-bait hook pulls from real specific short answers. A comparison hook pulls from pattern 8. Always mix in at least one pattern 4 (low effort) and one pattern 5 (tag a friend) somewhere in the batch for realism, regardless of hook type.\n\n';
 
     var prompt = 'You are writing a realistic ' + platformLabel + ' comment section under a video. This is for a "reading my own comments" reaction video format where the creator screenshots and reacts to real comment sections.\n\n'
-      + (isYT ? 'YOUTUBE TONE NOTE: YouTube comments read differently than IG/TikTok — they run longer on average, more discussion/debate-style, more replies-to-replies arguing a point, timestamps referenced ("the part at 2:14"), more "this reminds me of" tangents. Still keep the 17-word-max rule below for most comments, but YouTube comments can lean toward the upper end of that range more often than IG/TikTok would.\n\n' : '')
+      + 'HOW TO ACTUALLY BE FUNNY — these are craft rules, not suggestions. Most AI-written comments fail because they default to safe, predictable, cliché phrasing. Actively fight that:\n\n'
+      + '1. SPECIFICITY BEATS GENERIC. Concrete, oddly-specific details are funny; vague abstractions are not. "a 2019 Honda Civic with one hubcap" lands. "an old car" dies. Reach for the weirdly precise noun, the exact brand, the specific number, the unexpected detail. Never write the generic version of anything.\n\n'
+      + '2. PUNCH WORD GOES LAST. The funniest or most surprising word must be the FINAL word of the comment. If it lands mid-sentence and then the sentence keeps going, the joke dies on the extra words. Cut everything after the punch. "I bought a treadmill and now it is the most expensive clothes hanger I own" works because "hanger" lands last.\n\n'
+      + '3. NEVER EXPLAIN THE JOKE. Give the reader two incongruent concrete details and let them make the connection themselves. The laugh happens in their head at the moment of realization. If you state the joke outright, or add a clarifying phrase after the punchline, you have killed it. Trust the reader.\n\n'
+      + '4. EVERY COMMENT NEEDS A TARGET. Self-deprecation (targeting yourself), roasting the situation, or mock-outrage all work. A comment aimed at nothing reads as flat and corporate.\n\n'
+      + '5. STATUS PLAY. Some commenters write with total confident authority about something completely trivial (funny through the mismatch of serious tone vs stupid subject). Others deliberately lower themselves — rambling, hedge words like "I mean" and "literally", self-own energy. Both work. Pick one per commenter and commit.\n\n'
+      + '6. AVOID MODE COLLAPSE. Do not write the first joke that comes to mind — that is the same joke everyone writes. No puns unless genuinely sharp, no "dad joke" energy, no generic "this is so me" filler, no recycled meme formats unless the hook specifically calls for it. If a line feels safe or expected, rewrite it.\n\n'
+      + 'DISTINCT VOICES — CRITICAL: every single commenter must read like a different actual person, not the same writer using different usernames. Before writing each comment, silently assign that commenter ONE dominant trait and write the whole comment through that lens. Vary widely across the batch — e.g. the one who takes it literally, the over-explainer, the aggressively supportive one, the one who makes it about themselves, the "nobody asked but here is a fact" person, the deadpan one-liner, the one who is unreasonably invested, the one who noticed a tiny irrelevant detail, the one typing like they are out of breath. Never repeat a trait within one batch.\n\n'
+      + (isYT
+        ? 'PLATFORM VOICE — YOUTUBE: longer and more discursive than IG/TikTok. Commenters reference the creator\'s past videos or running jokes ("lore"), timestamps ("the part at 2:14"), and structured formats like "Nobody:" setups. More willing to write multi-sentence setups. Proper punctuation is normal here.\n\n'
+        : (isIG
+          ? 'PLATFORM VOICE — INSTAGRAM: observational and identity-driven, slightly more punctuated than TikTok. Tag-baiting is common ("@someone this is literally you"). Comments often connect the content back to the commenter\'s own social circle or aesthetic opinions. Slightly older energy than TikTok.\n\n'
+          : 'PLATFORM VOICE — TIKTOK: lowercase, minimal punctuation, hyper-ironic and surreal. Punctuation reads as trying too hard. Commenters break the fourth wall and address the algorithm directly ("why did the fyp send me here", "the timing of this is insane"). Extremely brief. Trend-formula phrasing repeated with variation.\n\n'))
       + 'THE HOOK / ON-SCREEN CAPTION OF THE VIDEO (this is what commenters are reacting to): "' + hook + '"\n\n'
       + vocabBank
       + 'TONE / INTENSITY: ' + vibeDescriptions[vibe] + '\n\n'
@@ -1131,6 +1150,7 @@
       + 'Mark exactly ONE of the comments (the funniest/best one) by starting that line with [PINNED] before the username — this represents the top comment the algorithm surfaced. Mark exactly ONE different comment (can overlap logic-wise but must be a different line) by starting it with [LIKED] before the username — this represents a comment the creator personally liked. Every other line has no marker.\n\n'
       + 'NESTED REPLIES: for exactly 2 of the comments in the batch (pick ones where a reply thread would feel natural — a joke someone builds on, a disagreement, a "wait what" reaction), write 2-3 short reply lines directly under that comment. Each reply line must start with ">" followed by a fake username, then the reply text — e.g. ">replyuser22: wait fr??". Replies should read like a real back-and-forth (agreeing, arguing, adding a joke, asking a follow-up) — not just more top-level comments. Every other comment in the batch has no replies attached.\n\n'
       + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid, victor.j1_, tonnyjayworld).\n\n'
+      + 'VARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous batch): ' + Math.random().toString(36).substring(2, 10) + '\n\n'
       + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nNested reply (indented under the comment above it): >username: reply text\nOne per line. No numbering. No extra commentary before or after this list.';
 
     try {
@@ -1158,7 +1178,7 @@
         var resp = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+          body: JSON.stringify({ model: model, max_tokens: 2000, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
         });
         if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
         var data = await resp.json();
@@ -1809,6 +1829,23 @@
       if (pos < realisticCount) list[idx].avatarKind = 'realistic';
       else if (pos < realisticCount + blankCount) list[idx].avatarKind = 'blank';
       else list[idx].avatarKind = 'cartoon';
+    });
+
+    // Assign guaranteed-unique photo seeds so no two commenters in the same
+    // batch ever get the same profile picture. pravatar.cc serves images
+    // 1-70, so we shuffle that full pool and deal from it without repeats.
+    var pool = [];
+    for (var p = 1; p <= 70; p++) pool.push(p);
+    for (var q = pool.length - 1; q > 0; q--) {
+      var r = Math.floor(Math.random() * (q + 1));
+      var swap = pool[q]; pool[q] = pool[r]; pool[r] = swap;
+    }
+    var dealt = 0;
+    list.forEach(function(c) {
+      if (c.avatarKind === 'realistic') {
+        c.avatarSeed = pool[dealt % pool.length];
+        dealt++;
+      }
     });
   }
 
