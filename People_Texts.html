@@ -171,7 +171,15 @@
       <option value="messages">Messages / DM Thread</option>
       <option value="comments">Comments (Roast Me 🔥)</option>
       <option value="songformats">Song Formats</option>
+      <option value="paste">Paste Your Own Conversation</option>
     </select>
+  </div>
+  <div id="pasteSection" style="margin-bottom:12px;display:none;">
+    <label>Paste your conversation — one message per line</label>
+    <textarea id="pasteInput" rows="10" placeholder="Me: yo did you see what she posted&#10;Them: no what happened&#10;Them: wait send it&#10;Me: check her story&#10;Me: the third one&#10;Them: NO WAY" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;font-family:inherit;line-height:1.6;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;">
+      Use <strong>Me:</strong> for your messages and <strong>Them:</strong> (or any name) for theirs. Same speaker twice in a row = double-texting, works automatically. Pick any platform + wallpaper above, then hit Render.
+    </div>
   </div>
   <div id="songFormatSection" style="margin-bottom:12px;display:none;">
     <label>Song Format</label>
@@ -318,6 +326,7 @@
   </div>
   <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
   <button class="btn btn-primary" id="generateSayItBtn" style="display:none;">Generate Story + Song 🎬</button>
+  <button class="btn btn-primary" id="renderPasteBtn" style="display:none;">Render Conversation 📱</button>
   <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
   <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the story and song...</div>
   <div class="error-box" id="errorBox"></div>
@@ -896,6 +905,43 @@
     return msgs;
   }
 
+  function doRenderPaste() {
+    hideError();
+    var raw = document.getElementById('pasteInput').value.trim();
+    if (!raw) { showError('Paste a conversation first.'); return; }
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var theirName = document.getElementById('theirName').value.trim() || 'Them';
+    var lines = raw.split('\n').filter(function(l){ return l.trim(); });
+    var msgs = [];
+    lines.forEach(function(line) {
+      line = line.trim();
+      var colonIdx = line.indexOf(':');
+      if (colonIdx === -1) {
+        // No speaker label — treat as a continuation of the previous speaker,
+        // or default to "them" if it's the very first line.
+        if (msgs.length > 0) {
+          msgs.push({ f: msgs[msgs.length-1].f, t: line, speaker: msgs[msgs.length-1].speaker });
+        } else {
+          msgs.push({ f: 'them', t: line, speaker: theirName });
+        }
+        return;
+      }
+      var speaker = line.substring(0, colonIdx).trim();
+      var text = line.substring(colonIdx + 1).trim();
+      if (!text) return;
+      var lower = speaker.toLowerCase();
+      var isMine = lower === 'me' || lower === myName.toLowerCase() || lower === 'i';
+      msgs.push({ f: isMine ? 'me' : 'them', t: text, speaker: isMine ? myName : speaker });
+    });
+    if (msgs.length === 0) { showError('Could not read any messages. Use the format "Me: your text" — one per line.'); return; }
+    currentMessages = msgs;
+    renderPhone();
+    renderAnimatePhone();
+    document.getElementById('previewSection').style.display = 'block';
+    document.getElementById('gemTextBox').style.display = 'none';
+    document.getElementById('compareWrap').classList.remove('visible');
+  }
+
   async function doGenerateSayIt() {
     hideError();
     var person = document.getElementById('person').value;
@@ -1198,32 +1244,16 @@
     finally { showLoading(false); }
   }
 
-  function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices) {
-    targetEl.innerHTML = '';
-    var dateLabel = document.createElement('div');
-    dateLabel.className = 'p-time';
-    dateLabel.style.color = theme.timeColor;
-    var now = new Date();
-    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-    targetEl.appendChild(dateLabel);
-
-    var person = document.getElementById('person').value;
-    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
-    var myName = document.getElementById('myName').value.trim() || 'Me';
-    var groupSizeEl = document.getElementById('groupSize');
-    var isGroupChat = groupSizeEl && parseInt(groupSizeEl.value) >= 3;
-    var groupSenderColors = {};
-    var groupPalette = ['#f56040', '#00b0f4', '#7c3aed', '#25d366', '#fe2c55', '#ffb300'];
-    function colorForSender(name) {
-      if (!groupSenderColors[name]) {
-        var keys = Object.keys(groupSenderColors);
-        groupSenderColors[name] = groupPalette[keys.length % groupPalette.length];
-      }
-      return groupSenderColors[name];
-    }
-
-    for (var i = 0; i < messages.length; i++) {
-      if (!showAll && i >= messages.length) break;
+  // Shared row builder — used by BOTH the static preview and the
+  // Animate-for-TikTok view so the two can never drift apart again.
+  // The animation previously had its own duplicate copy of this logic,
+  // which silently bypassed platform-specific quote styles, group sender
+  // labels, voice notes, story replies and double-text spacing.
+  function buildMessageRow(ctx) {
+    var messages = ctx.messages, i = ctx.i, theme = ctx.theme;
+    var timestamps = ctx.timestamps, replyIndices = ctx.replyIndices;
+    var theirName = ctx.theirName, myName = ctx.myName;
+    var isGroupChat = ctx.isGroupChat, colorForSender = ctx.colorForSender;
       var msg = messages[i]; var isMe = msg.f === 'me';
       var bTheme = isMe ? theme.bubbleMe : theme.bubbleThem;
       var ts = timestamps[i];
@@ -1245,15 +1275,46 @@
         dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
         row.appendChild(dm);
       } else {
-        if (replyIndices && replyIndices.has(i) && i > 0) {
+        var qStyle = theme.quoteStyle || 'nested';
+        if (replyIndices && replyIndices.has(i) && i > 0 && qStyle !== 'none') {
           var prevMsg = messages[i-1];
-          var quote = document.createElement('div');
-          quote.className = 'p-reply-quote';
-          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
           var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
-          quote.textContent = preview;
-          row.appendChild(quote);
-        } else if (!theme.isDiscord && !sameAsPrev && Math.random() < 0.08) {
+
+          if (qStyle === 'spine') {
+            // Discord: flat list architecture — no bubbles, so the quote is a
+            // single truncated line above the message with a mini avatar,
+            // linked by an L-shaped spine. Never a nested box.
+            var spineWrap = document.createElement('div');
+            spineWrap.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:11px;opacity:0.64;margin-bottom:2px;padding-left:6px;color:' + bTheme.color + ';white-space:nowrap;overflow:hidden;';
+            var spineLine = document.createElement('div');
+            spineLine.style.cssText = 'width:14px;height:8px;border-left:2px solid rgba(255,255,255,0.15);border-top:2px solid rgba(255,255,255,0.15);border-top-left-radius:6px;flex-shrink:0;';
+            var miniAvatar = document.createElement('div');
+            miniAvatar.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (isMe ? theme.avatarBg : theme.bubbleThem.bg) + ';flex-shrink:0;';
+            var spineText = document.createElement('span');
+            spineText.style.cssText = 'overflow:hidden;text-overflow:ellipsis;';
+            spineText.textContent = (isMe ? theirName : myName) + '  ' + (prevMsg.t.length > 32 ? prevMsg.t.substring(0,32) + '...' : prevMsg.t);
+            spineWrap.appendChild(spineLine);
+            spineWrap.appendChild(miniAvatar);
+            spineWrap.appendChild(spineText);
+            row.appendChild(spineWrap);
+          } else if (qStyle === 'nested-rounded') {
+            // Google Messages / Material 3: tonal nested block, heavily
+            // rounded, NO harsh vertical accent bar (per M3 spec).
+            var quote = document.createElement('div');
+            quote.className = 'p-reply-quote';
+            quote.style.cssText = 'border-left:none;font-size:10.5px;padding:6px 10px;border-radius:14px;margin-bottom:3px;max-width:82%;opacity:0.85;line-height:1.35;background:' + (isMe ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.09)') + ';color:' + bTheme.color + ';';
+            quote.textContent = preview;
+            row.appendChild(quote);
+          } else {
+            // Default nested model: quote sits inside the bubble stack with a
+            // vertical accent bar on the left (WhatsApp/Telegram/Meta/X/Snap).
+            var quote = document.createElement('div');
+            quote.className = 'p-reply-quote';
+            quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
+            quote.textContent = preview;
+            row.appendChild(quote);
+          }
+        } else if (theme.hasStories && !sameAsPrev && Math.random() < 0.08) {
           // Occasional "Replied to your story" style bubble — mocked with a
           // small placeholder thumbnail since there's no real story image to
           // reference. Purely decorative, separate from the real bubble.
@@ -1262,7 +1323,8 @@
           var storyThumb = document.createElement('div');
           storyThumb.style.cssText = 'width:22px;height:32px;border-radius:4px;background:linear-gradient(135deg,#f56040,#833ab4);flex-shrink:0;';
           var storyLabel = document.createElement('span');
-          storyLabel.textContent = 'Replied to ' + (isMe ? theirName + '\u2019s' : 'your') + ' story';
+          var storyWord = (theme === platformThemes.whatsapp) ? 'status' : 'story';
+          storyLabel.textContent = 'Replied to ' + (isMe ? theirName + '\u2019s' : 'your') + ' ' + storyWord;
           storyReply.appendChild(storyThumb);
           storyReply.appendChild(storyLabel);
           row.appendChild(storyReply);
@@ -1356,12 +1418,46 @@
           row.appendChild(rr);
         }
       }
-      targetEl.appendChild(row);
+    return row;
+  }
+
+  function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices) {
+    targetEl.innerHTML = '';
+    var dateLabel = document.createElement('div');
+    dateLabel.className = 'p-time';
+    dateLabel.style.color = theme.timeColor;
+    var now = new Date();
+    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    targetEl.appendChild(dateLabel);
+
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var myName = document.getElementById('myName').value.trim() || 'Me';
+    var groupSizeEl = document.getElementById('groupSize');
+    var isGroupChat = groupSizeEl && parseInt(groupSizeEl.value) >= 3;
+    var groupSenderColors = {};
+    var groupPalette = ['#f56040', '#00b0f4', '#7c3aed', '#25d366', '#fe2c55', '#ffb300'];
+    function colorForSender(name) {
+      if (!groupSenderColors[name]) {
+        var keys = Object.keys(groupSenderColors);
+        groupSenderColors[name] = groupPalette[keys.length % groupPalette.length];
+      }
+      return groupSenderColors[name];
+    }
+
+    for (var i = 0; i < messages.length; i++) {
+      targetEl.appendChild(buildMessageRow({
+        messages: messages, i: i, theme: theme, timestamps: timestamps,
+        replyIndices: replyIndices, theirName: theirName, myName: myName,
+        isGroupChat: isGroupChat, colorForSender: colorForSender
+      }));
     }
   }
 
   var platformThemes = {
     whatsapp: {
+      hasStories: true,
+      quoteStyle: 'nested',
       bgSb: '#0a0a0a', colorSb: '#f0f0f0',
       bgHeader: '#1a1a1a', borderHeader: '#333',
       bgMessages: '#0f0f0f',
@@ -1375,9 +1471,11 @@
       sendBg: '#005c4b', sendStroke: '#fff',
       avatarBg: '#005c4b', avatarColor: '#fff',
       nameColor: '#f0f0f0',
-      typingBg: '#1f2c34', typingDot: '#888'
+      typingBg: '#202c33', typingDot: '#888'
     },
     imessage: {
+      hasStories: false,
+      quoteStyle: 'none',
       bgSb: '#f5f5f5', colorSb: '#000',
       bgHeader: '#f5f5f5', borderHeader: '#ddd',
       bgMessages: '#f5f5f5',
@@ -1394,6 +1492,8 @@
       typingBg: '#e5e5ea', typingDot: '#888'
     },
     messenger: {
+      hasStories: true,
+      quoteStyle: 'nested',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#000',
@@ -1407,9 +1507,11 @@
       sendBg: '#0084ff', sendStroke: '#fff',
       avatarBg: 'linear-gradient(135deg, #ff8fb2, #a797ff, #00e5ff)', avatarColor: '#fff',
       nameColor: '#fff',
-      typingBg: '#1a1a1a', typingDot: '#888'
+      typingBg: '#262626', typingDot: '#888'
     },
     facebook: {
+      hasStories: true,
+      quoteStyle: 'nested',
       bgSb: '#1877f2', colorSb: '#fff',
       bgHeader: '#1877f2', borderHeader: '#166fe0',
       bgMessages: '#f0f2f5',
@@ -1419,13 +1521,15 @@
       bubbleThem: { bg: '#fff', color: '#000', radius: '18px 18px 18px 4px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      readReceipt: '✓', readColor: '#0084ff', readAllSent: false,
       sendBg: '#0084ff', sendStroke: '#fff',
       avatarBg: '#0084ff', avatarColor: '#fff',
       nameColor: '#000',
       typingBg: '#fff', typingDot: '#888'
     },
     telegram: {
+      hasStories: false,
+      quoteStyle: 'nested',
       bgSb: '#1a1033', colorSb: '#fff',
       bgHeader: '#1a1033', borderHeader: '#2a1f4a',
       bgMessages: '#0f0a1f',
@@ -1439,9 +1543,11 @@
       sendBg: '#3390ec', sendStroke: '#fff',
       avatarBg: '#3390ec', avatarColor: '#fff',
       nameColor: '#fff',
-      typingBg: '#2a1f4a', typingDot: '#888'
+      typingBg: '#182533', typingDot: '#888'
     },
     instagram: {
+      hasStories: true,
+      quoteStyle: 'nested',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#000',
@@ -1455,9 +1561,11 @@
       sendBg: '#833ab4', sendStroke: '#fff',
       avatarBg: 'linear-gradient(135deg, #4f5bd5, #962fbf, #d62976)', avatarColor: '#fff',
       nameColor: '#fff',
-      typingBg: '#1a1a1a', typingDot: '#888'
+      typingBg: '#262626', typingDot: '#888'
     },
     twitter: {
+      hasStories: false,
+      quoteStyle: 'nested',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#000',
@@ -1474,6 +1582,8 @@
       typingBg: '#1a1a1a', typingDot: '#888'
     },
     reddit: {
+      hasStories: false,
+      quoteStyle: 'none',
       bgSb: '#0d1117', colorSb: '#fff',
       bgHeader: '#0d1117', borderHeader: '#333',
       bgMessages: '#0d1117',
@@ -1490,6 +1600,8 @@
       typingBg: '#1a1a1a', typingDot: '#888'
     },
     snapchat: {
+      hasStories: true,
+      quoteStyle: 'nested',
       bgSb: '#fffc00', colorSb: '#000',
       bgHeader: '#fffc00', borderHeader: '#f0e600',
       bgMessages: '#fff',
@@ -1506,6 +1618,8 @@
       typingBg: '#f5f5f5', typingDot: '#888'
     },
     discord: {
+      hasStories: false,
+      quoteStyle: 'spine',
       bgSb: '#313338', colorSb: '#fff',
       bgHeader: '#313338', borderHeader: '#40444b',
       bgMessages: '#313338',
@@ -1522,6 +1636,8 @@
       typingBg: '#40444b', typingDot: '#888'
     },
     tiktok: {
+      hasStories: false,
+      quoteStyle: 'none',
       bgSb: '#000', colorSb: '#fff',
       bgHeader: '#000', borderHeader: '#333',
       bgMessages: '#fff',
@@ -1538,6 +1654,8 @@
       typingBg: '#f5f5f5', typingDot: '#888'
     },
     android: {
+      hasStories: false,
+      quoteStyle: 'nested-rounded',
       bgSb: '#0d0d0d', colorSb: '#fff',
       bgHeader: '#0d0d0d', borderHeader: '#333',
       bgMessages: '#0d0d0d',
@@ -1547,7 +1665,7 @@
       bubbleThem: { bg: '#2a2a2a', color: '#f0f0f0', radius: '24px' },
       timestampStyle: 'outside',
       timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#4ade80', readAllSent: false,
+      readReceipt: '✓', readColor: '#1a73e8', readAllSent: false,
       sendBg: '#1a73e8', sendStroke: '#fff',
       avatarBg: '#1a73e8', avatarColor: '#fff',
       nameColor: '#fff',
@@ -2188,6 +2306,17 @@
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var myName = document.getElementById('myName').value.trim() || 'Me';
+    var animGroupSizeEl = document.getElementById('groupSize');
+    var animIsGroupChat = animGroupSizeEl && parseInt(animGroupSizeEl.value) >= 3;
+    var animGroupSenderColors = {};
+    var animGroupPalette = ['#f56040', '#00b0f4', '#7c3aed', '#25d366', '#fe2c55', '#ffb300'];
+    function animColorForSender(name) {
+      if (!animGroupSenderColors[name]) {
+        var keys = Object.keys(animGroupSenderColors);
+        animGroupSenderColors[name] = animGroupPalette[keys.length % animGroupPalette.length];
+      }
+      return animGroupSenderColors[name];
+    }
 
     function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
 
@@ -2210,44 +2339,17 @@
         if (!isAnimating) break;
       }
 
-      var bTheme = isMe ? theme.bubbleMe : theme.bubbleThem;
-      var ts = animTimestamps[i];
-      var row = document.createElement('div');
-      row.className = 'p-bubble-row ' + (isMe ? 'me' : 'them');
+      // Use the SAME shared row builder as the static preview so the
+      // animated view can never drift out of sync with it again.
+      var row = buildMessageRow({
+        messages: currentMessages, i: i, theme: theme, timestamps: animTimestamps,
+        replyIndices: animReplyIndices, theirName: theirName, myName: myName,
+        isGroupChat: animIsGroupChat, colorForSender: animColorForSender
+      });
+      var isMeRow = currentMessages[i].f === 'me';
       row.style.opacity = '0';
-      row.style.transform = isMe ? 'translateX(20px)' : 'translateX(-20px)';
+      row.style.transform = isMeRow ? 'translateX(20px)' : 'translateX(-20px)';
       row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-
-      if (theme.isDiscord) {
-        var dm = document.createElement('div');
-        dm.style.cssText = 'display:flex;flex-direction:column;padding:2px 8px;';
-        dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
-        row.appendChild(dm);
-      } else {
-        if (animReplyIndices.has(i) && i > 0) {
-          var prevMsg = currentMessages[i-1];
-          var quote = document.createElement('div');
-          quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:rgba(128,128,128,0.1);color:' + bTheme.color + ';';
-          quote.textContent = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40)+'...' : prevMsg.t;
-          row.appendChild(quote);
-        }
-        var bubble = document.createElement('div');
-        bubble.style.cssText = 'max-width:82%;background:' + bTheme.bg + ';color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
-        bubble.textContent = msg.t;
-        var timeSpan = document.createElement('div');
-        timeSpan.className = 'p-bubble-time';
-        timeSpan.style.color = theme.timeBubble;
-        timeSpan.textContent = ts;
-        row.appendChild(bubble);
-        row.appendChild(timeSpan);
-        if (isMe && i === currentMessages.length - 1 && theme.readReceipt) {
-          var rr = document.createElement('div');
-          rr.className = 'p-read-receipt';
-          rr.style.color = theme.readColor;
-          rr.textContent = theme.readReceipt;
-          row.appendChild(rr);
-        }
-      }
 
       ma.appendChild(row);
       ma.parentElement.scrollTop = ma.parentElement.scrollHeight;
@@ -2373,29 +2475,33 @@
     var ct = document.getElementById('contentType').value;
     var isComments = ct === 'comments';
     var isSongFormats = ct === 'songformats';
+    var isPaste = ct === 'paste';
     var songFmt = document.getElementById('songFormat').value;
     var isSayIt = isSongFormats && songFmt === 'say_it_in_a_song';
 
+    document.getElementById('pasteSection').style.display = isPaste ? 'block' : 'none';
     document.getElementById('songFormatSection').style.display = isSongFormats ? 'block' : 'none';
     document.getElementById('messagePlatformSection').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsPlatformSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('avatarStyleSection').style.display = isComments ? 'block' : 'none';
-    document.getElementById('groupSizeSection').style.display = (isComments || isSongFormats) ? 'none' : 'block';
+    document.getElementById('groupSizeSection').style.display = (isComments || isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('saveConvoBtn').style.display = isSongFormats ? 'none' : '';
     document.getElementById('saveConvoBtn').textContent = isComments ? '💾 Save This Comment Batch' : '💾 Save This Conversation';
     document.getElementById('savedListTitle').textContent = isComments ? 'Saved Comment Batches' : 'Saved Conversations';
     renderSavedList();
-    document.getElementById('personFieldWrap').style.display = isComments ? 'none' : 'block';
-    document.getElementById('modeSection').style.display = (isComments || isSongFormats) ? 'none' : 'block';
+    document.getElementById('personFieldWrap').style.display = (isComments || isPaste) ? 'none' : 'block';
+    document.getElementById('modeSection').style.display = (isComments || isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('commentCountSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : (isSongFormats ? 'Situation / Topic (optional)' : 'Topic / Context (optional)');
     document.getElementById('topic').placeholder = isComments ? 'e.g. "hype up my fence like it\'s a girls comment section"' : (isSongFormats ? 'e.g. got wrongly accused of stealing at work' : 'e.g. forgot my birthday, saw me at the club...');
+    document.getElementById('topic').parentElement.style.display = isPaste ? 'none' : 'block';
     document.getElementById('phoneFrame').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
     document.getElementById('shortenBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
     document.getElementById('animateBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
-    document.getElementById('generateBtn').style.display = isSongFormats ? 'none' : 'block';
+    document.getElementById('generateBtn').style.display = (isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('generateSayItBtn').style.display = isSayIt ? 'block' : 'none';
+    document.getElementById('renderPasteBtn').style.display = isPaste ? 'block' : 'none';
     document.getElementById('sayItOutputCard').style.display = 'none';
     document.getElementById('previewSection').style.display = 'none';
 
@@ -2420,6 +2526,7 @@
     }
   });
   document.getElementById('generateSayItBtn').addEventListener('click', doGenerateSayIt);
+  document.getElementById('renderPasteBtn').addEventListener('click', doRenderPaste);
   document.getElementById('copySayItScriptBtn').addEventListener('click', function() {
     navigator.clipboard.writeText(document.getElementById('sayItScriptBox').textContent);
     this.textContent = '✓ Copied!';
