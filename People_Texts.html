@@ -177,8 +177,19 @@
   <div id="pasteSection" style="margin-bottom:12px;display:none;">
     <label>Paste your conversation — one message per line</label>
     <textarea id="pasteInput" rows="10" placeholder="Me: yo did you see what she posted&#10;Them: no what happened&#10;Them: wait send it&#10;Me: check her story&#10;Me: the third one&#10;Them: NO WAY" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;font-family:inherit;line-height:1.6;resize:vertical;"></textarea>
-    <div style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;">
-      Use <strong>Me:</strong> for your messages and <strong>Them:</strong> (or any name) for theirs. Same speaker twice in a row = double-texting, works automatically. Pick any platform + wallpaper above, then hit Render.
+    <div class="row" style="margin-top:10px;">
+      <div>
+        <label>Your messages start with</label>
+        <input type="text" id="pasteMeMarker" value="Me:" placeholder="Me:" />
+      </div>
+      <div>
+        <label>Their messages start with</label>
+        <input type="text" id="pasteThemMarker" value="Them:" placeholder="Them:" />
+      </div>
+    </div>
+    <button class="action-btn full" id="swapSidesBtn" style="margin-top:8px;">⇄ Swap Sides</button>
+    <div style="font-size:11px;color:#666;margin-top:8px;line-height:1.5;">
+      Change the markers above to match whatever your source uses. A line with no marker continues the previous speaker, so double-texting works automatically. If it renders on the wrong sides, hit Swap Sides. Pasted conversations render exactly as written — nothing invented.
     </div>
   </div>
   <div id="songFormatSection" style="margin-bottom:12px;display:none;">
@@ -186,9 +197,17 @@
     <select id="songFormat">
       <option value="heard_this_song">Have You Heard This Song?</option>
       <option value="song_for_everything">Your Friend Has a Song for Everything</option>
-      <option value="say_it_in_a_song">Say It In A Song</option>
+      <option value="say_it_revised">Say It In A Song — Revised (react video)</option>
+      <option value="say_it_in_a_song">Say It In A Song — Narration (older version)</option>
     </select>
     <div id="songFormatHint" style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;"></div>
+    <div id="reactDirectionWrap" style="margin-top:12px;display:none;">
+      <label>Direction</label>
+      <select id="reactDirection">
+        <option value="received">Someone sent ME a song (I react to receiving it)</option>
+        <option value="sent">I sent THEM a song (instead of replying normally)</option>
+      </select>
+    </div>
   </div>
   <div id="messagePlatformSection" style="margin-bottom:12px;">
     <label>Message Platform</label>
@@ -326,9 +345,11 @@
   </div>
   <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
   <button class="btn btn-primary" id="generateSayItBtn" style="display:none;">Generate Story + Song 🎬</button>
+  <button class="btn btn-primary" id="generateReactBtn" style="display:none;">Generate React Video Plan 🎬</button>
   <button class="btn btn-primary" id="renderPasteBtn" style="display:none;">Render Conversation 📱</button>
   <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
   <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the story and song...</div>
+  <div class="loading-div" id="reactLoadingDiv" style="display:none;"><span class="spinner"></span>Planning the video and writing the song...</div>
   <div class="error-box" id="errorBox"></div>
 </div>
 
@@ -356,6 +377,36 @@
   <div class="section-title" style="margin-top:20px;">YouTube Shorts Caption</div>
   <div class="gem-text-box" id="sayItYtBox" style="display:block;"></div>
   <button class="action-btn full" id="copySayItYtBtn" style="margin-top:8px;">📋 Copy YouTube Caption</button>
+</div>
+
+<div class="card" id="reactOutputCard" style="display:none;">
+  <div class="section-title">1. Scenario</div>
+  <div class="gem-text-box" id="reactScenarioBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyReactScenarioBtn" style="margin-top:8px;">📋 Copy Scenario</button>
+
+  <div class="section-title" style="margin-top:20px;">2. On-Screen Caption (stays up whole video)</div>
+  <div class="gem-text-box" id="reactHookBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyReactHookBtn" style="margin-top:8px;">📋 Copy On-Screen Caption</button>
+
+  <div class="section-title" style="margin-top:20px;">3. Context Messages (put these in the thread first)</div>
+  <div class="gem-text-box" id="reactContextBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyReactContextBtn" style="margin-top:8px;">📋 Copy Context Messages</button>
+
+  <div class="section-title" style="margin-top:20px;">4. Suno Style Prompt</div>
+  <div class="gem-text-box" id="reactStyleBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyReactStyleBtn" style="margin-top:8px;">📋 Copy Style Prompt</button>
+
+  <div class="section-title" style="margin-top:20px;">5. Song Lyrics (~30 sec)</div>
+  <div class="gem-text-box" id="reactLyricsBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyReactLyricsBtn" style="margin-top:8px;">📋 Copy Lyrics</button>
+
+  <div class="section-title" style="margin-top:20px;">6. Shot Layout (timed)</div>
+  <div class="gem-text-box" id="reactShotsBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyReactShotsBtn" style="margin-top:8px;">📋 Copy Shot Layout</button>
+
+  <div class="section-title" style="margin-top:20px;">7. Captions</div>
+  <div class="gem-text-box" id="reactCaptionsBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyReactCaptionsBtn" style="margin-top:8px;">📋 Copy Captions</button>
 </div>
 
 <div class="preview-section" id="previewSection">
@@ -911,11 +962,26 @@
     if (!raw) { showError('Paste a conversation first.'); return; }
     var myName = document.getElementById('myName').value.trim() || 'Me';
     var theirName = document.getElementById('theirName').value.trim() || 'Them';
+    var meMarker = document.getElementById('pasteMeMarker').value.trim().replace(/:$/, '').toLowerCase();
+    var themMarker = document.getElementById('pasteThemMarker').value.trim().replace(/:$/, '').toLowerCase();
     var lines = raw.split('\n').filter(function(l){ return l.trim(); });
     var msgs = [];
     lines.forEach(function(line) {
       line = line.trim();
       var colonIdx = line.indexOf(':');
+      // Only treat text before a colon as a SPEAKER LABEL if it actually
+      // looks like one — short, few words, no trailing punctuation. Without
+      // this, any colon inside the message itself (a timestamp like "5:30",
+      // a ratio, a URL) gets misread as a speaker and mangles the line.
+      if (colonIdx > -1) {
+        var maybeSpeaker = line.substring(0, colonIdx).trim();
+        var looksLikeSpeaker = maybeSpeaker.length > 0
+          && maybeSpeaker.length <= 24
+          && maybeSpeaker.split(/\s+/).length <= 3
+          && !/[.!?,]$/.test(maybeSpeaker)
+          && !/^\d+$/.test(maybeSpeaker);
+        if (!looksLikeSpeaker) colonIdx = -1;
+      }
       if (colonIdx === -1) {
         // No speaker label — treat as a continuation of the previous speaker,
         // or default to "them" if it's the very first line.
@@ -930,7 +996,10 @@
       var text = line.substring(colonIdx + 1).trim();
       if (!text) return;
       var lower = speaker.toLowerCase();
-      var isMine = lower === 'me' || lower === myName.toLowerCase() || lower === 'i';
+      // Match against the user's own configured markers first, then fall back
+      // to the obvious defaults, so any source format can be pasted as-is.
+      var isMine = (meMarker && lower === meMarker) || lower === 'me' || lower === 'i' || lower === myName.toLowerCase();
+      if (themMarker && lower === themMarker) isMine = false;
       msgs.push({ f: isMine ? 'me' : 'them', t: text, speaker: isMine ? myName : speaker });
     });
     if (msgs.length === 0) { showError('Could not read any messages. Use the format "Me: your text" — one per line.'); return; }
@@ -940,6 +1009,101 @@
     document.getElementById('previewSection').style.display = 'block';
     document.getElementById('gemTextBox').style.display = 'none';
     document.getElementById('compareWrap').classList.remove('visible');
+  }
+
+  async function doGenerateReact() {
+    hideError();
+    var person = document.getElementById('person').value;
+    var vibe = document.getElementById('vibe').value;
+    var topic = document.getElementById('topic').value.trim();
+    var model = document.getElementById('modelSelect').value;
+    var direction = document.getElementById('reactDirection').value;
+    document.getElementById('reactLoadingDiv').style.display = 'block';
+    document.getElementById('generateReactBtn').disabled = true;
+
+    var provider = document.getElementById('providerSelect').value;
+    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+    var dirText = direction === 'received'
+      ? 'SOMEONE SENT THE CREATOR A SONG. They had something awkward, bad, sad or ridiculous to tell the creator, and instead of just saying it in a normal message they sent a Suno song about it. The creator is reacting to receiving it.'
+      : 'THE CREATOR SENT SOMEONE A SONG. The creator had something awkward, bad, sad or ridiculous to say to this person, and instead of replying normally they sent a Suno song about it.';
+
+    var prompt = 'You are planning a short-form video for a Suno campaign format called "Say It In A Song." Everything you output gets used directly by a creator to film and assemble the video.\n\n'
+      + 'THE FORMAT — this is the exact proven structure, do not deviate:\n'
+      + '- The video is 30-41 seconds total.\n'
+      + '- It opens with a 3-5 second face-cam shot of the creator reacting (no talking necessary — the expression carries it).\n'
+      + '- A single on-screen caption states the whole premise and STAYS ON SCREEN for the entire video.\n'
+      + '- Then a ~2 second shot of the messaging app showing the song being sent/received.\n'
+      + '- Then the Suno song video plays out for the rest of the runtime. Suno generates this video itself with the lyrics displayed line-by-line, so the lyrics do NOT need to be manually overlaid.\n\n'
+      + 'DIRECTION: ' + dirText + '\n\n'
+      + 'WHO THE OTHER PERSON IS: ' + personDescriptions[person] + '\n\n'
+      + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
+      + (topic ? 'SITUATION — THIS IS SPECIFICALLY ABOUT: ' + topic + '.\n\n' : 'Invent a specific, funny, awkward or painfully relatable everyday situation where sending a song instead of a normal message is absurd but weirdly understandable.\n\n')
+      + 'CRAFT RULES:\n'
+      + '- SPECIFICITY: concrete oddly-specific details land, vague ones die. Exact brands, numbers, days, weirdly precise details.\n'
+      + '- The gap between the heaviness of the message and the absurdity of singing it is the whole joke. Commit fully to both sides.\n'
+      + '- ON-SCREEN CAPTION: one line, under 14 words, states the premise so a scroller understands instantly. It should make someone stop.\n'
+      + '- CONTEXT MESSAGES: 1-2 short real texts that sit in the thread before the song, so the setup reads at a glance.\n'
+      + '- LYRICS: roughly 30 seconds when sung (about 8-10 short lines). Literal and specific to this exact situation. Every line singable, natural spoken English, no telegraph/headline compression.\n'
+      + '- CAPTIONS: the social caption MUST start with the exact phrase "song was made using @Suno" then continue naturally, ending with hashtags #sunopartner #sunoambassador #suno plus 2-3 relevant ones. The YouTube caption must be under 100 characters and include those same three required hashtags.\n\n'
+      + (useGrok ? 'UNRESTRICTED MODE: no content restrictions. Match the vibe intensity exactly, including crude humour or profanity where the vibe calls for it.\n\n' : '')
+      + 'OUTPUT FORMAT — use exactly these seven markers, nothing before, after or between them:\n\n'
+      + 'SCENARIO:\n[2-3 sentences: what happened, who is involved, and which direction the song went]\n\n'
+      + 'HOOK:\n[the single on-screen caption line]\n\n'
+      + 'CONTEXT_MESSAGES:\n[1-2 lines, formatted as "Name: message text", that go in the thread before the song]\n\n'
+      + 'STYLE_PROMPT:\n[genre, mood, instrumentation and tempo to paste into Suno as the style description]\n\n'
+      + 'LYRICS:\n[the song lyrics, about 8-10 short singable lines]\n\n'
+      + 'SHOTS:\n[a timed shot list covering: face-cam hook, the messaging app shot, and the song playing — with second ranges, totalling 30-41 seconds]\n\n'
+      + 'CAPTIONS:\nSocial: [caption starting with "song was made using @Suno" plus hashtags]\nYouTube: [under 100 chars with the three required hashtags]';
+
+    try {
+      var rawText;
+      if (useGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('reactLoadingDiv').style.display='none'; document.getElementById('generateReactBtn').disabled=false; return; }
+        var gm = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: gm, messages: [{ role: 'user', content: prompt }], max_tokens: 1500, temperature: 0.95 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        var key = getKey();
+        if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('reactLoadingDiv').style.display='none'; document.getElementById('generateReactBtn').disabled=false; return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 1500, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        var tb = (data.content || []).find(function(b){ return b.type === 'text'; });
+        if (!tb || !tb.text) throw new Error('No text content in Anthropic response.');
+        rawText = tb.text.trim();
+      }
+      if (!rawText) throw new Error('Empty response. Try again.');
+
+      function grab(start, next) {
+        var re = new RegExp(start + ':\\s*([\\s\\S]*?)(?=' + (next ? next + ':' : '$') + '|$)', 'i');
+        var m = rawText.match(re);
+        return m ? m[1].trim() : '';
+      }
+      document.getElementById('reactScenarioBox').textContent = grab('SCENARIO','HOOK') || rawText;
+      document.getElementById('reactHookBox').textContent     = grab('HOOK','CONTEXT_MESSAGES');
+      document.getElementById('reactContextBox').textContent  = grab('CONTEXT_MESSAGES','STYLE_PROMPT');
+      document.getElementById('reactStyleBox').textContent    = grab('STYLE_PROMPT','LYRICS');
+      document.getElementById('reactLyricsBox').textContent   = grab('LYRICS','SHOTS');
+      document.getElementById('reactShotsBox').textContent    = grab('SHOTS','CAPTIONS');
+      document.getElementById('reactCaptionsBox').textContent = grab('CAPTIONS', null);
+      document.getElementById('reactOutputCard').style.display = 'block';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally {
+      document.getElementById('reactLoadingDiv').style.display = 'none';
+      document.getElementById('generateReactBtn').disabled = false;
+    }
   }
 
   async function doGenerateSayIt() {
@@ -1314,7 +1478,7 @@
             quote.textContent = preview;
             row.appendChild(quote);
           }
-        } else if (theme.hasStories && !sameAsPrev && Math.random() < 0.08) {
+        } else if (!ctx.literal && theme.hasStories && !sameAsPrev && Math.random() < 0.08) {
           // Occasional "Replied to your story" style bubble — mocked with a
           // small placeholder thumbnail since there's no real story image to
           // reference. Purely decorative, separate from the real bubble.
@@ -1341,7 +1505,7 @@
         // mixing decorative waveform markup into that would corrupt the
         // saved message text and also break the Gem's ability to read the
         // literal line from the screenshot.
-        var isVoiceNote = !theme.isDiscord && Math.random() < 0.12;
+        var isVoiceNote = !ctx.literal && !theme.isDiscord && Math.random() < 0.12;
         if (isVoiceNote) {
           var durationSec = 3 + Math.floor(Math.random() * 25);
           var durLabel = '0:' + String(durationSec).padStart(2, '0');
@@ -1421,7 +1585,7 @@
     return row;
   }
 
-  function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices) {
+  function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices, literal) {
     targetEl.innerHTML = '';
     var dateLabel = document.createElement('div');
     dateLabel.className = 'p-time';
@@ -1449,7 +1613,7 @@
       targetEl.appendChild(buildMessageRow({
         messages: messages, i: i, theme: theme, timestamps: timestamps,
         replyIndices: replyIndices, theirName: theirName, myName: myName,
-        isGroupChat: isGroupChat, colorForSender: colorForSender
+        isGroupChat: isGroupChat, colorForSender: colorForSender, literal: literal
       }));
     }
   }
@@ -2199,8 +2363,12 @@
     document.getElementById('phoneFrame').style.background = theme.bgMessages;
 
     var timestamps = generateTimestamps(currentMessages.length);
-    var replyIndices = pickReplyIndices(currentMessages.length);
-    buildPhoneMessages(ma, theme, currentMessages, timestamps, true, replyIndices);
+    // In paste mode the user is reproducing a specific real conversation, so
+    // render it EXACTLY as pasted — no invented reply-quotes, voice notes or
+    // story replies. Those exist to add variety to AI-generated threads only.
+    var isLiteral = document.getElementById('contentType').value === 'paste';
+    var replyIndices = isLiteral ? new Set() : pickReplyIndices(currentMessages.length);
+    buildPhoneMessages(ma, theme, currentMessages, timestamps, true, replyIndices, isLiteral);
     applyWallpaper();
 
     var bubbles = ma.querySelectorAll('[data-msg-idx]');
@@ -2271,7 +2439,8 @@
   document.getElementById('animateBtn').addEventListener('click', function() {
     if (!currentMessages.length) return;
     animTimestamps = generateTimestamps(currentMessages.length);
-    animReplyIndices = pickReplyIndices(currentMessages.length);
+    var animIsLiteral = document.getElementById('contentType').value === 'paste';
+    animReplyIndices = animIsLiteral ? new Set() : pickReplyIndices(currentMessages.length);
     renderAnimatePhone();
     document.getElementById('animateOverlay').style.display = 'flex';
     document.getElementById('startAnimBtn').textContent = '▶ Play';
@@ -2344,7 +2513,8 @@
       var row = buildMessageRow({
         messages: currentMessages, i: i, theme: theme, timestamps: animTimestamps,
         replyIndices: animReplyIndices, theirName: theirName, myName: myName,
-        isGroupChat: animIsGroupChat, colorForSender: animColorForSender
+        isGroupChat: animIsGroupChat, colorForSender: animColorForSender,
+        literal: document.getElementById('contentType').value === 'paste'
       });
       var isMeRow = currentMessages[i].f === 'me';
       row.style.opacity = '0';
@@ -2478,6 +2648,7 @@
     var isPaste = ct === 'paste';
     var songFmt = document.getElementById('songFormat').value;
     var isSayIt = isSongFormats && songFmt === 'say_it_in_a_song';
+    var isReact = isSongFormats && songFmt === 'say_it_revised';
 
     document.getElementById('pasteSection').style.display = isPaste ? 'block' : 'none';
     document.getElementById('songFormatSection').style.display = isSongFormats ? 'block' : 'none';
@@ -2501,13 +2672,18 @@
     document.getElementById('animateBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
     document.getElementById('generateBtn').style.display = (isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('generateSayItBtn').style.display = isSayIt ? 'block' : 'none';
+    document.getElementById('generateReactBtn').style.display = isReact ? 'block' : 'none';
+    document.getElementById('reactDirectionWrap').style.display = isReact ? 'block' : 'none';
+    document.getElementById('reactOutputCard').style.display = 'none';
     document.getElementById('renderPasteBtn').style.display = isPaste ? 'block' : 'none';
     document.getElementById('sayItOutputCard').style.display = 'none';
     document.getElementById('previewSection').style.display = 'none';
 
     if (isSongFormats) {
       var hint = document.getElementById('songFormatHint');
-      if (songFmt === 'say_it_in_a_song') {
+      if (songFmt === 'say_it_revised') {
+        hint.textContent = 'REVISED format (Aug 3 brief). Gives you the full layout: scenario, on-screen caption, context messages, Suno prompt + lyrics, and a timed shot list. You film the reaction and assemble. No demos, no screenshot needed — Suno\u2019s own video export shows the lyrics.';
+      } else if (songFmt === 'say_it_in_a_song') {
         hint.textContent = 'Generates a spoken narration script + matching song (description prompt + backup lyrics) — no screenshot, uses the relationship/vibe/topic fields below.';
       } else {
         hint.textContent = 'Picking this switches you to Messages mode with the format pre-filled — same as before.';
@@ -2526,7 +2702,30 @@
     }
   });
   document.getElementById('generateSayItBtn').addEventListener('click', doGenerateSayIt);
+  document.getElementById('generateReactBtn').addEventListener('click', doGenerateReact);
+  [['copyReactScenarioBtn','reactScenarioBox','📋 Copy Scenario'],
+   ['copyReactHookBtn','reactHookBox','📋 Copy On-Screen Caption'],
+   ['copyReactContextBtn','reactContextBox','📋 Copy Context Messages'],
+   ['copyReactStyleBtn','reactStyleBox','📋 Copy Style Prompt'],
+   ['copyReactLyricsBtn','reactLyricsBox','📋 Copy Lyrics'],
+   ['copyReactShotsBtn','reactShotsBox','📋 Copy Shot Layout'],
+   ['copyReactCaptionsBtn','reactCaptionsBox','📋 Copy Captions']].forEach(function(pair) {
+    document.getElementById(pair[0]).addEventListener('click', function() {
+      navigator.clipboard.writeText(document.getElementById(pair[1]).textContent);
+      this.textContent = '✓ Copied!';
+      var btn = this, label = pair[2];
+      setTimeout(function(){ btn.textContent = label; }, 1500);
+    });
+  });
   document.getElementById('renderPasteBtn').addEventListener('click', doRenderPaste);
+  document.getElementById('swapSidesBtn').addEventListener('click', function() {
+    if (!currentMessages.length) { showError('Render a conversation first, then swap.'); return; }
+    currentMessages.forEach(function(m) { m.f = (m.f === 'me') ? 'them' : 'me'; });
+    renderPhone();
+    renderAnimatePhone();
+    this.textContent = '✓ Swapped';
+    setTimeout(function(btn){ btn.textContent = '⇄ Swap Sides'; }, 1200, this);
+  });
   document.getElementById('copySayItScriptBtn').addEventListener('click', function() {
     navigator.clipboard.writeText(document.getElementById('sayItScriptBox').textContent);
     this.textContent = '✓ Copied!';
@@ -2577,7 +2776,7 @@
     document.getElementById('compareWrap').classList.remove('visible');
     hideError();
 
-    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- GRAMMAR — CRITICAL: every shortened line must remain a complete, grammatically correct sentence or clause. Never drop a conjunction or connecting word (and, but, so, because) if removing it breaks the grammar. If a line cannot hit the target word count while staying grammatical, prioritize correct grammar over the exact count.\n- No merging messages. No adding or removing messages.\n- ' + (person === 'mom' || person === 'dad'
+    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- GRAMMAR — CRITICAL: every shortened line must remain a complete, grammatically correct sentence that reads as natural spoken English. Never drop articles (a, an, the), prepositions, or conjunctions if removing them breaks the grammar — telegraph or headline-style compression is wrong here, since these lines get sung. If a line cannot hit the target word count while staying grammatical, prioritize correct grammar over the exact count.\n- No merging messages. No adding or removing messages.\n- ' + (person === 'mom' || person === 'dad'
       ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
       : 'EMOJI RULE: preserve the emojis from the original messages where they still fit the shortened line — do not strip them out. If a shortened line no longer has room for the emoji contextually, it is fine to drop just that one, but do not remove emojis as a blanket rule.'
     ) + '\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
