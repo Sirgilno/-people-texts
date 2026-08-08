@@ -199,6 +199,7 @@
       <option value="song_for_everything">Your Friend Has a Song for Everything</option>
       <option value="say_it_revised">Say It In A Song — Revised (react video)</option>
       <option value="say_it_in_a_song">Say It In A Song — Narration (older version)</option>
+      <option value="date_night">Date Night Countdown</option>
     </select>
     <div id="songFormatHint" style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;"></div>
     <div id="reactDirectionWrap" style="margin-top:12px;display:none;">
@@ -207,6 +208,19 @@
         <option value="received">Someone sent ME a song (I react to receiving it)</option>
         <option value="sent">I sent THEM a song (instead of replying normally)</option>
       </select>
+    </div>
+    <div id="dateNightWrap" style="margin-top:12px;display:none;">
+      <label>Your real clip list — one per line, include actual times where you have them</label>
+      <textarea id="dateNightClips" rows="9" placeholder="7:40am - waking up in bed&#10;9:10am - eating breakfast&#10;11:15am - going to town&#10;12:30pm - entering golden oaklets&#10;1:05pm - looking at baby wipes I bought&#10;4:00pm - arrived at mall (bought a mattress on the way)&#10;5:20pm - eating at rocomamas&#10;6:35pm - buying beer at shoprite, it's friday&#10;8:15pm - ending the day at home, drinks and a movie" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;font-family:inherit;line-height:1.6;resize:vertical;margin-bottom:10px;"></textarea>
+      <label>Roughly how long is each clip? (this decides how much lyric fits per clip)</label>
+      <select id="dateNightClipLength" style="margin-bottom:10px;">
+        <option value="short">Short — 3-5 seconds each</option>
+        <option value="medium" selected>Medium — 5-8 seconds each</option>
+        <option value="long">Long — 8-12 seconds each</option>
+      </select>
+      <div style="font-size:11px;color:#666;line-height:1.5;">
+        The date's outcome — heading out, or a flop ending (staying in, no text back) — comes from what you actually filmed. Describe your last clip honestly and the tool will match its tone to it, not invent a happy ending.
+      </div>
     </div>
   </div>
   <div id="messagePlatformSection" style="margin-bottom:12px;">
@@ -244,7 +258,7 @@
   </div>
   <div class="row">
     <div id="personFieldWrap">
-      <label>Who is texting you?</label>
+      <label id="personFieldLabel">Who is texting you?</label>
       <select id="person">
         <option value="mom">Mom</option>
         <option value="dad">Dad</option>
@@ -346,10 +360,12 @@
   <button class="btn btn-primary" id="generateBtn">Generate Conversation 🔥</button>
   <button class="btn btn-primary" id="generateSayItBtn" style="display:none;">Generate Story + Song 🎬</button>
   <button class="btn btn-primary" id="generateReactBtn" style="display:none;">Generate React Video Plan 🎬</button>
+  <button class="btn btn-primary" id="generateDateNightBtn" style="display:none;">Generate Countdown Plan 📅</button>
   <button class="btn btn-primary" id="renderPasteBtn" style="display:none;">Render Conversation 📱</button>
   <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
   <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the story and song...</div>
   <div class="loading-div" id="reactLoadingDiv" style="display:none;"><span class="spinner"></span>Planning the video and writing the song...</div>
+  <div class="loading-div" id="dateNightLoadingDiv" style="display:none;"><span class="spinner"></span>Mapping your clips to the song...</div>
   <div class="error-box" id="errorBox"></div>
 </div>
 
@@ -407,6 +423,28 @@
   <div class="section-title" style="margin-top:20px;">7. Captions</div>
   <div class="gem-text-box" id="reactCaptionsBox" style="display:block;"></div>
   <button class="action-btn full" id="copyReactCaptionsBtn" style="margin-top:8px;">📋 Copy Captions</button>
+</div>
+
+<div class="card" id="dateNightOutputCard" style="display:none;">
+  <div class="section-title">Hook (clip 1 only, 0-3s)</div>
+  <div class="gem-text-box" id="dnHookBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyDnHookBtn" style="margin-top:8px;">📋 Copy Hook</button>
+
+  <div class="section-title" style="margin-top:20px;">Per-Clip Breakdown (timestamp + status + lyric)</div>
+  <div class="gem-text-box" id="dnBreakdownBox" style="display:block;white-space:pre-wrap;"></div>
+  <button class="action-btn full" id="copyDnBreakdownBtn" style="margin-top:8px;">📋 Copy Breakdown</button>
+
+  <div class="section-title" style="margin-top:20px;">Suno Style Prompt</div>
+  <div class="gem-text-box" id="dnStyleBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyDnStyleBtn" style="margin-top:8px;">📋 Copy Style Prompt</button>
+
+  <div class="section-title" style="margin-top:20px;">Full Lyrics (paste into Suno)</div>
+  <div class="gem-text-box" id="dnLyricsBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyDnLyricsBtn" style="margin-top:8px;">📋 Copy Lyrics</button>
+
+  <div class="section-title" style="margin-top:20px;">Caption (this brief's own hashtags, not your usual ones)</div>
+  <div class="gem-text-box" id="dnCaptionBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyDnCaptionBtn" style="margin-top:8px;">📋 Copy Caption</button>
 </div>
 
 <div class="preview-section" id="previewSection">
@@ -1009,6 +1047,93 @@
     document.getElementById('previewSection').style.display = 'block';
     document.getElementById('gemTextBox').style.display = 'none';
     document.getElementById('compareWrap').classList.remove('visible');
+  }
+
+  async function doGenerateDateNight() {
+    hideError();
+    var clipsRaw = document.getElementById('dateNightClips').value.trim();
+    if (!clipsRaw) { showError('Paste your clip list first — one clip per line.'); return; }
+    var clipLines = clipsRaw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+    var clipLength = document.getElementById('dateNightClipLength').value;
+    var vibe = document.getElementById('vibe').value;
+    var model = document.getElementById('modelSelect').value;
+    document.getElementById('dateNightLoadingDiv').style.display = 'block';
+    document.getElementById('generateDateNightBtn').disabled = true;
+
+    var provider = document.getElementById('providerSelect').value;
+    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+    var secondsPerClip = clipLength === 'short' ? '3-5 seconds' : clipLength === 'long' ? '8-12 seconds' : '5-8 seconds';
+    var lineWordCount = clipLength === 'short' ? '6-9 words' : clipLength === 'long' ? '12-16 words' : '9-12 words';
+
+    var prompt = 'You are building the exact shot-by-shot plan for a "Date Night Countdown" video, using REAL clips the creator already filmed. This is not a generic template — every timestamp, location and outcome must come directly from what they give you below. Do not invent clips, do not add clips, do not change their order, do not invent times they did not give you.\n\n'
+      + 'THE CREATOR\'S REAL CLIP LIST, IN ORDER (exactly ' + clipLines.length + ' clips — your output must have exactly this many rows, no more, no fewer):\n'
+      + clipLines.map(function(l,i){ return (i+1) + '. ' + l; }).join('\n') + '\n\n'
+      + 'EACH CLIP RUNS ABOUT ' + secondsPerClip + '. This means each lyric line you write for a clip must be short enough to SING in that time — roughly ' + lineWordCount + ' per line. Do not write more than fits.\n\n'
+      + 'THE FORMAT (from the actual brief):\n'
+      + '- Clip 1 needs a HOOK (0-3s) stating the date-night premise, in addition to its own status line.\n'
+      + '- Every clip needs: the timestamp (use the creator\'s real time if given; if a clip has no time, estimate one that fits logically between its neighbours — never guess wildly), a short on-screen TEXT STATUS line about whether the other person has texted, and ONE matching lyric line.\n'
+      + '- The overall story is the creator waiting to hear from a date all day while living their normal day.\n'
+      + '- THE ENDING MUST MATCH WHAT THE CREATOR ACTUALLY DESCRIBED for their last clip — if they describe a flop (staying in, no text, drinks/movie), write that honestly, do not invent a happy ending. If they describe heading out, write that instead.\n\n'
+      + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
+      + 'CRAFT RULES:\n'
+      + '- SPECIFICITY: use the creator\'s own real details (exact places, items, times) rather than generic substitutes.\n'
+      + '- Natural spoken/sung English — never telegraph-style word-dropping, these lines get sung.\n'
+      + '- The status lines should build tension/comedy through the day (excitement, doubt, resignation, acceptance) rather than repeating the same emotion.\n\n'
+      + (useGrok ? 'UNRESTRICTED MODE: no content restrictions, match the vibe intensity exactly.\n\n' : '')
+      + 'OUTPUT FORMAT — exactly these markers, nothing else:\n\n'
+      + 'HOOK:\n[one line, under 20 words, for clip 1 only]\n\n'
+      + 'BREAKDOWN:\n[one row per clip, EXACTLY ' + clipLines.length + ' rows, format each row as: "Clip N | timestamp | status text | lyric line"]\n\n'
+      + 'STYLE_PROMPT:\n[genre, instrumentation, vocal style, BPM for Suno]\n\n'
+      + 'LYRICS:\n[all the lyric lines from the breakdown above, combined into one continuous singable song in the same order, formatted with [Verse]/[Chorus] tags where natural, ready to paste into Suno]\n\n'
+      + 'CAPTION:\n[caption in this exact style: "Date tonight so I turned the entire buildup into a song with @suno 🎶" followed by a specific line about the actual outcome, then hashtags #sunomusic #datenightcountdown plus 2-3 relevant ones]';
+
+    try {
+      var rawText;
+      if (useGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('dateNightLoadingDiv').style.display='none'; document.getElementById('generateDateNightBtn').disabled=false; return; }
+        var gm = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: gm, messages: [{ role: 'user', content: prompt }], max_tokens: 1800, temperature: 0.9 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        var key = getKey();
+        if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('dateNightLoadingDiv').style.display='none'; document.getElementById('generateDateNightBtn').disabled=false; return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 1800, temperature: 0.9, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        var tb = (data.content || []).find(function(b){ return b.type === 'text'; });
+        if (!tb || !tb.text) throw new Error('No text content in Anthropic response.');
+        rawText = tb.text.trim();
+      }
+      if (!rawText) throw new Error('Empty response. Try again.');
+
+      function grab(start, next) {
+        var re = new RegExp(start + ':\\s*([\\s\\S]*?)(?=' + (next ? next + ':' : '$') + '|$)', 'i');
+        var m = rawText.match(re);
+        return m ? m[1].trim() : '';
+      }
+      document.getElementById('dnHookBox').textContent = grab('HOOK','BREAKDOWN');
+      document.getElementById('dnBreakdownBox').textContent = grab('BREAKDOWN','STYLE_PROMPT');
+      document.getElementById('dnStyleBox').textContent = grab('STYLE_PROMPT','LYRICS');
+      document.getElementById('dnLyricsBox').textContent = grab('LYRICS','CAPTION');
+      document.getElementById('dnCaptionBox').textContent = grab('CAPTION', null);
+      document.getElementById('dateNightOutputCard').style.display = 'block';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally {
+      document.getElementById('dateNightLoadingDiv').style.display = 'none';
+      document.getElementById('generateDateNightBtn').disabled = false;
+    }
   }
 
   async function doGenerateReact() {
@@ -2649,6 +2774,7 @@
     var songFmt = document.getElementById('songFormat').value;
     var isSayIt = isSongFormats && songFmt === 'say_it_in_a_song';
     var isReact = isSongFormats && songFmt === 'say_it_revised';
+    var isDateNight = isSongFormats && songFmt === 'date_night';
 
     document.getElementById('pasteSection').style.display = isPaste ? 'block' : 'none';
     document.getElementById('songFormatSection').style.display = isSongFormats ? 'block' : 'none';
@@ -2660,7 +2786,11 @@
     document.getElementById('saveConvoBtn').textContent = isComments ? '💾 Save This Comment Batch' : '💾 Save This Conversation';
     document.getElementById('savedListTitle').textContent = isComments ? 'Saved Comment Batches' : 'Saved Conversations';
     renderSavedList();
-    document.getElementById('personFieldWrap').style.display = (isComments || isPaste) ? 'none' : 'block';
+    document.getElementById('personFieldWrap').style.display = (isComments || isPaste || isDateNight) ? 'none' : 'block';
+    // In react-video mode this field isn't about a text layout at all — it
+    // sets WHO the scenario involves (my mom / my boss / my best friend),
+    // which the prompt uses as the premise. Relabel so that's obvious.
+    document.getElementById('personFieldLabel').textContent = isReact ? 'Who is the song from / to?' : 'Who is texting you?';
     document.getElementById('modeSection').style.display = (isComments || isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('commentCountSection').style.display = isComments ? 'block' : 'none';
     document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : (isSongFormats ? 'Situation / Topic (optional)' : 'Topic / Context (optional)');
@@ -2675,13 +2805,18 @@
     document.getElementById('generateReactBtn').style.display = isReact ? 'block' : 'none';
     document.getElementById('reactDirectionWrap').style.display = isReact ? 'block' : 'none';
     document.getElementById('reactOutputCard').style.display = 'none';
+    document.getElementById('generateDateNightBtn').style.display = isDateNight ? 'block' : 'none';
+    document.getElementById('dateNightWrap').style.display = isDateNight ? 'block' : 'none';
+    document.getElementById('dateNightOutputCard').style.display = 'none';
     document.getElementById('renderPasteBtn').style.display = isPaste ? 'block' : 'none';
     document.getElementById('sayItOutputCard').style.display = 'none';
     document.getElementById('previewSection').style.display = 'none';
 
     if (isSongFormats) {
       var hint = document.getElementById('songFormatHint');
-      if (songFmt === 'say_it_revised') {
+      if (songFmt === 'date_night') {
+        hint.textContent = 'Paste your real filmed clips with actual times. Generates the hook, per-clip timestamp/status/lyric breakdown, Suno style prompt, full lyrics, and the caption using THIS brief\u2019s own hashtags (not your usual campaign rules).';
+      } else if (songFmt === 'say_it_revised') {
         hint.textContent = 'REVISED format (Aug 3 brief). Gives you the full layout: scenario, on-screen caption, context messages, Suno prompt + lyrics, and a timed shot list. You film the reaction and assemble. No demos, no screenshot needed — Suno\u2019s own video export shows the lyrics.';
       } else if (songFmt === 'say_it_in_a_song') {
         hint.textContent = 'Generates a spoken narration script + matching song (description prompt + backup lyrics) — no screenshot, uses the relationship/vibe/topic fields below.';
@@ -2703,6 +2838,19 @@
   });
   document.getElementById('generateSayItBtn').addEventListener('click', doGenerateSayIt);
   document.getElementById('generateReactBtn').addEventListener('click', doGenerateReact);
+  document.getElementById('generateDateNightBtn').addEventListener('click', doGenerateDateNight);
+  [['copyDnHookBtn','dnHookBox','📋 Copy Hook'],
+   ['copyDnBreakdownBtn','dnBreakdownBox','📋 Copy Breakdown'],
+   ['copyDnStyleBtn','dnStyleBox','📋 Copy Style Prompt'],
+   ['copyDnLyricsBtn','dnLyricsBox','📋 Copy Lyrics'],
+   ['copyDnCaptionBtn','dnCaptionBox','📋 Copy Caption']].forEach(function(pair) {
+    document.getElementById(pair[0]).addEventListener('click', function() {
+      navigator.clipboard.writeText(document.getElementById(pair[1]).textContent);
+      this.textContent = '✓ Copied!';
+      var btn = this, label = pair[2];
+      setTimeout(function(){ btn.textContent = label; }, 1500);
+    });
+  });
   [['copyReactScenarioBtn','reactScenarioBox','📋 Copy Scenario'],
    ['copyReactHookBtn','reactHookBox','📋 Copy On-Screen Caption'],
    ['copyReactContextBtn','reactContextBox','📋 Copy Context Messages'],
@@ -2776,7 +2924,18 @@
     document.getElementById('compareWrap').classList.remove('visible');
     hideError();
 
-    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n- Same number of messages, same speakers, SAME ORDER. Message 1 stays message 1, message 7 stays message 7.\n- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n- Same story, same punchlines, same energy.\n- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n- GRAMMAR — CRITICAL: every shortened line must remain a complete, grammatically correct sentence that reads as natural spoken English. Never drop articles (a, an, the), prepositions, or conjunctions if removing them breaks the grammar — telegraph or headline-style compression is wrong here, since these lines get sung. If a line cannot hit the target word count while staying grammatical, prioritize correct grammar over the exact count.\n- No merging messages. No adding or removing messages.\n- ' + (person === 'mom' || person === 'dad'
+    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n'
+      + '- COUNT — ABSOLUTE: the original has EXACTLY ' + currentMessages.length + ' messages. Your output must have EXACTLY ' + currentMessages.length + ' messages. Not one fewer. Every single original message must appear as its own shortened message, in the same order, from the same speaker. Never delete, merge, skip or combine any message for any reason.\n'
+      + '- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n'
+      + '- DEPENDENCY PROTECTION: messages often refer back to something said earlier using words like "exactly", "that", "it", "her", "she", "him", "this". If a later message points back at an earlier one, the earlier message MUST survive and MUST keep whatever noun the later message is referring to. Deleting or over-trimming a message that a later line depends on turns the punchline into nonsense.\n'
+      + '- Same story, same punchlines, same energy.\n'
+      + '- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n'
+      + '- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n'
+      + '- KEEP THE TEXTING VOICE — CRITICAL: match the original\'s capitalisation and punctuation habits exactly. If the original messages are lowercase, your shortened versions stay lowercase. Do NOT capitalise the first letter of a message that was lowercase. Do NOT add full stops at the end of messages that did not have them. These are text messages between real people, not formal prose.\n'
+      + '- KEEP EMPHASIS CAPS: if the original used ALL CAPS on a word or phrase for emphasis (like AND, EXACTLY, NO WAY), keep those caps exactly as they were. That capitalisation is carrying the comedic emphasis.\n'
+      + '- GRAMMAR: keep every line a complete, singable clause. Never drop articles (a, an, the), prepositions or conjunctions if removing them breaks the sense — telegraph or headline-style compression is wrong here. IMPORTANT: this rule is ONLY about not dropping small connecting words. It does NOT mean formalising the writing. Casual texting grammar, slang, lowercase and missing full stops are all correct and must be preserved.\n'
+      + '- No merging messages. No adding or removing messages.\n'
+      + '- ' + (person === 'mom' || person === 'dad'
       ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
       : 'EMOJI RULE: preserve the emojis from the original messages where they still fit the shortened line — do not strip them out. If a shortened line no longer has room for the emoji contextually, it is fine to drop just that one, but do not remove emojis as a blanket rule.'
     ) + '\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
@@ -2814,6 +2973,12 @@
 
       var parsed = parseConversation(rawShortenText, myName, theirName);
       if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
+      // Guard against silent message loss. Without this check the AI can
+      // quietly drop a message, which breaks any later message that referred
+      // back to it ("EXACTLY", "that one", "she") and kills the punchline.
+      if (parsed.length !== currentMessages.length) {
+        throw new Error('Shortened version came back with ' + parsed.length + ' messages instead of ' + currentMessages.length + '. Nothing was changed — hit Shorten for Song again.');
+      }
 
       originalMessages = JSON.parse(JSON.stringify(currentMessages));
       var shortenedMessages = parsed;
