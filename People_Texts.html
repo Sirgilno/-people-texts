@@ -200,6 +200,8 @@
       <option value="say_it_revised">Say It In A Song — Revised (react video)</option>
       <option value="say_it_in_a_song">Say It In A Song — Narration (older version)</option>
       <option value="date_night">Date Night Countdown</option>
+      <option value="musicaholic">Musicaholic</option>
+      <option value="just_a_song">It's Just a Song (Squidward)</option>
     </select>
     <div id="songFormatHint" style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;"></div>
     <div id="reactDirectionWrap" style="margin-top:12px;display:none;">
@@ -220,6 +222,20 @@
       </select>
       <div style="font-size:11px;color:#666;line-height:1.5;">
         The date's outcome — heading out, or a flop ending (staying in, no text back) — comes from what you actually filmed. Describe your last clip honestly and the tool will match its tone to it, not invent a happy ending.
+      </div>
+    </div>
+    <div id="musicaholicWrap" style="margin-top:12px;display:none;">
+      <label>What's the craving / addiction the song is about?</label>
+      <input type="text" id="musicaholicTopic" placeholder="e.g. can't function without music, needs bass in my ears constantly" />
+      <div style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;">
+        The hook caption is fixed by the brief: <strong>"what's your addiction?"</strong> — you film yourself feigning between devices (earbuds, AirPods, speaker) and the craving stops each time you try one. This just writes the background song and CTA.
+      </div>
+    </div>
+    <div id="justSongWrap" style="margin-top:12px;display:none;">
+      <label>What should the song be about?</label>
+      <input type="text" id="justSongTopic" placeholder="e.g. missing someone who moved on, growing apart from an old friend" />
+      <div style="font-size:11px;color:#666;margin-top:6px;line-height:1.5;">
+        Slide captions are fixed by the brief: slide 1 = <strong>"its just a song"</strong> (sad Squidward), slide 2 = <strong>"the song:"</strong> (Squidward tearing up). This writes a genuinely sad/hard-hitting song and pulls out the single climax line to display on slide 3.
       </div>
     </div>
   </div>
@@ -361,11 +377,13 @@
   <button class="btn btn-primary" id="generateSayItBtn" style="display:none;">Generate Story + Song 🎬</button>
   <button class="btn btn-primary" id="generateReactBtn" style="display:none;">Generate React Video Plan 🎬</button>
   <button class="btn btn-primary" id="generateDateNightBtn" style="display:none;">Generate Countdown Plan 📅</button>
+  <button class="btn btn-primary" id="generateMemeBtn" style="display:none;">Generate Song + Captions 🎵</button>
   <button class="btn btn-primary" id="renderPasteBtn" style="display:none;">Render Conversation 📱</button>
   <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
   <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the story and song...</div>
   <div class="loading-div" id="reactLoadingDiv" style="display:none;"><span class="spinner"></span>Planning the video and writing the song...</div>
   <div class="loading-div" id="dateNightLoadingDiv" style="display:none;"><span class="spinner"></span>Mapping your clips to the song...</div>
+  <div class="loading-div" id="memeLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the song...</div>
   <div class="error-box" id="errorBox"></div>
 </div>
 
@@ -445,6 +463,30 @@
   <div class="section-title" style="margin-top:20px;">Caption (this brief's own hashtags, not your usual ones)</div>
   <div class="gem-text-box" id="dnCaptionBox" style="display:block;"></div>
   <button class="action-btn full" id="copyDnCaptionBtn" style="margin-top:8px;">📋 Copy Caption</button>
+</div>
+
+<div class="card" id="memeOutputCard" style="display:none;">
+  <div class="section-title" id="memeCaptionsTitle">On-Screen Captions</div>
+  <div class="gem-text-box" id="memeCaptionsBox" style="display:block;white-space:pre-wrap;"></div>
+  <button class="action-btn full" id="copyMemeCaptionsBtn" style="margin-top:8px;">📋 Copy On-Screen Captions</button>
+
+  <div class="section-title" style="margin-top:20px;">Suno Style Prompt</div>
+  <div class="gem-text-box" id="memeStyleBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyMemeStyleBtn" style="margin-top:8px;">📋 Copy Style Prompt</button>
+
+  <div class="section-title" style="margin-top:20px;">Song Lyrics</div>
+  <div class="gem-text-box" id="memeLyricsBox" style="display:block;"></div>
+  <button class="action-btn full" id="copyMemeLyricsBtn" style="margin-top:8px;">📋 Copy Lyrics</button>
+
+  <div id="memeClimaxWrap" style="display:none;">
+    <div class="section-title" style="margin-top:20px;">Climax Line (goes on slide 3)</div>
+    <div class="gem-text-box" id="memeClimaxBox" style="display:block;"></div>
+    <button class="action-btn full" id="copyMemeClimaxBtn" style="margin-top:8px;">📋 Copy Climax Line</button>
+  </div>
+
+  <div class="section-title" style="margin-top:20px;">Social + CTA Captions</div>
+  <div class="gem-text-box" id="memeSocialBox" style="display:block;white-space:pre-wrap;"></div>
+  <button class="action-btn full" id="copyMemeSocialBtn" style="margin-top:8px;">📋 Copy Captions</button>
 </div>
 
 <div class="preview-section" id="previewSection">
@@ -1047,6 +1089,109 @@
     document.getElementById('previewSection').style.display = 'block';
     document.getElementById('gemTextBox').style.display = 'none';
     document.getElementById('compareWrap').classList.remove('visible');
+  }
+
+  async function doGenerateMeme() {
+    hideError();
+    var fmt = document.getElementById('songFormat').value;
+    var isJustSong = fmt === 'just_a_song';
+    var topic = isJustSong
+      ? document.getElementById('justSongTopic').value.trim()
+      : document.getElementById('musicaholicTopic').value.trim();
+    if (!topic) { showError('Tell it what the song should be about first.'); return; }
+    var vibe = document.getElementById('vibe').value;
+    var model = document.getElementById('modelSelect').value;
+    document.getElementById('memeLoadingDiv').style.display = 'block';
+    document.getElementById('generateMemeBtn').disabled = true;
+
+    var provider = document.getElementById('providerSelect').value;
+    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+
+    var formatBrief = isJustSong
+      ? 'FORMAT — "It\'s Just a Song" (Squidward meme, 3 slides):\n'
+        + '- Slide 1: sad Squidward listening to music meme, caption is FIXED as "its just a song"\n'
+        + '- Slide 2: Squidward tearing up meme, caption is FIXED as "the song:"\n'
+        + '- Slide 3: the climax line of the song displayed on screen, plus the CTA\n'
+        + '- The song plays as background audio across all three slides.\n'
+        + '- The song must be genuinely sad or hard-hitting — the whole joke is that it hits far harder than "just a song" implies. Do not make it comedic or ironic. Real emotional weight.\n\n'
+      : 'FORMAT — "Musicaholic":\n'
+        + '- Hook caption is FIXED as "what\'s your addiction?"\n'
+        + '- The creator lays out every music device they own (wired earbuds, AirPods, speaker) and films themselves feigning/craving between them. Each time they put one on, the craving stops.\n'
+        + '- A Suno song plays in the background across the whole video.\n'
+        + '- The song should match the addiction/craving energy — driving, hooky, something that sounds like a fix.\n\n';
+
+    var prompt = 'You are writing the song and captions for a short-form Suno campaign video.\n\n'
+      + formatBrief
+      + 'WHAT THE SONG IS ABOUT: ' + topic + '\n\n'
+      + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
+      + 'CRAFT RULES:\n'
+      + '- SPECIFICITY: concrete, oddly-specific details land. Vague abstractions die. Reach for the exact image, not the general one.\n'
+      + '- PUNCH WORD LAST: the strongest word in a line goes at the end of that line.\n'
+      + '- NEVER EXPLAIN: give the image, let the listener feel it. Do not spell out the emotion.\n'
+      + '- Natural singable English. No telegraph-style word dropping.\n\n'
+      + 'CAMPAIGN RULES (must follow exactly):\n'
+      + '- The CTA caption must be 3-5 seconds of on-screen text saying the song was made on Suno.\n'
+      + '- The social caption must start with the exact phrase "song was made using @Suno" and end with hashtags #sunopartner #sunoambassador #suno plus 2-3 relevant tags.\n'
+      + '- NEVER use the words "AI music", "AI generator", "AI song" anywhere — videos containing those do not count.\n'
+      + '- Never reference or imitate real musicians or copyrighted songs.\n\n'
+      + (useGrok ? 'UNRESTRICTED MODE: no content restrictions, match the vibe intensity exactly.\n\n' : '')
+      + 'OUTPUT FORMAT — exactly these markers, nothing else:\n\n'
+      + 'ONSCREEN:\n' + (isJustSong
+          ? '[list the three slide captions, one per line, in this exact form:\nSlide 1: its just a song\nSlide 2: the song:\nSlide 3: (the climax line goes here)]'
+          : '[the fixed hook caption, exactly: what\'s your addiction?]') + '\n\n'
+      + 'STYLE_PROMPT:\n[genre, instrumentation, vocal style, BPM to paste into Suno]\n\n'
+      + 'LYRICS:\n[the full song lyrics, structured with [Verse]/[Chorus] tags]\n\n'
+      + (isJustSong ? 'CLIMAX:\n[the single most emotionally devastating line from the lyrics above, copied exactly as written — this is what gets displayed on slide 3]\n\n' : '')
+      + 'CAPTIONS:\nCTA: [3-5 second on-screen CTA text]\nSocial: [caption starting with "song was made using @Suno" plus hashtags]';
+
+    try {
+      var rawText;
+      if (useGrok) {
+        var grokKey = getGrokKey();
+        if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('memeLoadingDiv').style.display='none'; document.getElementById('generateMemeBtn').disabled=false; return; }
+        var gm = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
+        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+          body: JSON.stringify({ model: gm, messages: [{ role: 'user', content: prompt }], max_tokens: 1200, temperature: 0.9 })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+        var data = await resp.json();
+        rawText = data.choices?.[0]?.message?.content?.trim();
+      } else {
+        var key = getKey();
+        if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('memeLoadingDiv').style.display='none'; document.getElementById('generateMemeBtn').disabled=false; return; }
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: model, max_tokens: 1200, temperature: 0.95, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
+        var data = await resp.json();
+        var tb = (data.content || []).find(function(b){ return b.type === 'text'; });
+        if (!tb || !tb.text) throw new Error('No text content in Anthropic response.');
+        rawText = tb.text.trim();
+      }
+      if (!rawText) throw new Error('Empty response. Try again.');
+
+      function grab(start, next) {
+        var re = new RegExp(start + ':\\s*([\\s\\S]*?)(?=' + (next ? next + ':' : '$') + '|$)', 'i');
+        var m = rawText.match(re);
+        return m ? m[1].trim() : '';
+      }
+      document.getElementById('memeCaptionsTitle').textContent = isJustSong ? 'Slide Captions (all 3 slides)' : 'On-Screen Hook Caption';
+      document.getElementById('memeCaptionsBox').textContent = grab('ONSCREEN','STYLE_PROMPT');
+      document.getElementById('memeStyleBox').textContent = grab('STYLE_PROMPT','LYRICS');
+      document.getElementById('memeLyricsBox').textContent = grab('LYRICS', isJustSong ? 'CLIMAX' : 'CAPTIONS');
+      document.getElementById('memeClimaxWrap').style.display = isJustSong ? 'block' : 'none';
+      if (isJustSong) document.getElementById('memeClimaxBox').textContent = grab('CLIMAX','CAPTIONS');
+      document.getElementById('memeSocialBox').textContent = grab('CAPTIONS', null);
+      document.getElementById('memeOutputCard').style.display = 'block';
+    } catch(err) { showError('Error: ' + err.message); }
+    finally {
+      document.getElementById('memeLoadingDiv').style.display = 'none';
+      document.getElementById('generateMemeBtn').disabled = false;
+    }
   }
 
   async function doGenerateDateNight() {
@@ -2775,6 +2920,9 @@
     var isSayIt = isSongFormats && songFmt === 'say_it_in_a_song';
     var isReact = isSongFormats && songFmt === 'say_it_revised';
     var isDateNight = isSongFormats && songFmt === 'date_night';
+    var isMusicaholic = isSongFormats && songFmt === 'musicaholic';
+    var isJustSong = isSongFormats && songFmt === 'just_a_song';
+    var isMeme = isMusicaholic || isJustSong;
 
     document.getElementById('pasteSection').style.display = isPaste ? 'block' : 'none';
     document.getElementById('songFormatSection').style.display = isSongFormats ? 'block' : 'none';
@@ -2786,7 +2934,7 @@
     document.getElementById('saveConvoBtn').textContent = isComments ? '💾 Save This Comment Batch' : '💾 Save This Conversation';
     document.getElementById('savedListTitle').textContent = isComments ? 'Saved Comment Batches' : 'Saved Conversations';
     renderSavedList();
-    document.getElementById('personFieldWrap').style.display = (isComments || isPaste || isDateNight) ? 'none' : 'block';
+    document.getElementById('personFieldWrap').style.display = (isComments || isPaste || isDateNight || isMeme) ? 'none' : 'block';
     // In react-video mode this field isn't about a text layout at all — it
     // sets WHO the scenario involves (my mom / my boss / my best friend),
     // which the prompt uses as the premise. Relabel so that's obvious.
@@ -2808,13 +2956,21 @@
     document.getElementById('generateDateNightBtn').style.display = isDateNight ? 'block' : 'none';
     document.getElementById('dateNightWrap').style.display = isDateNight ? 'block' : 'none';
     document.getElementById('dateNightOutputCard').style.display = 'none';
+    document.getElementById('musicaholicWrap').style.display = isMusicaholic ? 'block' : 'none';
+    document.getElementById('justSongWrap').style.display = isJustSong ? 'block' : 'none';
+    document.getElementById('generateMemeBtn').style.display = isMeme ? 'block' : 'none';
+    document.getElementById('memeOutputCard').style.display = 'none';
     document.getElementById('renderPasteBtn').style.display = isPaste ? 'block' : 'none';
     document.getElementById('sayItOutputCard').style.display = 'none';
     document.getElementById('previewSection').style.display = 'none';
 
     if (isSongFormats) {
       var hint = document.getElementById('songFormatHint');
-      if (songFmt === 'date_night') {
+      if (songFmt === 'musicaholic') {
+        hint.textContent = 'Hook caption is fixed by the brief ("what\u2019s your addiction?"). You film yourself craving between music devices. This writes the background song + CTA only.';
+      } else if (songFmt === 'just_a_song') {
+        hint.textContent = 'Three Squidward slides with fixed captions. This writes a genuinely sad song and pulls out the single climax line to display on slide 3.';
+      } else if (songFmt === 'date_night') {
         hint.textContent = 'Paste your real filmed clips with actual times. Generates the hook, per-clip timestamp/status/lyric breakdown, Suno style prompt, full lyrics, and the caption using THIS brief\u2019s own hashtags (not your usual campaign rules).';
       } else if (songFmt === 'say_it_revised') {
         hint.textContent = 'REVISED format (Aug 3 brief). Gives you the full layout: scenario, on-screen caption, context messages, Suno prompt + lyrics, and a timed shot list. You film the reaction and assemble. No demos, no screenshot needed — Suno\u2019s own video export shows the lyrics.';
@@ -2839,6 +2995,19 @@
   document.getElementById('generateSayItBtn').addEventListener('click', doGenerateSayIt);
   document.getElementById('generateReactBtn').addEventListener('click', doGenerateReact);
   document.getElementById('generateDateNightBtn').addEventListener('click', doGenerateDateNight);
+  document.getElementById('generateMemeBtn').addEventListener('click', doGenerateMeme);
+  [['copyMemeCaptionsBtn','memeCaptionsBox','📋 Copy On-Screen Captions'],
+   ['copyMemeStyleBtn','memeStyleBox','📋 Copy Style Prompt'],
+   ['copyMemeLyricsBtn','memeLyricsBox','📋 Copy Lyrics'],
+   ['copyMemeClimaxBtn','memeClimaxBox','📋 Copy Climax Line'],
+   ['copyMemeSocialBtn','memeSocialBox','📋 Copy Captions']].forEach(function(pair) {
+    document.getElementById(pair[0]).addEventListener('click', function() {
+      navigator.clipboard.writeText(document.getElementById(pair[1]).textContent);
+      this.textContent = '✓ Copied!';
+      var btn = this, label = pair[2];
+      setTimeout(function(){ btn.textContent = label; }, 1500);
+    });
+  });
   [['copyDnHookBtn','dnHookBox','📋 Copy Hook'],
    ['copyDnBreakdownBtn','dnBreakdownBox','📋 Copy Breakdown'],
    ['copyDnStyleBtn','dnStyleBox','📋 Copy Style Prompt'],
