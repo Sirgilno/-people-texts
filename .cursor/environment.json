@@ -1,0 +1,13 @@
+{
+  "name": "People Texts Generator",
+  "ports": [
+    { "name": "web", "port": 8000 }
+  ],
+  "terminals": [
+    {
+      "name": "web",
+      "command": "python3 -m http.server 8000 --bind 0.0.0.0 --directory /workspace",
+      "description": "Static HTTP server for the People Texts Generator app. Open http://localhost:8000/People_Texts.html to use it."
+    }
+  ]
+}
