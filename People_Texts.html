@@ -84,7 +84,7 @@
   .p-fake-input { flex: 1; border-radius: 18px; padding: 7px 14px; font-size: 12px; }
   .p-send { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .p-send.mic { width: 40px; height: 40px; }
-  .p-gm-read { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
+  .p-gm-read { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
   .p-date-chip { align-self: center; font-size: 11px; padding: 4px 10px; border-radius: 8px; margin: 8px auto; opacity: 1; }
   .p-reply-quote { font-size: 10px; padding: 4px 8px; border-left: 2px solid; border-radius: 4px; margin-bottom: 3px; max-width: 75%; opacity: 0.7; line-height: 1.3; }
   .p-typing { display: none; align-items: flex-start; margin: 2px 0; }
@@ -1872,7 +1872,7 @@
   function svgDoubleCheck(color, w) {
     var el = document.createElement('span');
     el.style.cssText = 'display:inline-flex;margin-left:3px;line-height:0;vertical-align:middle;';
-    el.innerHTML = '<svg width="' + (w || 13) + '" height="10" viewBox="0 0 16 11" fill="none"><path d="M1.2 6.1L4 9L10.6 1.4" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.1 6.2L8.5 9L15.2 1.4" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    el.innerHTML = '<svg width="' + (w || 16) + '" height="11" viewBox="0 0 16 11" fill="none"><path d="M1.2 6.1L4 9L10.6 1.4" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.1 6.2L8.5 9L15.2 1.4" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     return el;
   }
   function gmReadBadge(theme) {
@@ -2148,7 +2148,7 @@
           timeSpan.style.opacity = '0.85';
           timeSpan.appendChild(document.createTextNode(ts));
           if (isMe && theme.readReceiptStyle === 'in-bubble-ticks') {
-            timeSpan.appendChild(svgDoubleCheck(theme.readColor, 13));
+            timeSpan.appendChild(svgDoubleCheck(theme.readColor, 16));
           }
           bubble.style.display = 'flex';
           bubble.style.alignItems = 'flex-end';
@@ -2488,7 +2488,7 @@
       bgInput: '#131314', bgFakeInput: '#2d2f31', colorFakeInput: '#c4c7c5', fakePlaceholder: 'RCS message',
       floatInput: false,
       bubbleShape: 'pill',
-      bubbleMe: { bg: '#004a77', color: '#d3e3fd', radius: '24px' },
+      bubbleMe: { bg: '#1a73e8', color: '#ffffff', radius: '24px' },
       bubbleThem: { bg: '#2d2f31', color: '#e3e3e3', radius: '24px' },
       timestampStyle: 'hidden',
       timeColor: '#c4c7c5', timeBubble: '#c4c7c5',
