@@ -286,6 +286,10 @@
         <option value="stranger">Stranger / Random DM</option>
         <option value="niece">Niece</option>
         <option value="nephew">Nephew</option>
+        <option value="mil">Mother-in-Law (MIL)</option>
+        <option value="roommate">Roommate</option>
+        <option value="realtor">Realtor</option>
+        <option value="professor">Professor / TA</option>
       </select>
     </div>
     <div>
@@ -341,6 +345,17 @@
         <option value="notes_breakup">Notes App — Breakup Note to Song</option>
         <option value="notes_todo">Notes App — Chaotic To-Do List to Song</option>
         <option value="until_noticed">Until Someone Notices Series</option>
+      </optgroup>
+      <optgroup label="🗓️ August Push — Back to School &amp; Drama">
+        <option value="bts_roommate">Back-to-School — Roommate After 3 Days</option>
+        <option value="bts_mom_syllabus">Back-to-School — Mom After Syllabus Week</option>
+        <option value="bts_sorority_rush">Back-to-School — Sorority Rush Week</option>
+        <option value="mil_delivery_room">Pregnancy — MIL Banned From Delivery Room</option>
+        <option value="mil_baby_name">Pregnancy — MIL Reacts to the Baby Name</option>
+        <option value="mil_house">MIL — Judging Our House Purchase</option>
+        <option value="mil_shower">MIL — Baby / Bridal Shower Drama</option>
+        <option value="bach_trip">Bachelorette — Trip Group Chat Chaos</option>
+        <option value="realtor_starter">Realtor — "Starter Homes" in 2026</option>
       </optgroup>
     </select>
   </div>
@@ -657,7 +672,11 @@
     coworker: 'a coworker or boss texting in a professional setting. The tone is often passive-aggressive, overly polite, corporate, or subtly competitive. References work drama, deadlines, meetings, and power dynamics. Everything feels slightly tense or performative, even when trying to sound friendly.',
     stranger: 'a random stranger from anywhere in the world who slid into the DMs or sent an unexpected text. This person can be from any country or background. Possible energies include: wrong number confusion, overly familiar internet stranger, awkward but harmless, slightly creepy, scammy or salesy, overly enthusiastic, mysterious, love-bombing, or completely random. The dynamic is usually awkward, weird, funny, unsettling, or unexpectedly entertaining depending on the stranger\'s personality and intent.',
     niece: 'a niece texting her aunt or uncle. She is dramatic, overly familiar for her age, asks for favors or money in a roundabout way, shares too much about her social life, and treats her relative like a cool older friend. Gen Z energy mixed with family entitlement. She often overshares and expects immediate emotional support or help.',
-    nephew: 'a nephew texting his aunt or uncle. He is chaotic and only checks in when he needs something (usually money, advice, or a favour). He shares questionable life choices and has a mix of student energy and street smarts. The dynamic is funny but slightly exhausting, with him often trying to sound more mature than he is.'
+    nephew: 'a nephew texting his aunt or uncle. He is chaotic and only checks in when he needs something (usually money, advice, or a favour). He shares questionable life choices and has a mix of student energy and street smarts. The dynamic is funny but slightly exhausting, with him often trying to sound more mature than he is.',
+    mil: 'a mother-in-law texting her child-in-law (or dropping into the family chat). She is judgmental, boundary-crossing, and passive-aggressive under a thin layer of sweetness. She inserts herself into the biggest life events — the pregnancy announcement, the baby name, being in the delivery room, baby and bridal showers, the wedding, gifts, and which house you should buy — and treats her opinions as final. She weaponises guilt, plays the victim the moment she is challenged, "just wants what is best," and manufactures the kind of drama that makes people scream in the comments. Ranges from sickly-sweet-with-a-knife-behind-it to openly outrageous "there is NO way she actually said that" energy.',
+    roommate: 'a roommate texting the person they live with. Chaotic, boundary-free, and oblivious. Passive-aggressive notes about dishes, rent, noise, "borrowing" without asking, mystery smells, overnight guests, thermostat wars, and unlabelled fridge food. College and early-twenties energy. Swings between weirdly wholesome and completely unhinged — the kind of roommate story that sounds made up but everyone has lived through.',
+    realtor: 'a realtor texting a first-time home buyer. Relentlessly upbeat and salesy, spinning overpriced disasters as "cozy starter homes" and "great deals," glossing over obvious red flags, and nudging way over budget. Peak 2026 housing-market delusion — calling $425K a steal for something visibly falling apart — the kind of exchange that makes viewers rage-comment about the prices and whether the house is remotely worth it.',
+    professor: 'a professor or TA texting a student, or a student texting them. Ranges from coldly bureaucratic to secretly unhinged. Deadlines, extension begging, grade-rounding pleas, attendance policing, syllabus-week chaos, group-project betrayals, and passive-aggressive "per my last email" energy. Campus comedy that feels painfully real.'
   };
 
   // Minimal neutral examples (not injected into prompt)
@@ -692,6 +711,18 @@
     ],
     nephew: [
       "Nephew: Unc you good?\nMe: Yeah you?\nNephew: I'm good. So random question...\nMe: How much\nNephew: Why do you always think I want money"
+    ],
+    mil: [
+      "MIL: I was thinking I'll be in the delivery room with you two\nMe: We actually wanted just us\nMIL: Oh. I see. I carried him for 9 months but okay\nMe: It's not like that\nMIL: No no. I understand. I always understand."
+    ],
+    roommate: [
+      "Roommate: hey so whose turn is it to do the dishes\nMe: yours\nRoommate: I did them in like March though\nMe: it's August\nRoommate: exactly. muscle memory"
+    ],
+    realtor: [
+      "Realtor: Found the ONE for you!! 🏡\nMe: how much\nRealtor: Only $425k, absolute steal\nMe: the photos show a hole in the roof\nRealtor: That's called natural skylighting hun ✨"
+    ],
+    professor: [
+      "Me: Hi professor, is there any way to round my 89.4 to an A?\nProfessor: There is not.\nMe: I'll do extra credit anything\nProfessor: Per my syllabus, per my last email, and per the email before that: no."
     ]
   };
 
@@ -810,6 +841,60 @@
       desc: '📅 "Day X of doing something until someone notices" — serialized format. Each post builds suspense. Can be funny or heartfelt. Song matches the escalating energy.',
       person: 'bestfriend', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
       topic: 'day 12 of texting someone daily with a different ridiculous compliment until they finally notice and react'
+    },
+    bts_roommate: {
+      label: 'Back-to-School — Roommate After 3 Days',
+      desc: '🎓 BIG PUSH. New roommate already unbearable after 3 days — dishes, rent, noise, "borrowing". Song Mode → Gem. CTA in first half.',
+      person: 'roommate', vibe: 'funny', mode: 'song', msgStyle: 'imessage',
+      topic: 'texts from my roommate after living together for only THREE days — already passive aggressive about dishes, rent, noise and borrowing things without asking, spiralling into pure unhinged chaos'
+    },
+    bts_mom_syllabus: {
+      label: 'Back-to-School — Mom After Syllabus Week',
+      desc: '🎓 BIG PUSH. Mom finds out what you did during syllabus week — guilt-trip meltdown. Song Mode → Gem. CTA in first half.',
+      person: 'mom', vibe: 'guilt', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'mom texting after she found out what I got up to during syllabus week — guilt, worry and dramatic disappointment spiralling completely out of control'
+    },
+    bts_sorority_rush: {
+      label: 'Back-to-School — Sorority Rush Week',
+      desc: '🎓 BIG PUSH. A sorority sends increasingly intense rush-week messages. Keep it brand-safe — nothing illegal. Song Mode → Gem. CTA in first half.',
+      person: 'stranger', vibe: 'dramatic', mode: 'song', msgStyle: 'instagram',
+      topic: 'a sorority sending increasingly intense, almost cult-like messages during rush week — wildly over-the-top pledge energy that sounds fake but feels real, nothing illegal'
+    },
+    mil_delivery_room: {
+      label: 'Pregnancy — MIL Banned From Delivery Room',
+      desc: '🤰 Proven MIL + pregnancy drama. She finds out she can\'t be in the delivery room and melts down. Built to spark comment-section arguments. Song Mode → Gem.',
+      person: 'mil', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'texts from my mother-in-law after finding out she CANNOT be in the delivery room — full guilt-trip meltdown, playing the victim and dragging the whole family into it'
+    },
+    mil_baby_name: {
+      label: 'Pregnancy — MIL Reacts to the Baby Name',
+      desc: '🤰 MIL passive-aggressively hates the baby name and pushes her own. Rage-bait for the comments. Song Mode → Gem. CTA in first half.',
+      person: 'mil', vibe: 'passive', mode: 'song', msgStyle: 'imessage',
+      topic: 'texts from my mother-in-law after we told her the baby name — thinly veiled disgust, unsolicited "better" suggestions and passive-aggressive concern about what people will think'
+    },
+    mil_house: {
+      label: 'MIL — Judging Our House Purchase',
+      desc: '🏠 Expanded MIL: she found out what you paid and inserts herself into the house decision, even calling the realtor. Song Mode → Gem.',
+      person: 'mil', vibe: 'passive', mode: 'song', msgStyle: 'whatsapp',
+      topic: 'mother-in-law found out how much we paid for our house and has strong opinions — contacting our realtor behind our backs, judging every room and insisting she gets a say in where we live'
+    },
+    mil_shower: {
+      label: 'MIL — Baby / Bridal Shower Drama',
+      desc: '🎁 Expanded MIL: she tries to hijack the shower — guest list, gifts, making it about her. Song Mode → Gem. CTA in first half.',
+      person: 'mil', vibe: 'dramatic', mode: 'song', msgStyle: 'imessage',
+      topic: 'mother-in-law trying to hijack the baby shower or bridal shower — guest-list power grabs, openly complaining about the gifts and making the entire day about herself'
+    },
+    bach_trip: {
+      label: 'Bachelorette — Trip Group Chat Chaos',
+      desc: '🍾 Performs well with women. A bachelorette trip group chat imploding. Best in Group Chat mode (3-4 people). Song Mode → Gem.',
+      person: 'bestfriend', vibe: 'unhinged', mode: 'song', msgStyle: 'imessage',
+      topic: 'a bachelorette trip group chat completely falling apart — someone secretly invited an ex, a bridesmaid refuses to split the Airbnb and the bride keeps adding insane rules for everyone'
+    },
+    realtor_starter: {
+      label: 'Realtor — "Starter Homes" in 2026',
+      desc: '🏠 Housing-market rage-bait. Realtor keeps sending overpriced disasters as "great deals". Makes viewers comment "$425K FOR THAT?!". Song Mode → Gem.',
+      person: 'realtor', vibe: 'dramatic', mode: 'song', msgStyle: 'imessage',
+      topic: 'asked my realtor for affordable starter homes and she keeps sending overpriced disasters, calling $425K a "great deal" for a house that is visibly falling apart — peak 2026 housing-market delusion'
     }
   };
 
