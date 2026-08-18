@@ -131,8 +131,8 @@
 
   /* ── Two-column app layout (controls | live preview) ── */
   .app-shell { max-width: 680px; margin: 0 auto; }
-  @media (min-width: 1024px) {
-    .app-shell.has-preview { max-width: 1180px; display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 28px; align-items: start; }
+  @media (min-width: 900px) {
+    .app-shell.has-preview { max-width: 1180px; display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
     .app-shell.has-preview > #previewSection { grid-column: 2; grid-row: 1 / span 99; position: sticky; top: 20px; align-self: start; margin-top: 0; }
     .app-shell.has-preview > *:not(#previewSection) { grid-column: 1; min-width: 0; }
   }
