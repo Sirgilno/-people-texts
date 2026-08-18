@@ -158,7 +158,7 @@
   .c-like-col { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 28px; padding-top: 2px; }
   .c-like-count { font-size: 10px; line-height: 1.2; }
   .c-emoji-bar { display: flex; gap: 14px; padding: 8px 14px 4px; font-size: 20px; line-height: 1; overflow-x: auto; }
-  .c-composer { display: flex; align-items: center; gap: 10px; padding: 8px 14px 12px; border-top: 0.5px solid; }
+  .c-composer { display: flex; align-items: center; gap: 10px; padding: 8px 14px 12px; }
   .c-composer-input { flex: 1; border-radius: 20px; padding: 8px 14px; font-size: 12px; border: 1px solid transparent; }
   .c-yt-send { width: 32px; height: 32px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .name-gen-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 12px; cursor: pointer; white-space: nowrap; margin-top: 6px; width: 100%; text-align: center; transition: border-color 0.15s, color 0.15s; }
@@ -1844,10 +1844,10 @@
       + 'Generate exactly ' + count + ' distinct fake ' + platformLabel + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
       + 'Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful comedy, not actual bullying.\n\n'
       + 'Mark exactly ONE of the comments (the funniest/best one) by starting that line with [PINNED] before the username — this represents the top comment the algorithm surfaced. Mark exactly ONE different comment (can overlap logic-wise but must be a different line) by starting it with [LIKED] before the username — this represents a comment the creator personally liked. Every other line has no marker.\n\n'
-      + 'NESTED REPLIES: for exactly 2 of the comments in the batch (pick ones where a reply thread would feel natural — a joke someone builds on, a disagreement, a "wait what" reaction), write 2-3 short reply lines directly under that comment. Each reply line must start with ">" followed by a fake username, then the reply text — e.g. ">replyuser22: wait fr??". Replies should read like a real back-and-forth (agreeing, arguing, adding a joke, asking a follow-up) — not just more top-level comments. Every other comment in the batch has no replies attached.\n\n'
+      + 'NESTED REPLIES: for exactly 2 of the comments in the batch (pick ones where a reply thread would feel natural — a joke someone builds on, a disagreement, a "wait what" reaction), write 2-3 short reply lines directly under that comment. Each reply line must start with ">" followed by a fake username, then the reply text — e.g. ">replyuser22: wait fr??". Replies should read like a real back-and-forth (agreeing, arguing, adding a joke, asking a follow-up) — not just more top-level comments. Every other comment in the batch has no replies attached. On exactly ONE nested reply (the creator responding in-thread), prefix with [CREATOR] after the >: e.g. "> [CREATOR] ghosttowndj_: wait I meant it tho". Use a realistic handle, never the literal word CREATOR.\n\n'
       + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid, victor.j1_, tonnyjayworld).\n\n'
       + 'VARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous batch): ' + Math.random().toString(36).substring(2, 10) + '\n\n'
-      + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nNested reply (indented under the comment above it): >username: reply text\nOne per line. No numbering. No extra commentary before or after this list.';
+      + 'FORMAT: username: comment text\nOr with markers: [PINNED] username: comment text\nNested reply: >username: reply text\nCreator nested reply: > [CREATOR] username: reply text\nOne per line. No numbering. No extra commentary before or after this list.';
 
     try {
       var rawText;
@@ -2695,6 +2695,7 @@
   };
 
   var currentComments = [];
+  var commentsHeaderCount = 0;
 
   function randomLikeCount() {
     var n = Math.floor(Math.random() * 2900) + 40;
@@ -2762,15 +2763,15 @@
     lines.forEach(function(line) {
       // Nested reply — starts with ">", attaches to the most recent top-level comment.
       if (line.charAt(0) === '>') {
-        var replyMatch = line.substring(1).trim().match(/^([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
+        var replyLine = line.substring(1).trim();
+        var rCreator = false;
+        var replyCreatorMatch = replyLine.match(/^\[CREATOR\]\s*/i);
+        if (replyCreatorMatch) { rCreator = true; replyLine = replyLine.replace(replyCreatorMatch[0], ''); }
+        var replyMatch = replyLine.match(/^@?([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
         if (replyMatch && out.length > 0) {
           var parent = out[out.length - 1];
           if (!parent.nestedReplies) parent.nestedReplies = [];
-          var rUser = replyMatch[1].replace(/^@/, '');
-          var rText = replyMatch[2].trim();
-          var rCreator = false;
-          if (rUser.toUpperCase() === 'CREATOR' || replyMatch[0].match(/^\[CREATOR\]/i)) rCreator = true;
-          parent.nestedReplies.push({ user: rUser, text: rText, isCreator: rCreator || Math.random() < 0.35 });
+          parent.nestedReplies.push({ user: replyMatch[1], text: replyMatch[2].trim(), isCreator: rCreator });
         }
         return;
       }
@@ -2801,6 +2802,7 @@
       });
     });
     assignAvatarKinds(out);
+    commentsHeaderCount = 0;
     return out;
   }
 
@@ -2844,8 +2846,17 @@
     });
   }
 
+  function likeCountNumeric(likes) {
+    var s = String(likes == null ? '' : likes).trim();
+    if (/k$/i.test(s)) return (parseFloat(s) || 0) * 1000;
+    return parseInt(s.replace(/[^\d]/g, ''), 10) || 0;
+  }
+
   function formatHeaderCommentCount(visible, abbreviated) {
-    var total = Math.max(visible + Math.floor(Math.random() * 900) + 80, visible * 3);
+    if (!commentsHeaderCount) {
+      commentsHeaderCount = Math.max(visible * 12, visible + Math.floor(Math.random() * 5200) + 280);
+    }
+    var total = commentsHeaderCount;
     if (abbreviated && total >= 1000) return (total / 1000).toFixed(1).replace('.0', '') + 'K comments';
     return total.toLocaleString() + ' comments';
   }
@@ -2876,7 +2887,7 @@
   }
 
   function bindEditable(el, onSave) {
-    el.className = 'bubble-editable';
+    el.classList.add('bubble-editable');
     el.contentEditable = 'true';
     el.spellcheck = false;
     el.addEventListener('blur', function() { onSave(this.textContent.trim()); });
@@ -2935,7 +2946,7 @@
       if (c.pinned) {
         var pinnedTag = document.createElement('div');
         pinnedTag.className = 'c-pinned-label';
-        pinnedTag.style.color = theme.replyColor;
+        pinnedTag.style.color = theme.timeColor;
         pinnedTag.textContent = 'Pinned by ' + (theme.pinnedBy === 'creator' ? 'creator' : '@' + c.user);
         body.appendChild(pinnedTag);
       }
@@ -3025,7 +3036,7 @@
           var ru = document.createElement('span');
           ru.className = 'c-username';
           ru.style.color = theme.username;
-          ru.textContent = r.user;
+          ru.textContent = isYT ? '@' + r.user : r.user;
           replyRow.appendChild(ru);
           if (r.isCreator && isTT) {
             var cr = document.createElement('span');
@@ -3060,7 +3071,7 @@
           + '<div class="c-like-count" style="color:' + theme.likeCountColor + ';">' + c.likes + '</div>'
           + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2" style="margin-top:6px;opacity:0.85;"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7L2.3 13a2 2 0 0 0 2 2.3H10z"/></svg>';
       } else {
-        var filled = parseInt(String(c.likes).replace(/[^\d]/g, ''), 10) > 500;
+        var filled = likeCountNumeric(c.likes) >= 500;
         likeCol.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' + (filled ? theme.heartFilled : 'none') + '" stroke="' + (filled ? theme.heartFilled : theme.heartColor) + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>'
           + '<div class="c-like-count" style="color:' + theme.likeCountColor + ';">' + c.likes + '</div>';
       }
@@ -3084,6 +3095,7 @@
     composer.className = 'c-composer';
     composer.style.borderColor = theme.inputBorder;
     composer.style.background = theme.inputBg;
+    if (theme.showEmojiBar) composer.style.borderTop = '0.5px solid ' + theme.inputBorder;
     var miniAv = buildCommentAvatarEl({ user: 'Me', avatarKind: 'cartoon', avatarSeed: 1 }, theme);
     miniAv.style.width = '28px';
     miniAv.style.height = '28px';
@@ -3386,6 +3398,7 @@
       el.querySelector('.saved-item-preview').addEventListener('click', function() {
         if (item.type === 'comments') {
           currentComments = JSON.parse(JSON.stringify(item.comments));
+          commentsHeaderCount = 0;
           renderComments();
         } else {
           currentMessages = JSON.parse(JSON.stringify(item.messages));
@@ -3763,6 +3776,7 @@
       document.getElementById('contentType').dispatchEvent(new Event('change'));
       renderComments();
       document.getElementById('previewSection').style.display = 'block';
+      return currentComments;
     };
   }
 })();
