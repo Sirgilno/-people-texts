@@ -1049,7 +1049,9 @@
     if (p.vibe) { document.getElementById('vibe').value = p.vibe; updateModelOptions(); }
     if (p.msgStyle) document.getElementById('msgStyle').value = p.msgStyle;
     if (p.topic) document.getElementById('topic').value = p.topic;
-    if (p.mode) setMode(p.mode);
+    // Do not apply p.mode — Song Mode is a Gem/lyrics step the user turns on
+    // themselves. Campaign presets used to force it and that also bloated the
+    // Claude prompt enough to return empty thinking-only responses.
   }
   document.getElementById('applyPresetBtn').addEventListener('click', function() {
     var val = document.getElementById('sunoPreset').value;
@@ -1146,6 +1148,88 @@
   function getKey() { return safeGet('anthropic_api_key'); }
   function getGrokKey() { return safeGet('xai_api_key'); }
   function getModel() { return document.getElementById('modelSelect').value; }
+
+  function extractAnthropicText(data) {
+    var blocks = (data && data.content) || [];
+    var texts = [];
+    var types = [];
+    for (var i = 0; i < blocks.length; i++) {
+      var b = blocks[i];
+      if (b == null) continue;
+      if (typeof b === 'string') {
+        types.push('string');
+        if (b.trim()) texts.push(b);
+        continue;
+      }
+      types.push(b.type || 'unknown');
+      if (b.type === 'thinking' || b.type === 'redacted_thinking') continue;
+      if (typeof b.text === 'string' && b.text.trim()) texts.push(b.text);
+    }
+    return { text: texts.join('\n').trim(), stopReason: data && data.stop_reason, blockTypes: types };
+  }
+
+  function anthropicEmptyMessage(info) {
+    if (info && info.stopReason === 'max_tokens') {
+      return 'Claude ran out of tokens before finishing the texts. Try Generate again.';
+    }
+    var types = (info && info.blockTypes) || [];
+    if (types.indexOf('thinking') !== -1 || types.indexOf('redacted_thinking') !== -1) {
+      return 'Claude returned reasoning with no usable text. Try Generate again.';
+    }
+    return 'Claude returned an empty response. Try Generate again.';
+  }
+
+  async function callAnthropicText(key, model, prompt, maxTokens, temperature) {
+    async function once(tokens, withThinkingOff) {
+      var body = {
+        model: model,
+        max_tokens: tokens,
+        temperature: temperature == null ? 1 : temperature,
+        messages: [{ role: 'user', content: prompt }]
+      };
+      if (withThinkingOff) body.thinking = { type: 'disabled' };
+      var resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify(body)
+      });
+      var data = await resp.json().catch(function() { return {}; });
+      if (!resp.ok) {
+        var msg = data.error ? data.error.message : 'Anthropic API error';
+        var err = new Error(msg);
+        err.status = resp.status;
+        err.payload = data;
+        throw err;
+      }
+      return data;
+    }
+
+    var tokens = maxTokens || 4096;
+    var useThinkingOff = /sonnet-5|sonnet-4|opus-4|opus-5/i.test(model || '');
+    var data;
+    try {
+      data = await once(tokens, useThinkingOff);
+    } catch (err) {
+      var raw = ((err.payload && err.payload.error && err.payload.error.message) || err.message || '').toLowerCase();
+      if (useThinkingOff && /thinking|unexpected|unknown/.test(raw)) {
+        data = await once(tokens, false);
+      } else {
+        throw err;
+      }
+    }
+    var info = extractAnthropicText(data);
+    if (!info.text) {
+      data = await once(Math.max(tokens * 2, 8192), false);
+      info = extractAnthropicText(data);
+    }
+    if (!info.text) throw new Error(anthropicEmptyMessage(info));
+    return info.text;
+  }
 
   document.getElementById('saveKeyBtn').addEventListener('click', function() {
     var key = document.getElementById('apiKeyInput').value.trim();
@@ -1377,16 +1461,7 @@
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('memeLoadingDiv').style.display='none'; document.getElementById('generateMemeBtn').disabled=false; return; }
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 1200, temperature: 0.95, messages: [{ role: 'user', content: prompt }] })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
-        var data = await resp.json();
-        var tb = (data.content || []).find(function(b){ return b.type === 'text'; });
-        if (!tb || !tb.text) throw new Error('No text content in Anthropic response.');
-        rawText = tb.text.trim();
+        rawText = await callAnthropicText(key, model, prompt, 4096, 0.95);
       }
       if (!rawText) throw new Error('Empty response. Try again.');
 
@@ -1466,16 +1541,7 @@
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('dateNightLoadingDiv').style.display='none'; document.getElementById('generateDateNightBtn').disabled=false; return; }
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 1800, temperature: 0.9, messages: [{ role: 'user', content: prompt }] })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
-        var data = await resp.json();
-        var tb = (data.content || []).find(function(b){ return b.type === 'text'; });
-        if (!tb || !tb.text) throw new Error('No text content in Anthropic response.');
-        rawText = tb.text.trim();
+        rawText = await callAnthropicText(key, model, prompt, 4096, 0.9);
       }
       if (!rawText) throw new Error('Empty response. Try again.');
 
@@ -1559,16 +1625,7 @@
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('reactLoadingDiv').style.display='none'; document.getElementById('generateReactBtn').disabled=false; return; }
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 1500, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
-        var data = await resp.json();
-        var tb = (data.content || []).find(function(b){ return b.type === 'text'; });
-        if (!tb || !tb.text) throw new Error('No text content in Anthropic response.');
-        rawText = tb.text.trim();
+        rawText = await callAnthropicText(key, model, prompt, 4096, 1.0);
       }
       if (!rawText) throw new Error('Empty response. Try again.');
 
@@ -1646,16 +1703,7 @@
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
-        var data = await resp.json();
-        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
-        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response — the model may have returned only a thinking block.'); }
-        rawText = textBlock.text.trim();
+        rawText = await callAnthropicText(key, model, prompt, 4096, 1.0);
       }
 
       if (!rawText) throw new Error('Empty response. Try again.');
@@ -1772,16 +1820,7 @@
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); showLoading(false); return; }
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 2000, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
-        var data = await resp.json();
-        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
-        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
-        rawText = textBlock.text.trim();
+        rawText = await callAnthropicText(key, model, prompt, 4096, 1.0);
       }
 
       var parsed = parseConversation(rawText, myName, theirName);
@@ -1871,16 +1910,7 @@
       } else {
         var key = getKey();
         if (!key) { showError('Please save your Anthropic API key first, or switch Provider to xAI Grok.'); showLoading(false); return; }
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({ model: model, max_tokens: 2000, temperature: 1.0, messages: [{ role: 'user', content: prompt }] })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'Anthropic API error'); }
-        var data = await resp.json();
-        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
-        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
-        rawText = textBlock.text.trim();
+        rawText = await callAnthropicText(key, model, prompt, 4096, 1.0);
       }
 
       var parsed = parseComments(rawText);
@@ -3655,16 +3685,7 @@
         rawShortenText = data.choices?.[0]?.message?.content?.trim();
       } else {
         if (!key) { showError('Please save your API key first.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method:'POST',
-          headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-          body: JSON.stringify({ model:shortenModel, max_tokens:800, messages:[{role:'user',content:sp}] })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error?e.error.message:'API error'); }
-        var data = await resp.json();
-        var textBlock = (data.content || []).find(function(b) { return b.type === 'text'; });
-        if (!textBlock || !textBlock.text) { throw new Error('No text content in Anthropic response \u2014 the model may have returned only a thinking block.'); }
-        rawShortenText = textBlock.text.trim();
+        rawShortenText = await callAnthropicText(key, shortenModel, sp, 2048, 0.7);
       }
 
       var parsed = parseConversation(rawShortenText, myName, theirName);
@@ -3769,7 +3790,7 @@
   updateKeyStatus();
   document.getElementById('theirName').placeholder = 'e.g. Mum';
 
-  if (new URLSearchParams(location.search).get('test') === 'comments') {
+  if (new URLSearchParams(location.search).get('test')) {
     window.__ptgCommentsTest = function(text) {
       currentComments = parseComments(text);
       document.getElementById('contentType').value = 'comments';
@@ -3778,6 +3799,11 @@
       document.getElementById('previewSection').style.display = 'block';
       return currentComments;
     };
+    window.__ptgExtractAnthropicText = extractAnthropicText;
+    window.__ptgAnthropicEmptyMessage = anthropicEmptyMessage;
+    window.__ptgApplyPreset = applyPresetFields;
+    window.__ptgGetMode = function() { return currentMode; };
+    window.__ptgSunoPresets = sunoPresets;
   }
 })();
 </script>
