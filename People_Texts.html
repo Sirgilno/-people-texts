@@ -57,7 +57,15 @@
   .phone > * { position: relative; z-index: 1; }
   .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
   .p-chat-header { padding: 8px 14px 10px; text-align: center; }
-  .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; }
+  .p-header-row { display: flex; align-items: center; gap: 8px; text-align: left; }
+  .p-header-row.centered { flex-direction: column; gap: 4px; text-align: center; }
+  .p-header-row.centered .p-avatar { margin: 0 auto; }
+  .p-header-meta { flex: 1; min-width: 0; }
+  .p-header-sub { font-size: 11px; font-weight: 400; opacity: 0.72; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .p-header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .p-header-actions svg { display: block; }
+  .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .p-header-row:not(.centered) .p-avatar { margin: 0; }
   .p-chat-name { font-size: 13px; font-weight: 600; }
   .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 0; }
   .p-bubble-row { display: flex; flex-direction: column; }
@@ -70,8 +78,14 @@
   .p-read-receipt { font-size: 9px; margin-top: 1px; padding: 0 4px; text-align: right; }
   .p-time { font-size: 10px; text-align: center; margin: 6px 0; opacity: 0.5; }
   .p-input-bar { padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+  .p-compose-lead, .p-compose-trail { display: none; align-items: center; gap: 8px; flex-shrink: 0; color: inherit; }
+  .p-compose-lead.visible, .p-compose-trail.visible { display: flex; }
+  .p-compose-icon { width: 20px; height: 20px; opacity: 0.85; }
   .p-fake-input { flex: 1; border-radius: 18px; padding: 7px 14px; font-size: 12px; }
   .p-send { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .p-send.mic { width: 40px; height: 40px; }
+  .p-gm-read { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
+  .p-date-chip { align-self: center; font-size: 11px; padding: 4px 10px; border-radius: 8px; margin: 8px auto; opacity: 1; }
   .p-reply-quote { font-size: 10px; padding: 4px 8px; border-left: 2px solid; border-radius: 4px; margin-bottom: 3px; max-width: 75%; opacity: 0.7; line-height: 1.3; }
   .p-typing { display: none; align-items: flex-start; margin: 2px 0; }
   .p-typing-bubble { background: #e5e5ea; border-radius: 18px 18px 18px 4px; padding: 10px 14px; display: flex; gap: 3px; align-items: center; }
@@ -574,12 +588,20 @@
         </div>
       </div>
       <div class="p-chat-header" id="pChatHeader">
-        <div class="p-avatar" id="pAvatar">M</div>
-        <div class="p-chat-name" id="pName">Mum</div>
+        <div class="p-header-row centered" id="pHeaderRow">
+          <div class="p-avatar" id="pAvatar">M</div>
+          <div class="p-header-meta">
+            <div class="p-chat-name" id="pName">Mum</div>
+            <div class="p-header-sub" id="pHeaderSub"></div>
+          </div>
+          <div class="p-header-actions" id="pHeaderActions"></div>
+        </div>
       </div>
       <div class="p-messages" id="pMessages"></div>
       <div class="p-input-bar" id="pInputBar">
+        <div class="p-compose-lead" id="pComposeLead"></div>
         <div class="p-fake-input" id="pFakeInput">Message</div>
+        <div class="p-compose-trail" id="pComposeTrail"></div>
         <div class="p-send" id="pSendBtn">
           <svg width="12" height="12" viewBox="0 0 12 12"><path id="pSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
@@ -649,10 +671,24 @@
     <div class="phone" id="animatePhone" style="width:280px;">
       <div class="phone-wallpaper" id="animateWallpaper"></div>
       <div class="p-status-bar" id="aSb"><span id="aTime">9:41</span><div style="display:flex;gap:4px;align-items:center;"><svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="2" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="4" y="1.5" width="2.5" height="9.5" rx="1" fill="currentColor"/><rect x="8" y="0" width="2.5" height="11" rx="1" fill="currentColor"/></svg></div></div>
-      <div class="p-chat-header" id="aCh"><div class="p-avatar" id="aAv">M</div><div class="p-chat-name" id="aN">Mum</div></div>
+      <div class="p-chat-header" id="aCh">
+        <div class="p-header-row centered" id="aHeaderRow">
+          <div class="p-avatar" id="aAv">M</div>
+          <div class="p-header-meta">
+            <div class="p-chat-name" id="aN">Mum</div>
+            <div class="p-header-sub" id="aHeaderSub"></div>
+          </div>
+          <div class="p-header-actions" id="aHeaderActions"></div>
+        </div>
+      </div>
       <div class="p-messages" id="aMessages" style="min-height:300px;"></div>
       <div class="p-typing" id="aTyping"><div class="p-typing-bubble" id="aTypingBubble"><div class="p-typing-dot"></div><div class="p-typing-dot"></div><div class="p-typing-dot"></div></div></div>
-      <div class="p-input-bar" id="aIb"><div class="p-fake-input" id="aFi">Message</div><div class="p-send" id="aSend"><svg width="12" height="12" viewBox="0 0 12 12"><path id="aSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="p-input-bar" id="aIb">
+        <div class="p-compose-lead" id="aComposeLead"></div>
+        <div class="p-fake-input" id="aFi">Message</div>
+        <div class="p-compose-trail" id="aComposeTrail"></div>
+        <div class="p-send" id="aSend"><svg width="12" height="12" viewBox="0 0 12 12"><path id="aSendPath" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
     </div>
   </div>
   <div class="animate-controls">
@@ -1830,6 +1866,154 @@
     finally { showLoading(false); }
   }
 
+  function iconSvg(d, w, h, stroke) {
+    return '<svg class="p-compose-icon" width="' + (w || 20) + '" height="' + (h || 20) + '" viewBox="0 0 24 24" fill="none" stroke="' + (stroke || 'currentColor') + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  }
+  function svgDoubleCheck(color, w) {
+    var el = document.createElement('span');
+    el.style.cssText = 'display:inline-flex;margin-left:3px;line-height:0;vertical-align:middle;';
+    el.innerHTML = '<svg width="' + (w || 16) + '" height="11" viewBox="0 0 16 11" fill="none"><path d="M1.2 6.1L4 9L10.6 1.4" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.1 6.2L8.5 9L15.2 1.4" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return el;
+  }
+  function gmReadBadge(theme) {
+    var el = document.createElement('div');
+    el.className = 'p-gm-read';
+    el.style.background = theme.readBadgeBg || '#eceef0';
+    el.innerHTML = '<svg width="11" height="8" viewBox="0 0 16 11" fill="none"><path d="M1.2 6.1L4 9L10.6 1.4" stroke="' + (theme.readBadgeTick || '#1a1c1e') + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.1 6.2L8.5 9L15.2 1.4" stroke="' + (theme.readBadgeTick || '#1a1c1e') + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return el;
+  }
+  function clusterRadius(theme, isMe, sameAsPrev, sameAsNext) {
+    if (theme.bubbleShape === 'pill') return '24px';
+    var r = theme.bubbleRadius || '20px';
+    var tail = theme.bubbleTail || '8px';
+    if (sameAsNext) return r;
+    return isMe ? (r + ' ' + r + ' ' + tail + ' ' + r) : (r + ' ' + r + ' ' + r + ' ' + tail);
+  }
+  function applyChatChrome(theme, ids) {
+    var header = document.getElementById(ids.header);
+    var row = document.getElementById(ids.headerRow);
+    var sub = document.getElementById(ids.sub);
+    var actions = document.getElementById(ids.actions);
+    var lead = document.getElementById(ids.lead);
+    var trail = document.getElementById(ids.trail);
+    var ib = document.getElementById(ids.inputBar);
+    var fi = document.getElementById(ids.fakeInput);
+    var sendBtn = document.getElementById(ids.sendBtn);
+    var sendPath = document.getElementById(ids.sendPath);
+    var layout = theme.headerLayout || 'centered';
+    var iconColor = theme.headerIconColor || theme.colorSb || '#fff';
+
+    header.style.cssText = 'padding:' + (layout === 'centered' ? '8px 14px 10px' : '6px 10px 8px') + ';text-align:' + (layout === 'centered' ? 'center' : 'left') + ';border-bottom:0.5px solid ' + theme.borderHeader + ';background:' + theme.bgHeader + ';';
+    row.className = 'p-header-row' + (layout === 'centered' ? ' centered' : '');
+    var back = row.querySelector('.p-header-back');
+    if (layout !== 'centered') {
+      if (!back) {
+        back = document.createElement('span');
+        back.className = 'p-header-back';
+        back.style.cssText = 'display:flex;align-items:center;flex-shrink:0;margin-right:2px;';
+        row.insertBefore(back, row.firstChild);
+      }
+      back.style.display = 'flex';
+      back.innerHTML = iconSvg('<polyline points="15 18 9 12 15 6"/>', 22, 22, iconColor);
+    } else if (back) {
+      back.style.display = 'none';
+    }
+    if (sub) {
+      if (theme.headerSubtitle) {
+        sub.textContent = theme.headerSubtitle;
+        sub.style.display = 'block';
+        sub.style.color = theme.headerSubColor || theme.timeColor;
+      } else {
+        sub.textContent = '';
+        sub.style.display = 'none';
+      }
+    }
+    if (actions) {
+      if (theme.headerActions) {
+        var video = iconSvg('<path d="M15 8l6-3v14l-6-3"/><rect x="2" y="6" width="13" height="12" rx="2"/>', 20, 20, iconColor);
+        var phone = iconSvg('<path d="M6 3h3l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/>', 18, 18, iconColor);
+        var more = iconSvg('<circle cx="12" cy="5" r="1.4" fill="' + iconColor + '" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="' + iconColor + '" stroke="none"/><circle cx="12" cy="19" r="1.4" fill="' + iconColor + '" stroke="none"/>', 18, 18, iconColor);
+        actions.innerHTML = video + phone + more;
+        actions.style.display = 'flex';
+      } else {
+        actions.innerHTML = '';
+        actions.style.display = 'none';
+      }
+    }
+
+    var composer = theme.composer || 'simple';
+    var composeColor = theme.composeIconColor || theme.colorFakeInput || '#888';
+    if (lead) {
+      if (composer === 'gmessages') {
+        lead.innerHTML = iconSvg('<path d="M12 5v14M5 12h14"/>', 22, 22, composeColor);
+        lead.classList.add('visible');
+      } else if (composer === 'whatsapp') {
+        lead.innerHTML = iconSvg('<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>', 20, 20, composeColor);
+        lead.classList.add('visible');
+      } else {
+        lead.innerHTML = '';
+        lead.classList.remove('visible');
+      }
+    }
+    if (trail) {
+      if (composer === 'whatsapp') {
+        trail.innerHTML = iconSvg('<path d="M21.4 11.6L12 2.2 2.6 11.6a2 2 0 0 0-.6 1.4V20a2 2 0 0 0 2 2h4v-6h8v6h4a2 2 0 0 0 2-2v-7a2 2 0 0 0-.6-1.4z"/>', 18, 18, composeColor) + iconSvg('<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>', 18, 18, composeColor);
+        trail.classList.add('visible');
+      } else if (composer === 'gmessages') {
+        trail.innerHTML = iconSvg('<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>', 20, 20, composeColor) + iconSvg('<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>', 18, 18, composeColor);
+        trail.classList.add('visible');
+      } else {
+        trail.innerHTML = '';
+        trail.classList.remove('visible');
+      }
+    }
+
+    sendBtn.classList.toggle('mic', composer === 'whatsapp' || composer === 'gmessages');
+    if (composer === 'whatsapp' || composer === 'gmessages') {
+      sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + (theme.sendStroke || '#fff') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M19 11a7 7 0 0 1-14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>';
+    } else if (sendPath) {
+      sendBtn.classList.remove('mic');
+      sendBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12"><path id="' + ids.sendPath + '" d="M6 1L6 11M6 1L2 5M6 1L10 5" stroke="' + (theme.sendStroke || '#fff') + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+
+    if (theme.floatInput) {
+      ib.style.cssText = 'padding:6px 8px 10px;display:flex;align-items:center;gap:8px;background:transparent;';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:9px 12px;font-size:13px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';box-shadow:0 1px 6px rgba(0,0,0,0.28);';
+    } else {
+      ib.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
+    }
+    if (composer === 'whatsapp') {
+      ib.style.background = 'transparent';
+      fi.style.background = 'transparent';
+      fi.style.boxShadow = 'none';
+      fi.style.padding = '10px 4px';
+      var composeWrap = fi.parentElement;
+      composeWrap.style.background = 'transparent';
+      ib.style.cssText = 'padding:6px 8px 10px;display:flex;align-items:center;gap:6px;background:transparent;';
+      fi.style.cssText = 'flex:1;border-radius:0;padding:10px 4px;font-size:13px;background:transparent;border:none;color:' + theme.colorFakeInput + ';box-shadow:none;';
+      if (!ib.querySelector('.p-wa-pill')) {
+        var pill = document.createElement('div');
+        pill.className = 'p-wa-pill';
+        pill.style.cssText = 'flex:1;display:flex;align-items:center;gap:8px;background:' + theme.bgFakeInput + ';border-radius:24px;padding:2px 12px;box-shadow:0 1px 6px rgba(0,0,0,0.28);min-height:42px;';
+        ib.insertBefore(pill, sendBtn);
+        if (lead) pill.appendChild(lead);
+        pill.appendChild(fi);
+        if (trail) pill.appendChild(trail);
+      }
+    } else {
+      var leftover = ib.querySelector('.p-wa-pill');
+      if (leftover) {
+        ib.insertBefore(lead, leftover);
+        ib.insertBefore(fi, leftover);
+        ib.insertBefore(trail, leftover);
+        leftover.remove();
+      }
+    }
+    fi.textContent = theme.fakePlaceholder;
+    sendBtn.style.background = theme.sendBg;
+  }
+
   // Shared row builder — used by BOTH the static preview and the
   // Animate-for-TikTok view so the two can never drift apart again.
   // The animation previously had its own duplicate copy of this logic,
@@ -1862,14 +2046,12 @@
         row.appendChild(dm);
       } else {
         var qStyle = theme.quoteStyle || 'nested';
+        var quoteEl = null;
         if (replyIndices && replyIndices.has(i) && i > 0 && qStyle !== 'none') {
           var prevMsg = messages[i-1];
           var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
 
           if (qStyle === 'spine') {
-            // Discord: flat list architecture — no bubbles, so the quote is a
-            // single truncated line above the message with a mini avatar,
-            // linked by an L-shaped spine. Never a nested box.
             var spineWrap = document.createElement('div');
             spineWrap.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:11px;opacity:0.64;margin-bottom:2px;padding-left:6px;color:' + bTheme.color + ';white-space:nowrap;overflow:hidden;';
             var spineLine = document.createElement('div');
@@ -1884,26 +2066,18 @@
             spineWrap.appendChild(spineText);
             row.appendChild(spineWrap);
           } else if (qStyle === 'nested-rounded') {
-            // Google Messages / Material 3: tonal nested block, heavily
-            // rounded, NO harsh vertical accent bar (per M3 spec).
-            var quote = document.createElement('div');
-            quote.className = 'p-reply-quote';
-            quote.style.cssText = 'border-left:none;font-size:10.5px;padding:6px 10px;border-radius:14px;margin-bottom:3px;max-width:82%;opacity:0.85;line-height:1.35;background:' + (isMe ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.09)') + ';color:' + bTheme.color + ';';
-            quote.textContent = preview;
-            row.appendChild(quote);
+            quoteEl = document.createElement('div');
+            quoteEl.className = 'p-reply-quote';
+            quoteEl.style.cssText = 'border-left:none;font-size:10.5px;padding:6px 10px;border-radius:14px;margin-bottom:4px;opacity:0.9;line-height:1.35;background:' + (isMe ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.09)') + ';color:' + bTheme.color + ';';
+            quoteEl.textContent = preview;
           } else {
-            // Default nested model: quote sits inside the bubble stack with a
-            // vertical accent bar on the left (WhatsApp/Telegram/Meta/X/Snap).
-            var quote = document.createElement('div');
-            quote.className = 'p-reply-quote';
-            quote.style.cssText = 'font-size:10px;padding:4px 8px;border-left:2px solid ' + (isMe ? theme.bubbleMe.bg : theme.bubbleThem.bg) + ';border-radius:4px;margin-bottom:3px;max-width:82%;opacity:0.7;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)') + ';color:' + bTheme.color + ';';
-            quote.textContent = preview;
-            row.appendChild(quote);
+            quoteEl = document.createElement('div');
+            quoteEl.className = 'p-reply-quote';
+            var qBar = isMe ? (theme.quoteBarMe || theme.bubbleMe.bg) : (theme.quoteBarThem || theme.bubbleThem.bg);
+            quoteEl.style.cssText = 'font-size:10px;padding:4px 8px;border-left:3px solid ' + qBar + ';border-radius:6px;margin-bottom:4px;opacity:0.85;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.06)') + ';color:' + bTheme.color + ';';
+            quoteEl.textContent = preview;
           }
         } else if (!ctx.literal && theme.hasStories && !sameAsPrev && Math.random() < 0.08) {
-          // Occasional "Replied to your story" style bubble — mocked with a
-          // small placeholder thumbnail since there's no real story image to
-          // reference. Purely decorative, separate from the real bubble.
           var storyReply = document.createElement('div');
           storyReply.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;opacity:0.75;margin-bottom:3px;color:' + bTheme.color + ';';
           var storyThumb = document.createElement('div');
@@ -1916,8 +2090,10 @@
           row.appendChild(storyReply);
         }
 
+        var sameAsNext = i < messages.length - 1 && messages[i+1].f === msg.f && (msg.f === 'me' || !isGroupChat || messages[i+1].speaker === msg.speaker);
+        var radius = clusterRadius(theme, isMe, sameAsPrev, sameAsNext);
         var bubble = document.createElement('div');
-        var bubbleStyle = 'max-width:82%;color:' + bTheme.color + ';padding:8px 12px;border-radius:' + bTheme.radius + ';font-size:13px;line-height:1.4;';
+        var bubbleStyle = 'max-width:82%;color:' + bTheme.color + ';padding:7px 10px 6px 10px;border-radius:' + radius + ';font-size:13px;line-height:1.4;';
         bubbleStyle += 'background:' + bTheme.bg + ';';
 
         // Occasionally render a voice-note look above the real message. This
@@ -1946,21 +2122,55 @@
         }
 
         bubble.style.cssText = bubbleStyle;
-        bubble.textContent = msg.t;
-        bubble.dataset.msgIdx = i;
+        if (quoteEl && theme.quoteInBubble !== false) {
+          bubble.appendChild(quoteEl);
+        } else if (quoteEl) {
+          row.appendChild(quoteEl);
+        }
+        var textEl = document.createElement('span');
+        textEl.dataset.msgIdx = i;
+        textEl.textContent = msg.t;
+        bubble.appendChild(textEl);
 
         var tsStyle = theme.timestampStyle || 'outside';
+        var isLastMe = isMe;
+        if (isMe) {
+          for (var li = i + 1; li < messages.length; li++) {
+            if (messages[li].f === 'me') { isLastMe = false; break; }
+          }
+        }
+        var timeColor = isMe ? (theme.timeBubbleMe || theme.timeBubble) : (theme.timeBubbleThem || theme.timeBubble);
 
-        if (tsStyle === 'inside') {
+        if (tsStyle === 'inside' || tsStyle === 'in-meta') {
           var timeSpan = document.createElement('span');
           timeSpan.className = 'p-bubble-time inside';
-          timeSpan.style.color = theme.timeBubble;
-          timeSpan.textContent = ts;
+          timeSpan.style.color = timeColor;
+          timeSpan.style.opacity = '0.85';
+          timeSpan.appendChild(document.createTextNode(ts));
+          if (isMe && theme.readReceiptStyle === 'in-bubble-ticks') {
+            timeSpan.appendChild(svgDoubleCheck(theme.readColor, 16));
+          }
           bubble.style.display = 'flex';
           bubble.style.alignItems = 'flex-end';
           bubble.style.flexWrap = 'wrap';
+          bubble.style.gap = '0';
           bubble.appendChild(timeSpan);
           row.appendChild(bubble);
+        } else if (tsStyle === 'hidden') {
+          var gmWrap = document.createElement('div');
+          gmWrap.style.cssText = 'position:relative;max-width:82%;';
+          bubble.style.maxWidth = '100%';
+          if (isMe && theme.readReceiptStyle === 'in-bubble-circle' && isLastMe) {
+            bubble.style.paddingBottom = '10px';
+            bubble.style.paddingRight = '16px';
+            gmWrap.appendChild(bubble);
+            var badge = gmReadBadge(theme);
+            badge.style.cssText += 'position:absolute;right:-1px;bottom:-3px;';
+            gmWrap.appendChild(badge);
+          } else {
+            gmWrap.appendChild(bubble);
+          }
+          row.appendChild(gmWrap);
         } else if (tsStyle === 'divider') {
           var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
           var d = new Date(); d.setMinutes(d.getMinutes() - (messages.length - i) * 3);
@@ -1975,7 +2185,7 @@
           divider.className = 'p-time-divider';
           divider.style.color = theme.timeColor;
           divider.textContent = divLabel;
-          targetEl.appendChild(divider);
+          if (ctx.targetEl) ctx.targetEl.appendChild(divider);
           row.appendChild(bubble);
         } else {
           var timeSpan = document.createElement('div');
@@ -1987,11 +2197,9 @@
         }
 
         var showRR = false;
-        if (isMe && theme.readReceipt && theme.readReceipt !== 'checkcheck' && theme.readReceipt !== 'checkmark') {
+        if (isMe && theme.readReceipt && !theme.readReceiptStyle) {
           if (theme.readAllSent || i === messages.length - 1) showRR = true;
-        }
-        if (isMe && (theme.readReceipt === 'checkcheck' || theme.readReceipt === 'checkmark')) {
-          showRR = true;
+          if (theme.readReceipt === 'checkcheck' || theme.readReceipt === 'checkmark') showRR = true;
         }
         if (showRR) {
           var rr = document.createElement('div');
@@ -2010,10 +2218,11 @@
   function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices, literal) {
     targetEl.innerHTML = '';
     var dateLabel = document.createElement('div');
-    dateLabel.className = 'p-time';
+    dateLabel.className = theme.dateChip ? 'p-date-chip' : 'p-time';
     dateLabel.style.color = theme.timeColor;
+    if (theme.dateChip) dateLabel.style.background = theme.dateChipBg || 'rgba(0,0,0,0.35)';
     var now = new Date();
-    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    dateLabel.textContent = theme.dateChip ? 'Today' : ('Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0'));
     targetEl.appendChild(dateLabel);
 
     var person = document.getElementById('person').value;
@@ -2035,7 +2244,8 @@
       targetEl.appendChild(buildMessageRow({
         messages: messages, i: i, theme: theme, timestamps: timestamps,
         replyIndices: replyIndices, theirName: theirName, myName: myName,
-        isGroupChat: isGroupChat, colorForSender: colorForSender, literal: literal
+        isGroupChat: isGroupChat, colorForSender: colorForSender, literal: literal,
+        targetEl: targetEl
       }));
     }
   }
@@ -2044,20 +2254,40 @@
     whatsapp: {
       hasStories: true,
       quoteStyle: 'nested',
-      bgSb: '#0a0a0a', colorSb: '#f0f0f0',
-      bgHeader: '#1a1a1a', borderHeader: '#333',
-      bgMessages: '#0f0f0f',
-      bgInput: '#1a1a1a', bgFakeInput: '#252525', colorFakeInput: '#888', fakePlaceholder: 'Message',
-      floatInput: true, floatInputBg: '#1a1a1a',
-      bubbleMe: { bg: '#005c4b', color: '#fff', radius: '18px 18px 4px 18px' },
-      bubbleThem: { bg: '#202c33', color: '#f0f0f0', radius: '18px 18px 18px 4px' },
-      timestampStyle: 'inside',
-      timeColor: '#888', timeBubble: '#ffffff',
-      readReceipt: '✓✓', readColor: '#34b7f1', readAllSent: true,
-      sendBg: '#005c4b', sendStroke: '#fff',
-      avatarBg: '#005c4b', avatarColor: '#fff',
-      nameColor: '#f0f0f0',
-      typingBg: '#202c33', typingDot: '#888'
+      quoteInBubble: true,
+      quoteBarMe: '#25d366',
+      quoteBarThem: '#53bdeb',
+      headerLayout: 'bar',
+      headerActions: true,
+      headerSubtitle: 'online',
+      headerIconColor: '#aebac1',
+      headerSubColor: '#8696a0',
+      composer: 'whatsapp',
+      composeIconColor: '#8696a0',
+      defaultWallpaper: 'doodle1',
+      dateChip: true,
+      dateChipBg: '#182229',
+      bgSb: '#0b141a', colorSb: '#e9edef',
+      bgHeader: '#1f2c34', borderHeader: '#1f2c34',
+      bgMessages: '#0b141a',
+      bgInput: 'transparent', bgFakeInput: '#1f2c34', colorFakeInput: '#8696a0', fakePlaceholder: 'Message',
+      floatInput: true, floatInputBg: 'transparent',
+      bubbleMe: { bg: '#005c4b', color: '#e9edef', radius: '20px 20px 8px 20px' },
+      bubbleThem: { bg: '#1f2c34', color: '#e9edef', radius: '20px 20px 20px 8px' },
+      bubbleRadius: '20px',
+      bubbleTail: '8px',
+      timestampStyle: 'in-meta',
+      timeColor: '#8696a0', timeBubble: 'rgba(255,255,255,0.6)',
+      timeBubbleMe: 'rgba(255,255,255,0.55)',
+      timeBubbleThem: '#8696a0',
+      readReceipt: '✓✓',
+      readReceiptStyle: 'in-bubble-ticks',
+      readColor: '#53bdeb',
+      readAllSent: true,
+      sendBg: '#00a884', sendStroke: '#111b21',
+      avatarBg: '#00a884', avatarColor: '#fff',
+      nameColor: '#e9edef',
+      typingBg: '#1f2c34', typingDot: '#8696a0'
     },
     imessage: {
       hasStories: false,
@@ -2242,20 +2472,35 @@
     android: {
       hasStories: false,
       quoteStyle: 'nested-rounded',
-      bgSb: '#0d0d0d', colorSb: '#fff',
-      bgHeader: '#0d0d0d', borderHeader: '#333',
-      bgMessages: '#0d0d0d',
-      bgInput: '#0d0d0d', bgFakeInput: '#1a1a1a', colorFakeInput: '#888', fakePlaceholder: 'Message',
+      quoteInBubble: true,
+      headerLayout: 'bar',
+      headerActions: true,
+      headerSubtitle: 'RCS chat · encrypted',
+      headerIconColor: '#c4c7c5',
+      headerSubColor: '#c4c7c5',
+      composer: 'gmessages',
+      composeIconColor: '#c4c7c5',
+      dateChip: true,
+      dateChipBg: '#2d2f31',
+      bgSb: '#131314', colorSb: '#e3e3e3',
+      bgHeader: '#131314', borderHeader: '#2d2f31',
+      bgMessages: '#131314',
+      bgInput: '#131314', bgFakeInput: '#2d2f31', colorFakeInput: '#c4c7c5', fakePlaceholder: 'RCS message',
       floatInput: false,
-      bubbleMe: { bg: '#1a73e8', color: '#fff', radius: '24px' },
-      bubbleThem: { bg: '#2a2a2a', color: '#f0f0f0', radius: '24px' },
-      timestampStyle: 'outside',
-      timeColor: '#888', timeBubble: '#666',
-      readReceipt: '✓', readColor: '#1a73e8', readAllSent: false,
-      sendBg: '#1a73e8', sendStroke: '#fff',
-      avatarBg: '#1a73e8', avatarColor: '#fff',
-      nameColor: '#fff',
-      typingBg: '#2a2a2a', typingDot: '#888'
+      bubbleShape: 'pill',
+      bubbleMe: { bg: '#1a73e8', color: '#ffffff', radius: '24px' },
+      bubbleThem: { bg: '#2d2f31', color: '#e3e3e3', radius: '24px' },
+      timestampStyle: 'hidden',
+      timeColor: '#c4c7c5', timeBubble: '#c4c7c5',
+      readReceipt: '✓✓',
+      readReceiptStyle: 'in-bubble-circle',
+      readColor: '#a8c7fa',
+      readBadgeBg: '#eceef0',
+      readBadgeTick: '#1a1c1e',
+      sendBg: '#a8c7fa', sendStroke: '#003355',
+      avatarBg: '#004a77', avatarColor: '#d3e3fd',
+      nameColor: '#e3e3e3',
+      typingBg: '#2d2f31', typingDot: '#c4c7c5'
     }
   };
 
@@ -2297,9 +2542,13 @@
     var opacity = parseInt(document.getElementById('wallpaperOpacity').value) / 100;
     var phone = document.getElementById('phoneFrame');
     var animatePhone = document.getElementById('animatePhone');
-    if (currentWallpaper === 'none') {
-      phone.style.background = '#222';
-      if (animatePhone) animatePhone.style.background = '#222';
+    var styleKey = document.getElementById('msgStyle').value;
+    var platTheme = platformThemes[styleKey] || {};
+    var wallpaperId = currentWallpaper === 'none' ? (platTheme.defaultWallpaper || 'none') : currentWallpaper;
+    if (wallpaperId === 'none') {
+      var plain = platTheme.bgMessages || '#222';
+      phone.style.background = plain;
+      if (animatePhone) animatePhone.style.background = plain;
       return;
     }
     var colors = {
@@ -2316,7 +2565,7 @@
       'solid5': '#1e3a5f',
       // Classic Monoline style — dense, interlocked, low opacity (~10-12%),
       // matches the exact spec found in research for WhatsApp-style doodles.
-      'doodle1': doodleTile(buildDoodleSVG([ICONS.heart], 140, 9, 'rgba(255,255,255,0.11)', false), 140, '#161b22'),
+      'doodle1': doodleTile(buildDoodleSVG([ICONS.heart], 140, 9, 'rgba(255,255,255,0.11)', false), 140, '#0b141a'),
       'doodle2': doodleTile(buildDoodleSVG([ICONS.star, ICONS.envelope], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#14181f'),
       'doodle3': doodleTile(buildDoodleSVG([ICONS.note, ICONS.plane], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#171a24'),
       // Vector Overlay style — sparse, rotated, larger tile, matches
@@ -2327,7 +2576,7 @@
       'geo1': '#14181f url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="1.4" fill="rgba(255,255,255,0.09)"/></svg>') + '") repeat',
       'geo2': '#161616 url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><path d="M0,13 L6.5,6.5 L13,13 L19.5,6.5 L26,13" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/></svg>') + '") repeat'
     };
-    var bg = colors[currentWallpaper] || '#222';
+    var bg = colors[wallpaperId] || platTheme.bgMessages || '#222';
     phone.style.background = bg;
     if (animatePhone) animatePhone.style.background = bg;
   }
@@ -2759,18 +3008,12 @@
     var sendPath = document.getElementById('pSendPath');
 
     sb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
-    ch.style.cssText = 'padding:8px 14px 10px;text-align:center;border-bottom:0.5px solid ' + theme.borderHeader + ';background:' + theme.bgHeader + ';';
+    applyChatChrome(theme, {
+      header: 'pChatHeader', headerRow: 'pHeaderRow', sub: 'pHeaderSub', actions: 'pHeaderActions',
+      inputBar: 'pInputBar', lead: 'pComposeLead', fakeInput: 'pFakeInput', trail: 'pComposeTrail',
+      sendBtn: 'pSendBtn', sendPath: 'pSendPath'
+    });
     ma.style.background = 'transparent';
-
-    if (theme.floatInput) {
-      ib.style.cssText = 'padding:6px 10px 10px;display:flex;align-items:center;gap:8px;background:' + (theme.floatInputBg || theme.bgInput) + ';';
-      fi.style.cssText = 'flex:1;border-radius:24px;padding:9px 16px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';box-shadow:0 2px 8px rgba(0,0,0,0.3);';
-    } else {
-      ib.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
-      fi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
-    }
-
-    fi.textContent = theme.fakePlaceholder;
 
     if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
       av.style.background = theme.avatarBg;
@@ -2779,8 +3022,6 @@
     }
     av.style.color = theme.avatarColor || personData[person].avatarText;
     hn.style.color = theme.nameColor;
-    sendBtn.style.background = theme.sendBg;
-    sendPath.setAttribute('stroke', theme.sendStroke);
 
     document.getElementById('phoneFrame').style.background = theme.bgMessages;
 
@@ -2831,12 +3072,13 @@
     var aSendPath = document.getElementById('aSendPath');
 
     aSb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
-    aCh.style.cssText = 'padding:8px 14px 10px;text-align:center;border-bottom:0.5px solid ' + theme.borderHeader + ';background:' + theme.bgHeader + ';';
+    applyChatChrome(theme, {
+      header: 'aCh', headerRow: 'aHeaderRow', sub: 'aHeaderSub', actions: 'aHeaderActions',
+      inputBar: 'aIb', lead: 'aComposeLead', fakeInput: 'aFi', trail: 'aComposeTrail',
+      sendBtn: 'aSend', sendPath: 'aSendPath'
+    });
     document.getElementById('aMessages').style.background = 'transparent';
     document.getElementById('animatePhone').style.background = theme.bgMessages;
-    aIb.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
-    aFi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
-    aFi.textContent = theme.fakePlaceholder;
     if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
       aAv.style.background = theme.avatarBg;
     } else {
@@ -2844,8 +3086,6 @@
     }
     aAv.style.color = theme.avatarColor || personData[person].avatarText;
     aN.style.color = theme.nameColor;
-    aSend.style.background = theme.sendBg;
-    aSendPath.setAttribute('stroke', theme.sendStroke);
 
     var tb = document.getElementById('aTypingBubble');
     tb.style.background = theme.typingBg;
@@ -2888,10 +3128,11 @@
 
     ma.innerHTML = '';
     var dateLabel = document.createElement('div');
-    dateLabel.className = 'p-time';
+    dateLabel.className = theme.dateChip ? 'p-date-chip' : 'p-time';
     dateLabel.style.color = theme.timeColor;
+    if (theme.dateChip) dateLabel.style.background = theme.dateChipBg || 'rgba(0,0,0,0.35)';
     var now = new Date();
-    dateLabel.textContent = 'Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    dateLabel.textContent = theme.dateChip ? 'Today' : ('Today ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0'));
     ma.appendChild(dateLabel);
 
     var person = document.getElementById('person').value;
@@ -2936,7 +3177,8 @@
         messages: currentMessages, i: i, theme: theme, timestamps: animTimestamps,
         replyIndices: animReplyIndices, theirName: theirName, myName: myName,
         isGroupChat: animIsGroupChat, colorForSender: animColorForSender,
-        literal: document.getElementById('contentType').value === 'paste'
+        literal: document.getElementById('contentType').value === 'paste',
+        targetEl: ma
       });
       var isMeRow = currentMessages[i].f === 'me';
       row.style.opacity = '0';
