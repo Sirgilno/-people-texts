@@ -133,6 +133,34 @@
   .bubble-editable { outline: none; cursor: text; }
   .bubble-editable:focus { box-shadow: 0 0 0 2px rgba(183,148,246,0.5); }
   .edit-hint { font-size: 11px; color: var(--text-faint); text-align: center; margin-top: 4px; display: none; }
+
+  /* ── Comment section mockups (IG / TikTok / YouTube) ── */
+  .c-sheet-handle { width: 36px; height: 4px; border-radius: 2px; margin: 0 auto 10px; }
+  .c-header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .c-header-title { font-weight: 600; flex: 1; text-align: center; }
+  .c-header-sort { font-size: 12px; font-weight: 600; opacity: 0.85; white-space: nowrap; }
+  .c-header-close { font-size: 18px; line-height: 1; opacity: 0.7; padding: 0 4px; }
+  .c-comment-row { display: flex; gap: 10px; padding: 8px 0; align-items: flex-start; }
+  .c-avatar { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; }
+  .c-body { flex: 1; min-width: 0; }
+  .c-pinned-label { font-size: 10px; font-weight: 600; margin-bottom: 4px; opacity: 0.85; }
+  .c-inline-line { font-size: 13px; line-height: 1.4; word-break: break-word; }
+  .c-username { font-weight: 600; }
+  .c-yt-userline { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .c-yt-time { font-weight: 400; opacity: 0.65; font-size: 11px; }
+  .c-comment-text { font-size: 13px; line-height: 1.35; word-break: break-word; margin-bottom: 4px; }
+  .c-actions { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
+  .c-creator-liked { display: inline-flex; align-items: center; gap: 3px; font-weight: 400; font-size: 11px; }
+  .c-creator-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #fe2c55; background: rgba(254,44,85,0.1); padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .c-view-replies { font-size: 11px; font-weight: 600; margin-top: 6px; cursor: default; }
+  .c-nested { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .c-nested-yt { border-left: 2px solid #ff0000; padding-left: 12px; margin-left: 4px; }
+  .c-like-col { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 28px; padding-top: 2px; }
+  .c-like-count { font-size: 10px; line-height: 1.2; }
+  .c-emoji-bar { display: flex; gap: 14px; padding: 8px 14px 4px; font-size: 20px; line-height: 1; overflow-x: auto; }
+  .c-composer { display: flex; align-items: center; gap: 10px; padding: 8px 14px 12px; border-top: 0.5px solid; }
+  .c-composer-input { flex: 1; border-radius: 20px; padding: 8px 14px; font-size: 12px; border: 1px solid transparent; }
+  .c-yt-send { width: 32px; height: 32px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .name-gen-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 12px; cursor: pointer; white-space: nowrap; margin-top: 6px; width: 100%; text-align: center; transition: border-color 0.15s, color 0.15s; }
   .name-gen-btn:hover { border-color: var(--accent); color: var(--text); }
   .mood-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-faint); margin-bottom: 4px; }
@@ -2635,28 +2663,34 @@
   // ── COMMENTS MODE (Instagram / TikTok comment sections) ──────────
   var commentThemes = {
     instagram_comments: {
+      platform: 'instagram',
       bg: '#000', headerBg: '#000', headerBorder: '#262626', headerText: '#fff',
       text: '#f5f5f5', username: '#f5f5f5', timeColor: '#8e8e8e',
       replyColor: '#8e8e8e', likeCountColor: '#8e8e8e', heartColor: '#8e8e8e',
-      inputBg: '#000', inputBorder: '#262626', inputPlaceholder: '#8e8e8e',
+      heartFilled: '#ed4956', inputBg: '#000', inputBorder: '#262626', inputPlaceholder: '#8e8e8e',
+      handleColor: '#555', sortLabel: 'Most recent ▾', pinnedBy: 'creator',
       avatarPalette: ['#f56040', '#833ab4', '#c13584', '#5851db', '#e17055', '#00b0f4'],
-      headerLabel: 'Comments'
+      inlineUsername: true, likeType: 'heart', showEmojiBar: false, showClose: false
     },
     tiktok_comments: {
+      platform: 'tiktok',
       bg: '#fff', headerBg: '#fff', headerBorder: '#f1f1f2', headerText: '#161823',
       text: '#161823', username: '#161823', timeColor: '#8a8b91',
-      replyColor: '#8a8b91', likeCountColor: '#8a8b91', heartColor: '#8a8b91',
-      inputBg: '#fff', inputBorder: '#f1f1f2', inputPlaceholder: '#8a8b91',
+      replyColor: '#8a8b91', likeCountColor: '#8a8b91', heartColor: '#161823',
+      heartFilled: '#fe2c55', inputBg: '#f1f1f2', inputBorder: '#f1f1f2', inputPlaceholder: '#8a8b91',
+      handleColor: '#d1d1d6', sortLabel: null, pinnedBy: 'creator',
       avatarPalette: ['#fe2c55', '#25f4ee', '#7c3aed', '#f56040', '#0084ff', '#00b0f4'],
-      headerLabel: null
+      inlineUsername: true, likeType: 'heart', showEmojiBar: true, showClose: true
     },
     youtube_comments: {
+      platform: 'youtube',
       bg: '#0f0f0f', headerBg: '#0f0f0f', headerBorder: '#272727', headerText: '#fff',
       text: '#f1f1f1', username: '#f1f1f1', timeColor: '#aaaaaa',
       replyColor: '#3ea6ff', likeCountColor: '#aaaaaa', heartColor: '#aaaaaa',
-      inputBg: '#0f0f0f', inputBorder: '#272727', inputPlaceholder: '#717171',
+      heartFilled: '#fff', inputBg: '#272727', inputBorder: '#272727', inputPlaceholder: '#717171',
+      handleColor: '#555', sortLabel: 'Top ▾', pinnedBy: 'creator',
       avatarPalette: ['#c62828', '#1565c0', '#2e7d32', '#6a1b9a', '#ef6c00', '#00838f'],
-      headerLabel: 'Comments'
+      inlineUsername: false, likeType: 'thumbs', showEmojiBar: false, showClose: false, redThread: true
     }
   };
 
@@ -2732,7 +2766,11 @@
         if (replyMatch && out.length > 0) {
           var parent = out[out.length - 1];
           if (!parent.nestedReplies) parent.nestedReplies = [];
-          parent.nestedReplies.push({ user: replyMatch[1].replace(/^@/, ''), text: replyMatch[2].trim() });
+          var rUser = replyMatch[1].replace(/^@/, '');
+          var rText = replyMatch[2].trim();
+          var rCreator = false;
+          if (rUser.toUpperCase() === 'CREATOR' || replyMatch[0].match(/^\[CREATOR\]/i)) rCreator = true;
+          parent.nestedReplies.push({ user: rUser, text: rText, isCreator: rCreator || Math.random() < 0.35 });
         }
         return;
       }
@@ -2742,6 +2780,9 @@
       if (pinnedMatch) { isPinned = true; cleanLine = cleanLine.replace(pinnedMatch[0], ''); }
       var likedMatch = cleanLine.match(/^\[LIKED\]\s*/i);
       if (likedMatch) { isLiked = true; cleanLine = cleanLine.replace(likedMatch[0], ''); }
+      var isCreator = false;
+      var creatorMatch = cleanLine.match(/^\[CREATOR\]\s*/i);
+      if (creatorMatch) { isCreator = true; cleanLine = cleanLine.replace(creatorMatch[0], ''); }
       var m = cleanLine.match(/^[-*\d.)\s]*([a-zA-Z0-9._]{2,30}):\s*(.+)$/);
       if (!m) return;
       out.push({
@@ -2754,6 +2795,7 @@
         edited: Math.random() < 0.06,
         pinned: isPinned,
         creatorLiked: isLiked,
+        isCreator: isCreator,
         avatarSeed: Math.floor(Math.random() * 70) + 1,
         nestedReplies: null
       });
@@ -2802,147 +2844,196 @@
     });
   }
 
+  function formatHeaderCommentCount(visible, abbreviated) {
+    var total = Math.max(visible + Math.floor(Math.random() * 900) + 80, visible * 3);
+    if (abbreviated && total >= 1000) return (total / 1000).toFixed(1).replace('.0', '') + 'K comments';
+    return total.toLocaleString() + ' comments';
+  }
+
+  function buildCommentAvatarEl(c, theme) {
+    var avatarStyle = (document.getElementById('avatarStyle') || {}).value || 'mixed';
+    var effectiveKind = avatarStyle === 'mixed' ? (c.avatarKind || 'cartoon')
+      : (avatarStyle === 'realistic' ? 'realistic' : 'cartoon');
+    var avatarColor = theme.avatarPalette[hashSeed(c.user) % theme.avatarPalette.length];
+    var avatar = document.createElement('div');
+    avatar.className = 'c-avatar';
+    avatar.style.background = avatarColor;
+    if (effectiveKind === 'blank') return avatar;
+    var avatarImg = document.createElement('img');
+    avatarImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    var fallbackText = document.createTextNode(c.user.charAt(0).toUpperCase());
+    avatar.appendChild(fallbackText);
+    avatarImg.onload = function() { fallbackText.remove(); };
+    if (effectiveKind === 'realistic') {
+      avatarImg.src = 'https://i.pravatar.cc/64?img=' + c.avatarSeed;
+      avatarImg.onerror = function() { this.onerror = null; this.src = generateProceduralAvatarDataUri(c.user); };
+    } else {
+      avatarImg.src = generateProceduralAvatarDataUri(c.user);
+      avatarImg.onerror = function() { this.remove(); };
+    }
+    avatar.appendChild(avatarImg);
+    return avatar;
+  }
+
+  function bindEditable(el, onSave) {
+    el.className = 'bubble-editable';
+    el.contentEditable = 'true';
+    el.spellcheck = false;
+    el.addEventListener('blur', function() { onSave(this.textContent.trim()); });
+    el.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+  }
+
   function renderComments() {
     var platKey = document.getElementById('commentsPlatform').value;
     var theme = commentThemes[platKey] || commentThemes.instagram_comments;
-    var isIG = platKey === 'instagram_comments';
-    var isYT = platKey === 'youtube_comments';
+    var plat = theme.platform || 'instagram';
+    var isIG = plat === 'instagram';
+    var isTT = plat === 'tiktok';
+    var isYT = plat === 'youtube';
 
     document.getElementById('commentsFrame').style.background = theme.bg;
     document.getElementById('cStatusBar').style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bg + ';color:' + theme.headerText + ';';
-
-    var now = new Date();
-    document.getElementById('cTime').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('cTime').textContent = new Date().getHours() + ':' + String(new Date().getMinutes()).padStart(2,'0');
 
     var header = document.getElementById('cHeader');
+    header.style.cssText = 'padding:10px 14px 12px;background:' + theme.headerBg + ';border-bottom:0.5px solid ' + theme.headerBorder + ';color:' + theme.headerText + ';';
+
     if (isIG) {
-      header.style.cssText = 'padding:10px 14px 12px;background:' + theme.bg + ';border-bottom:0.5px solid ' + theme.headerBorder + ';';
-      header.innerHTML = '<div style="width:36px;height:4px;background:#333;border-radius:2px;margin:0 auto 12px;"></div>'
-        + '<div style="text-align:center;color:' + theme.headerText + ';font-size:15px;font-weight:600;">Comments</div>';
+      header.innerHTML = '<div class="c-sheet-handle" style="background:' + theme.handleColor + ';"></div>'
+        + '<div class="c-header-row"><span class="c-header-sort" style="color:' + theme.timeColor + ';visibility:hidden;">·</span>'
+        + '<span class="c-header-title" style="font-size:15px;">Comments</span>'
+        + '<span class="c-header-sort" style="color:' + theme.timeColor + ';">' + theme.sortLabel + '</span></div>';
+    } else if (isTT) {
+      header.innerHTML = '<div class="c-header-row">'
+        + '<span style="font-size:15px;font-weight:700;flex:1;">' + formatHeaderCommentCount(currentComments.length, true) + '</span>'
+        + '<span class="c-header-close">×</span></div>';
     } else {
-      header.style.cssText = 'padding:8px 14px;background:' + theme.bg + ';border-bottom:0.5px solid ' + theme.headerBorder + ';';
-      header.innerHTML = '<div style="color:' + theme.headerText + ';font-size:14px;font-weight:700;">' + currentComments.length + ' comments</div>';
+      header.innerHTML = '<div class="c-header-row">'
+        + '<span style="font-size:14px;font-weight:700;flex:1;">' + formatHeaderCommentCount(currentComments.length, false) + '</span>'
+        + '<span class="c-header-sort" style="color:' + theme.timeColor + ';">' + theme.sortLabel + '</span></div>';
     }
 
     var list = document.getElementById('commentsList');
     list.innerHTML = '';
-    list.style.background = theme.bg;
-    list.style.padding = '10px 14px';
+    list.style.cssText = 'background:' + theme.bg + ';padding:6px 14px 10px;flex:1;overflow-y:auto;';
 
     currentComments.forEach(function(c) {
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:10px;padding:10px 0;' + (c.pinned ? 'background:' + ((isIG || isYT) ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)') + ';border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;' : '');
-
-      var avatarStyle = (document.getElementById('avatarStyle') || {}).value || 'mixed';
-      var effectiveKind = avatarStyle === 'mixed' ? (c.avatarKind || 'cartoon')
-        : (avatarStyle === 'realistic' ? 'realistic' : 'cartoon');
-      var avatarColor = theme.avatarPalette[Math.floor(Math.random() * theme.avatarPalette.length)];
-      var avatar = document.createElement('div');
-      avatar.style.cssText = 'flex-shrink:0;width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;overflow:hidden;';
-
-      if (effectiveKind === 'blank') {
-        // No picture, no letter — just a plain colored circle, matching the
-        // "some blank" look of a real comment section.
-        row.appendChild(avatar);
-      } else {
-        var avatarImg = document.createElement('img');
-        avatarImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-        // Isolate the fallback letter into its own text node. Setting
-        // avatar.textContent = '' on the PARENT div (the old bug) destroys
-        // ALL children — including the <img> that just finished loading and
-        // triggered onload in the first place. Removing only this specific
-        // text node leaves the image untouched.
-        var fallbackText = document.createTextNode(c.user.charAt(0).toUpperCase());
-        avatar.appendChild(fallbackText);
-        avatarImg.onload = function() { fallbackText.remove(); };
-        if (effectiveKind === 'realistic') {
-          avatarImg.src = 'https://i.pravatar.cc/64?img=' + c.avatarSeed;
-          // If the realistic photo can't load (e.g. blocked network, offline,
-          // or inside Claude's sandboxed artifact preview), fall back to a
-          // generated avatar instead of leaving a bare letter.
-          avatarImg.onerror = function() { this.onerror = null; this.src = generateProceduralAvatarDataUri(c.user); };
-        } else {
-          avatarImg.src = generateProceduralAvatarDataUri(c.user);
-          avatarImg.onerror = function() { this.remove(); };
-        }
-        avatar.appendChild(avatarImg);
-        row.appendChild(avatar);
+      row.className = 'c-comment-row';
+      if (c.pinned) {
+        row.style.background = isTT ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)';
+        row.style.borderRadius = '8px';
+        row.style.padding = '8px 6px';
+        row.style.margin = '0 -6px';
       }
 
+      row.appendChild(buildCommentAvatarEl(c, theme));
+
       var body = document.createElement('div');
-      body.style.cssText = 'flex:1;min-width:0;';
+      body.className = 'c-body';
 
       if (c.pinned) {
         var pinnedTag = document.createElement('div');
-        pinnedTag.style.cssText = 'font-size:10px;color:' + theme.replyColor + ';font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:4px;';
-        pinnedTag.innerHTML = '📌 Pinned by creator';
+        pinnedTag.className = 'c-pinned-label';
+        pinnedTag.style.color = theme.replyColor;
+        pinnedTag.textContent = 'Pinned by ' + (theme.pinnedBy === 'creator' ? 'creator' : '@' + c.user);
         body.appendChild(pinnedTag);
       }
 
-      var topLine = document.createElement('div');
-      topLine.style.cssText = 'font-size:12.5px;color:' + theme.username + ';font-weight:600;margin-bottom:2px;';
-      var usernameSpan = document.createElement('span');
-      usernameSpan.className = 'bubble-editable';
-      usernameSpan.contentEditable = 'true';
-      usernameSpan.spellcheck = false;
-      usernameSpan.textContent = c.user;
-      usernameSpan.addEventListener('blur', function() {
-        c.user = this.textContent.trim() || c.user;
-        // Note: deliberately NOT touching avatar.textContent here — the
-        // fallback letter is only a transient loading-state placeholder;
-        // once the avatar image has loaded, avatar.textContent would wipe
-        // it out (same destructive-DOM-mutation bug fixed above).
-      });
-      usernameSpan.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
-      topLine.appendChild(usernameSpan);
-      var verifiedBadge = document.createElement('span');
-      verifiedBadge.title = 'Click to toggle verified badge';
-      verifiedBadge.style.cssText = 'cursor:pointer;margin-left:3px;color:' + (c.verified ? '#3897f0' : '#3a3a3a') + ';font-size:12px;';
-      verifiedBadge.textContent = '✔';
-      verifiedBadge.addEventListener('click', function() {
-        c.verified = !c.verified;
-        this.style.color = c.verified ? '#3897f0' : '#3a3a3a';
-      });
-      topLine.appendChild(verifiedBadge);
-      var timeSpan = document.createElement('span');
-      timeSpan.style.cssText = 'font-weight:400;color:' + theme.timeColor + ';font-size:11px;';
-      timeSpan.textContent = ' ' + c.time + (c.edited ? ' • Edited' : '');
-      topLine.appendChild(timeSpan);
-      body.appendChild(topLine);
-
-      var textLine = document.createElement('div');
-      textLine.className = 'bubble-editable';
-      textLine.contentEditable = 'true';
-      textLine.spellcheck = false;
-      textLine.style.cssText = 'font-size:13px;color:' + theme.text + ';line-height:1.35;margin-bottom:4px;word-break:break-word;';
-      textLine.textContent = c.text;
-      textLine.addEventListener('blur', function() { c.text = this.textContent.trim() || c.text; });
-      body.appendChild(textLine);
+      if (theme.inlineUsername) {
+        var inline = document.createElement('div');
+        inline.className = 'c-inline-line';
+        inline.style.color = theme.text;
+        var userSpan = document.createElement('span');
+        userSpan.className = 'c-username';
+        userSpan.style.color = theme.username;
+        userSpan.textContent = c.user;
+        bindEditable(userSpan, function(v) { c.user = v || c.user; });
+        inline.appendChild(userSpan);
+        if (c.verified) {
+          var vb = document.createElement('span');
+          vb.style.cssText = 'color:#3897f0;font-size:11px;margin-left:2px;';
+          vb.textContent = ' ✔';
+          inline.appendChild(vb);
+        }
+        if (c.isCreator && isTT) {
+          var cb = document.createElement('span');
+          cb.className = 'c-creator-badge';
+          cb.textContent = 'Creator';
+          inline.appendChild(cb);
+        }
+        inline.appendChild(document.createTextNode(' '));
+        var txtSpan = document.createElement('span');
+        txtSpan.textContent = c.text;
+        bindEditable(txtSpan, function(v) { c.text = v || c.text; });
+        inline.appendChild(txtSpan);
+        body.appendChild(inline);
+      } else {
+        var userLine = document.createElement('div');
+        userLine.className = 'c-yt-userline';
+        userLine.style.color = theme.username;
+        var uSpan = document.createElement('span');
+        uSpan.textContent = '@' + c.user;
+        bindEditable(uSpan, function(v) { c.user = v.replace(/^@/, '') || c.user; });
+        userLine.appendChild(uSpan);
+        var tSpan = document.createElement('span');
+        tSpan.className = 'c-yt-time';
+        tSpan.style.color = theme.timeColor;
+        tSpan.textContent = ' · ' + c.time + (c.edited ? ' (edited)' : '');
+        userLine.appendChild(tSpan);
+        body.appendChild(userLine);
+        var textLine = document.createElement('div');
+        textLine.className = 'c-comment-text bubble-editable';
+        textLine.style.color = theme.text;
+        textLine.contentEditable = 'true';
+        textLine.spellcheck = false;
+        textLine.textContent = c.text;
+        textLine.addEventListener('blur', function() { c.text = this.textContent.trim() || c.text; });
+        body.appendChild(textLine);
+      }
 
       var actions = document.createElement('div');
-      actions.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';font-weight:600;display:flex;align-items:center;gap:8px;';
+      actions.className = 'c-actions';
+      actions.style.color = theme.replyColor;
+      if (theme.inlineUsername) {
+        var timeLbl = document.createElement('span');
+        timeLbl.style.fontWeight = '400';
+        timeLbl.style.color = theme.timeColor;
+        timeLbl.textContent = c.time + (c.edited ? ' · Edited' : '');
+        actions.appendChild(timeLbl);
+      }
       var replySpan = document.createElement('span');
       replySpan.textContent = 'Reply';
       actions.appendChild(replySpan);
-      if (c.creatorLiked) {
-        var likedBadge = document.createElement('span');
-        likedBadge.style.cssText = 'display:inline-flex;align-items:center;gap:2px;color:' + theme.heartColor + ';font-weight:400;';
-        likedBadge.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="#ed4956" stroke="#ed4956"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg> creator liked';
-        actions.appendChild(likedBadge);
+      if (c.creatorLiked && isIG) {
+        var liked = document.createElement('span');
+        liked.className = 'c-creator-liked';
+        liked.style.color = theme.timeColor;
+        liked.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="#ed4956" stroke="#ed4956"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg> Liked by creator';
+        actions.appendChild(liked);
       }
       body.appendChild(actions);
 
       if (c.nestedReplies && c.nestedReplies.length > 0) {
         var repliesWrap = document.createElement('div');
-        repliesWrap.style.cssText = 'margin-top:8px;padding-left:16px;border-left:1px solid ' + theme.headerBorder + ';display:flex;flex-direction:column;gap:6px;';
+        repliesWrap.className = 'c-nested' + (theme.redThread ? ' c-nested-yt' : '');
         c.nestedReplies.forEach(function(r) {
           var replyRow = document.createElement('div');
-          replyRow.style.cssText = 'font-size:12px;color:' + theme.text + ';line-height:1.35;';
-          var replyUser = document.createElement('span');
-          replyUser.style.cssText = 'font-weight:600;color:' + theme.username + ';margin-right:5px;';
-          replyUser.textContent = r.user;
-          replyRow.appendChild(replyUser);
-          replyRow.appendChild(document.createTextNode(r.text));
+          replyRow.className = 'c-inline-line';
+          replyRow.style.color = theme.text;
+          replyRow.style.fontSize = '12px';
+          var ru = document.createElement('span');
+          ru.className = 'c-username';
+          ru.style.color = theme.username;
+          ru.textContent = r.user;
+          replyRow.appendChild(ru);
+          if (r.isCreator && isTT) {
+            var cr = document.createElement('span');
+            cr.className = 'c-creator-badge';
+            cr.textContent = 'Creator';
+            replyRow.appendChild(cr);
+          }
+          replyRow.appendChild(document.createTextNode(' ' + r.text));
           repliesWrap.appendChild(replyRow);
         });
         body.appendChild(repliesWrap);
@@ -2950,39 +3041,68 @@
 
       if (c.replies > 0) {
         var repliesLine = document.createElement('div');
-        repliesLine.style.cssText = 'font-size:11px;color:' + theme.replyColor + ';margin-top:6px;padding-left:2px;';
-        repliesLine.innerHTML = '<span style="display:inline-block;width:18px;border-top:1px solid ' + theme.headerBorder + ';margin-right:6px;vertical-align:middle;"></span>View ' + c.replies + (c.replies === 1 ? ' reply' : ' more replies');
+        repliesLine.className = 'c-view-replies';
+        repliesLine.style.color = theme.replyColor;
+        if (isIG) {
+          repliesLine.innerHTML = '<span style="display:inline-block;width:20px;border-top:1px solid ' + theme.headerBorder + ';margin-right:8px;vertical-align:middle;"></span>View ' + c.replies + (c.replies === 1 ? ' reply' : ' replies');
+        } else {
+          repliesLine.textContent = 'View ' + c.replies + (c.replies === 1 ? ' reply' : ' replies');
+        }
         body.appendChild(repliesLine);
       }
 
       row.appendChild(body);
 
       var likeCol = document.createElement('div');
-      likeCol.style.cssText = 'flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:2px;';
-      var heart = document.createElement('div');
-      heart.innerHTML = isIG
-        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>'
-        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>';
-      likeCol.appendChild(heart);
-      var likeCount = document.createElement('div');
-      likeCount.style.cssText = 'font-size:10px;color:' + theme.likeCountColor + ';';
-      likeCount.textContent = c.likes;
-      likeCol.appendChild(likeCount);
-      if (!isIG) {
-        var thumbDown = document.createElement('div');
-        thumbDown.style.marginTop = '6px';
-        thumbDown.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7L2.3 13a2 2 0 0 0 2 2.3H10z"/></svg>';
-        likeCol.appendChild(thumbDown);
+      likeCol.className = 'c-like-col';
+      if (theme.likeType === 'thumbs') {
+        likeCol.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22V11H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3z"/></svg>'
+          + '<div class="c-like-count" style="color:' + theme.likeCountColor + ';">' + c.likes + '</div>'
+          + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + theme.heartColor + '" stroke-width="2" style="margin-top:6px;opacity:0.85;"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7L2.3 13a2 2 0 0 0 2 2.3H10z"/></svg>';
+      } else {
+        var filled = parseInt(String(c.likes).replace(/[^\d]/g, ''), 10) > 500;
+        likeCol.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' + (filled ? theme.heartFilled : 'none') + '" stroke="' + (filled ? theme.heartFilled : theme.heartColor) + '" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>'
+          + '<div class="c-like-count" style="color:' + theme.likeCountColor + ';">' + c.likes + '</div>';
       }
       row.appendChild(likeCol);
-
       list.appendChild(row);
     });
 
     var inputBar = document.getElementById('cInputBar');
-    inputBar.style.cssText = 'padding:8px 14px;display:flex;align-items:center;gap:8px;background:' + theme.inputBg + ';border-top:0.5px solid ' + theme.inputBorder + ';';
-    inputBar.innerHTML = '<div style="flex:1;border-radius:20px;padding:8px 14px;font-size:12px;background:' + theme.inputBg + ';border:' + ((isIG || isYT) ? '1px solid ' + theme.inputBorder : 'none') + ';color:' + theme.inputPlaceholder + ';">' + (isYT ? 'Add a comment...' : (isIG ? 'Add a comment...' : 'Add comment...')) + '</div>';
+    inputBar.innerHTML = '';
+    inputBar.style.cssText = 'background:' + theme.inputBg + ';border-top:0.5px solid ' + theme.inputBorder + ';';
 
+    if (theme.showEmojiBar) {
+      var emojiBar = document.createElement('div');
+      emojiBar.className = 'c-emoji-bar';
+      emojiBar.style.color = theme.headerText;
+      emojiBar.textContent = '😂 ❤️ 😳 🔥 👏 😢 😍';
+      inputBar.appendChild(emojiBar);
+    }
+
+    var composer = document.createElement('div');
+    composer.className = 'c-composer';
+    composer.style.borderColor = theme.inputBorder;
+    composer.style.background = theme.inputBg;
+    var miniAv = buildCommentAvatarEl({ user: 'Me', avatarKind: 'cartoon', avatarSeed: 1 }, theme);
+    miniAv.style.width = '28px';
+    miniAv.style.height = '28px';
+    miniAv.style.fontSize = '11px';
+    composer.appendChild(miniAv);
+    var inp = document.createElement('div');
+    inp.className = 'c-composer-input';
+    inp.style.background = theme.inputBg === theme.bg ? theme.inputBorder : theme.inputBg;
+    inp.style.borderColor = isIG || isYT ? theme.inputBorder : 'transparent';
+    inp.style.color = theme.inputPlaceholder;
+    inp.textContent = isTT ? 'Add comment...' : 'Add a comment...';
+    composer.appendChild(inp);
+    if (isYT) {
+      var send = document.createElement('div');
+      send.className = 'c-yt-send';
+      send.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>';
+      composer.appendChild(send);
+    }
+    inputBar.appendChild(composer);
     document.getElementById('editHint').style.display = 'block';
   }
 
@@ -3635,6 +3755,16 @@
   createWallpaperOptions();
   updateKeyStatus();
   document.getElementById('theirName').placeholder = 'e.g. Mum';
+
+  if (new URLSearchParams(location.search).get('test') === 'comments') {
+    window.__ptgCommentsTest = function(text) {
+      currentComments = parseComments(text);
+      document.getElementById('contentType').value = 'comments';
+      document.getElementById('contentType').dispatchEvent(new Event('change'));
+      renderComments();
+      document.getElementById('previewSection').style.display = 'block';
+    };
+  }
 })();
 </script>
 <script>
