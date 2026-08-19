@@ -665,7 +665,7 @@
   <div class="action-btns">
     <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
   </div>
-  <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span>Trimming for lyrics...</div>
+  <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span><span id="shortenLoadingText">Trimming for lyrics...</span></div>
   <div class="shorten-badge" id="shortenBadge">✓ Shortened for song lyrics</div>
   <div class="compare-wrap" id="compareWrap">
     <div class="compare-col">
@@ -3721,11 +3721,11 @@
       + '- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n'
       + '- KEEP THE TEXTING VOICE — CRITICAL: match the original\'s capitalisation and punctuation habits exactly. If the original messages are lowercase, your shortened versions stay lowercase. Do NOT capitalise the first letter of a message that was lowercase. Do NOT add full stops at the end of messages that did not have them. These are text messages between real people, not formal prose.\n'
       + '- KEEP EMPHASIS CAPS: if the original used ALL CAPS on a word or phrase for emphasis (like AND, EXACTLY, NO WAY), keep those caps exactly as they were. That capitalisation is carrying the comedic emphasis.\n'
-      + '- MEANING LOCK: keep every proper noun, brand, and specific object (High Life, Verizon, hard seltzer, inflatable pool, etc.). "hard seltzer" must stay "hard seltzer", never just "seltzer".\n'
-      + '- GRAMMAR LOCK — NO TELEGRAPH SPEAK. The line must still read like a text a person sent. Keep and / also / I\'d / to / the / a when they are holding the sentence together.\n'
-      + '  BAD: "i will fight god told mom seltzer"\n'
-      + '  GOOD: "i will fight god and i told mom i\'d switch to hard seltzer"\n'
-      + '  If you cannot shorten a line without that BAD style, output the original line unchanged.\n'
+      + '- MEANING: keep every specific noun, name, brand, place, and object from that original line. Do not swap a specific thing for a vaguer shorter word.\n'
+      + '- GRAMMAR: every line must still read like a text a person actually sent — a complete clause, not a headline. Keep connecting words (and, also, to, the, a, I\'d, I am) when they hold the sentence together.\n'
+      + '  Pattern to avoid: dropping those words so it becomes "went store milk told mom".\n'
+      + '  Pattern to use: "i went to the store for milk and told mom".\n'
+      + '  If you cannot shorten a line without that broken style, output the original line unchanged.\n'
       + '- No merging messages. No adding or removing messages.\n'
       + '- ' + (person === 'mom' || person === 'dad'
       ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
@@ -3736,31 +3736,57 @@
       var shortenProvider = document.getElementById('providerSelect').value;
       var shortenVibe = document.getElementById('vibe').value;
       var shortenUseGrok = shortenProvider === 'xai' || (shortenProvider === 'auto' && (shortenVibe === 'unhinged' || shortenVibe === 'unhingedmax'));
-      var rawShortenText;
+      var grokKey = shortenUseGrok ? getGrokKey() : '';
+      if (shortenUseGrok && !grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
+      if (!shortenUseGrok && !key) { showError('Please save your API key first.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
 
-      if (shortenUseGrok) {
-        var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
-        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-          body: JSON.stringify({ model: shortenModel, messages: [{ role: 'user', content: sp }], max_tokens: 800, temperature: 0.7 })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-        var data = await resp.json();
-        rawShortenText = data.choices?.[0]?.message?.content?.trim();
-      } else {
-        if (!key) { showError('Please save your API key first.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
-        rawShortenText = await callAnthropicText(key, shortenModel, sp, 2048, 0.7);
+      async function runShortenModel(prompt, maxTokens) {
+        if (shortenUseGrok) {
+          var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
+            body: JSON.stringify({ model: shortenModel, messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens || 1200, temperature: 0.7 })
+          });
+          if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
+          var data = await resp.json();
+          return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '').trim();
+        }
+        return callAnthropicText(key, shortenModel, prompt, maxTokens || 2048, 0.7);
       }
 
+      function lineSpeaker(m) {
+        return m.f === 'them' ? (m.speaker || theirName) : myName;
+      }
+
+      document.getElementById('shortenLoadingText').textContent = 'Trimming for lyrics...';
+      var rawShortenText = await runShortenModel(sp, 2048);
       var parsed = parseConversation(rawShortenText, myName, theirName);
       if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
-      // Guard against silent message loss. Without this check the AI can
-      // quietly drop a message, which breaks any later message that referred
-      // back to it ("EXACTLY", "that one", "she") and kills the punchline.
       if (parsed.length !== currentMessages.length) {
         throw new Error('Shortened version came back with ' + parsed.length + ' messages instead of ' + currentMessages.length + '. Nothing was changed — hit Shorten for Song again.');
+      }
+
+      document.getElementById('shortenLoadingText').textContent = 'Fixing grammar and meaning...';
+      var pairLines = currentMessages.map(function(m, i) {
+        return (i + 1) + '.\nORIGINAL: ' + lineSpeaker(m) + ': ' + m.t
+          + '\nSHORTENED: ' + lineSpeaker(parsed[i]) + ': ' + parsed[i].t;
+      }).join('\n\n');
+      var polishPrompt = 'You are correcting a shortened text conversation. Pass 1 already shortened each line. Pass 1 often drops connecting words and specific nouns, which changes meaning and breaks grammar. Fix that.\n\n'
+        + 'There are EXACTLY ' + currentMessages.length + ' messages. Output EXACTLY ' + currentMessages.length + ' messages, same speakers, same order.\n\n'
+        + pairLines + '\n\n'
+        + 'For each pair, rewrite SHORTENED so that:\n'
+        + '- It means the SAME thing as ORIGINAL. Keep every specific noun, name, brand, place, object, and the same joke from that original line. Do not invent new facts. Do not swap a specific thing for a vaguer shorter word.\n'
+        + '- It reads like a real text: a complete clause, not a headline. Restore connecting words (and, also, to, the, a, I\'d) if pass 1 deleted them and the sentence now sounds broken.\n'
+        + '- Stay shorter than ORIGINAL when ORIGINAL is long, but never by deleting grammar or specific details. If a line cannot be both short and correct, prefer the original wording.\n'
+        + '- Match the original\'s capitalisation, slang, and punctuation habits.\n'
+        + '- If a shortened line is already correct, copy it unchanged.\n\n'
+        + 'Format: SPEAKER: message text\nOutput ONLY the conversation.';
+      try {
+        var polishedRaw = await runShortenModel(polishPrompt, 2048);
+        var polished = parseConversation(polishedRaw, myName, theirName);
+        if (polished.length === currentMessages.length) parsed = polished;
+      } catch (polishErr) {
+        console.warn('Shorten grammar pass failed, using first pass', polishErr);
       }
 
       parsed.forEach(function(m, i) {
@@ -3803,7 +3829,11 @@
       document.getElementById('shortenBadge').textContent = '👆 Pick a version above';
       document.getElementById('shortenBadge').style.display = 'block';
     } catch(err) { showError('Error: ' + err.message); }
-    finally { document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; }
+    finally {
+      document.getElementById('shortenLoadingDiv').style.display='none';
+      document.getElementById('shortenBtn').disabled=false;
+      document.getElementById('shortenLoadingText').textContent = 'Trimming for lyrics...';
+    }
   });
 
   document.getElementById('downloadBtn').addEventListener('click', function() {
