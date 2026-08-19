@@ -50,9 +50,11 @@
   .key-row { display: flex; gap: 8px; margin-bottom: 8px; }
   .key-row input { flex: 1; }
   .key-save-btn { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .preview-section { display: none; margin-top: 20px; }
+  .preview-section { display: none; margin-top: 20px; flex-direction: column; }
+  .preview-toolbar { margin-bottom: 12px; }
+  .preview-toolbar .action-btns { margin-bottom: 8px; }
   .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
-  .phone { width: 448px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
+  .phone { width: 100%; max-width: 448px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
   .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .phone > * { position: relative; z-index: 1; }
   .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
@@ -175,8 +177,15 @@
   .app-shell { max-width: 680px; margin: 0 auto; }
   @media (min-width: 900px) {
     .app-shell.has-preview { max-width: 1180px; display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
-    .app-shell.has-preview > #previewSection { grid-column: 2; grid-row: 1 / span 99; position: sticky; top: 20px; align-self: start; margin-top: 0; }
+    .app-shell.has-preview > #previewSection {
+      grid-column: 2; grid-row: 1 / span 99; position: sticky; top: 20px; align-self: start; margin-top: 0;
+      max-height: calc(100vh - 40px); min-height: 0; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
     .app-shell.has-preview > *:not(#previewSection) { grid-column: 1; min-width: 0; }
+    .app-shell.has-preview .preview-toolbar { flex: 0 1 auto; min-height: 0; max-height: 46vh; overflow-y: auto; }
+    .app-shell.has-preview .phone-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; margin-bottom: 12px; }
+    .app-shell.has-preview .preview-more { flex: 0 0 auto; }
   }
 
   /* ── Searchable preset picker ── */
@@ -604,6 +613,31 @@
 </div>
 
 <div class="preview-section" id="previewSection">
+  <div class="preview-toolbar">
+    <div class="action-btns">
+      <button class="action-btn" id="regenBtn">Regenerate 🔄</button>
+      <button class="action-btn primary" id="downloadBtn">Download PNG 📸</button>
+    </div>
+    <div class="action-btns" id="shortenRow">
+      <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
+    </div>
+    <p class="edit-hint" id="shortenHint" style="display:block;margin-top:0;margin-bottom:8px;">Turns rambling lines into singable lyrics. Leaves short punches alone.</p>
+    <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span><span id="shortenLoadingText">Trimming for lyrics...</span></div>
+    <div class="shorten-badge" id="shortenBadge">✓ Shortened for song lyrics</div>
+    <div class="compare-wrap" id="compareWrap">
+      <div class="compare-col">
+        <div class="compare-col-title">📝 Original</div>
+        <div id="compareOriginal"></div>
+        <button class="compare-pick" id="pickOriginal">Use Original</button>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title">✂️ Shortened</div>
+        <div id="compareShortened"></div>
+        <button class="compare-pick" id="pickShortened">Use Shortened</button>
+      </div>
+    </div>
+  </div>
+
   <div class="phone-wrap">
     <div class="phone" id="phoneFrame">
       <div class="phone-wallpaper" id="phoneWallpaper"></div>
@@ -651,39 +685,20 @@
     </div>
   </div>
 
-  <div class="action-btns">
-    <button class="action-btn" id="regenBtn">Regenerate 🔄</button>
-    <button class="action-btn primary" id="downloadBtn">Download PNG 📸</button>
-  </div>
-  <div class="action-btns">
-    <button class="action-btn full accent" id="animateBtn">▶️ Animate for TikTok</button>
-  </div>
-  <div class="action-btns">
-    <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
-  </div>
-  <p class="edit-hint" id="editHint">✏️ Tap any message or comment to edit it directly</p>
-  <div class="action-btns">
-    <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
-  </div>
-  <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span><span id="shortenLoadingText">Trimming for lyrics...</span></div>
-  <div class="shorten-badge" id="shortenBadge">✓ Shortened for song lyrics</div>
-  <div class="compare-wrap" id="compareWrap">
-    <div class="compare-col">
-      <div class="compare-col-title">📝 Original</div>
-      <div id="compareOriginal"></div>
-      <button class="compare-pick" id="pickOriginal">Use Original</button>
+  <div class="preview-more">
+    <div class="action-btns">
+      <button class="action-btn full accent" id="animateBtn">▶️ Animate for TikTok</button>
     </div>
-    <div class="compare-col">
-      <div class="compare-col-title">✂️ Shortened</div>
-      <div id="compareShortened"></div>
-      <button class="compare-pick" id="pickShortened">Use Shortened</button>
+    <div class="action-btns">
+      <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
     </div>
+    <p class="edit-hint" id="editHint">✏️ Tap any message or comment to edit it directly</p>
+    <div class="action-btns" id="copyBtnRow">
+      <button class="action-btn full" id="copyBtn">Copy text for Gem 📋</button>
+    </div>
+    <div class="gem-text-box" id="gemTextBox"></div>
+    <div class="copied-toast" id="copiedToast">✓ Copied to clipboard!</div>
   </div>
-  <div class="action-btns" id="copyBtnRow">
-    <button class="action-btn full" id="copyBtn">Copy text for Gem 📋</button>
-  </div>
-  <div class="gem-text-box" id="gemTextBox"></div>
-  <div class="copied-toast" id="copiedToast">✓ Copied to clipboard!</div>
 </div>
 
 <div class="card saved-convos" id="savedConvosCard">
@@ -735,6 +750,13 @@
   var currentWallpaper = 'none';
   var isAnimating = false;
   var originalMessages = [];
+
+  function setPreviewVisible(on) {
+    var el = document.getElementById('previewSection');
+    var shell = document.getElementById('appShell');
+    if (el) el.style.display = on ? 'flex' : 'none';
+    if (shell) shell.classList.toggle('has-preview', !!on);
+  }
 
   // ── MOOD SLIDER ──────────────────────────────────────────────
   var moodLabels = [
@@ -1364,22 +1386,82 @@
     document.getElementById('errorBox').style.display = 'none';
   }
 
-  function parseConversation(text, myName, theirName) {
+  function normalizeSpeaker(name) {
+    return String(name || '').trim().replace(/:$/, '').toLowerCase();
+  }
+
+  function lastSpeakerToken(name) {
+    var parts = normalizeSpeaker(name).split(/\s+/).filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : '';
+  }
+
+  // Your-name box vs Their-name box decide green/right vs grey/left.
+  // "Uncle Gil" and "Gil" must count as the same person.
+  function speakerRole(speaker, myName, theirName, extraThem) {
+    var s = normalizeSpeaker(speaker);
+    var mine = normalizeSpeaker(myName) || 'me';
+    var them = normalizeSpeaker(theirName);
+    extraThem = extraThem || [];
+    if (!s) return 'them';
+    if (s === 'me' || s === 'i' || s === mine) return 'me';
+    if (them && s === them) return 'them';
+    var sLast = lastSpeakerToken(s);
+    var mineLast = lastSpeakerToken(mine);
+    var themLast = lastSpeakerToken(them);
+    var mineFuzzy = sLast && mineLast && sLast === mineLast && mineLast.length >= 2;
+    var themFuzzy = sLast && themLast && sLast === themLast && themLast.length >= 2;
+    if (mineFuzzy && !themFuzzy) return 'me';
+    if (themFuzzy && !mineFuzzy) return 'them';
+    for (var i = 0; i < extraThem.length; i++) {
+      var extra = normalizeSpeaker(extraThem[i]);
+      if (extra && (s === extra || (sLast && lastSpeakerToken(extra) === sLast && sLast.length >= 2))) return 'them';
+    }
+    var dummy = (s === 'speaker' || s === 'name');
+    if (extraThem.length) return 'them';
+    if (!dummy && them && s !== them) return 'me';
+    return 'them';
+  }
+
+  function splitSpeakerLine(line) {
+    var colonIdx = line.indexOf(':');
+    if (colonIdx < 0) return null;
+    var maybeSpeaker = line.substring(0, colonIdx).trim();
+    var looksLikeSpeaker = maybeSpeaker.length > 0
+      && maybeSpeaker.length <= 28
+      && maybeSpeaker.split(/\s+/).length <= 4
+      && !/[.!?,]$/.test(maybeSpeaker)
+      && !/^\d+$/.test(maybeSpeaker)
+      && !/^https?$/i.test(maybeSpeaker);
+    if (!looksLikeSpeaker) return null;
+    var text = line.substring(colonIdx + 1).trim();
+    if (!text) return null;
+    return { speaker: maybeSpeaker, text: text };
+  }
+
+  function parseConversation(text, myName, theirName, extraThem) {
+    myName = String(myName || 'Me').trim() || 'Me';
+    theirName = String(theirName || '').trim();
+    extraThem = extraThem || [];
     var lines = text.trim().split('\n').filter(function(l){ return l.trim(); });
     var msgs = [];
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i].trim();
       if (!line) continue;
-      var lower = line.toLowerCase();
-      if (lower.startsWith('me:') || lower.startsWith(myName.toLowerCase() + ':')) {
-        var prefixLen = lower.startsWith('me:') ? 3 : myName.length + 1;
-        msgs.push({ f: 'me', t: line.substring(prefixLen).trim() });
-      } else if (line.includes(':')) {
-        var parts = line.split(':');
-        var speakerName = parts[0].trim();
-        var content = parts.slice(1).join(':').trim();
-        msgs.push({ f: 'them', t: content, speaker: speakerName });
+      var tagged = splitSpeakerLine(line);
+      if (!tagged) {
+        if (msgs.length > 0) {
+          msgs.push({ f: msgs[msgs.length - 1].f, t: line, speaker: msgs[msgs.length - 1].speaker });
+        } else {
+          msgs.push({ f: 'them', t: line, speaker: theirName });
+        }
+        continue;
       }
+      var role = speakerRole(tagged.speaker, myName, theirName, extraThem);
+      msgs.push({
+        f: role,
+        t: tagged.text,
+        speaker: role === 'me' ? myName : tagged.speaker
+      });
     }
     return msgs;
   }
@@ -1434,7 +1516,7 @@
     currentMessages = msgs;
     renderPhone();
     renderAnimatePhone();
-    document.getElementById('previewSection').style.display = 'block';
+    setPreviewVisible(true);
     document.getElementById('gemTextBox').style.display = 'none';
     document.getElementById('compareWrap').classList.remove('visible');
   }
@@ -1808,7 +1890,8 @@
     var useGrokEarly = providerEarly === 'xai' || (providerEarly === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
 
     var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
-      + 'CONTEXT: This is a conversation between two real people. Write it as two distinct personalities talking naturally, with real texture — actual modern texting rhythm, natural contractions, realistic slang where it fits the personalities and vibe, genuine comedic timing. This should read like a real screenshot people would believe, not a sanitized generic paraphrase.\n\n'
+      + 'PURPOSE: these texts will be turned into a song. They still have to look like a real screenshot, but write so the funny lines can be sung later — one idea per message when someone is rambling, punch word last, mix short gut-punch replies with longer setups. Do not write actual verse/chorus unless Song Mode is on.\n\n'
+      + 'CONTEXT: two distinct personalities talking naturally, with real modern texting texture. This should read like a screenshot people would believe, not a sanitized paraphrase.\n\n'
       + 'HOW TO ACTUALLY BE FUNNY — craft rules, not suggestions. AI-written dialogue fails when it defaults to safe, predictable phrasing. Actively fight that:\n'
       + '- SPECIFICITY BEATS GENERIC. Concrete oddly-specific details are funny; vague ones are not. "you left my charger at nandos on tuesday" lands. "you lost my stuff" dies. Always reach for the exact brand, number, day, or weirdly precise detail.\n'
       + '- PUNCH WORD GOES LAST. The funniest or most surprising word must be the FINAL word of that message. If it lands mid-sentence and the message keeps going, the joke dies on the extra words. Cut everything after the punch.\n'
@@ -1835,7 +1918,10 @@
       + '- Vary message length — some short fragments, some longer.\n'
       + '- The conversation must have ONE memorable quotable moment.\n'
       + '- DOUBLE-TEXTING: real people often send 2-4 messages in a row with no reply in between, especially when heated, anxious, excited, or venting. Include this occasionally where the mood calls for it — do not force strict back-and-forth alternation every single line. CRITICAL: double-texted messages still count toward the total message count specified above — restructuring some replies as double-texts does NOT mean you add extra messages on top of that count. The total stays exactly what was specified, no matter how the messages are grouped.\n\n'
-      + 'FORMAT: ' + (groupSize >= 3 ? myName + ' is written as "' + myName + ':". Every other person is written using their EXACT name as given above, e.g. "' + otherNames[0] + ': message text".' : 'SPEAKER: message text only.') + ' No extra text before or after.\n'
+      + 'FORMAT: ' + (groupSize >= 3
+        ? myName + ' is written as "' + myName + ':". Every other person is written using their EXACT name as given above, e.g. "' + otherNames[0] + ': message text".'
+        : 'Each line MUST start with the exact name from the name boxes. "' + myName + ':" is the phone owner (right / green bubbles). "' + theirName + ':" is the other person (left / grey bubbles). Never write SPEAKER. Never invent a different label (no Uncle/Aunt prefix unless that exact text is in the box). Never put ' + myName + '\'s messages under ' + theirName + '.')
+      + ' No extra text before or after.\n'
       + (person === 'mom' || person === 'dad'
         ? '- EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — at least 1 emoji should appear somewhere in the conversation, but keep it simple and how an older person actually texts (❤️ 🙏 😊 👍), never stacked, never more than one per message.\n\n'
         : '- EMOJI RULE: emojis should be present throughout, multiple across the conversation (not just one), but every emoji must fit the specific line it is on — read the emotional context of that exact message and pick an emoji that actually matches it, not a random default. Do not force an emoji onto every single line, but do not go sparse either — most conversations should have several placed naturally across different messages.\n\n')
@@ -1871,11 +1957,11 @@
         rawText = await callAnthropicText(key, model, prompt, 4096, 1.0);
       }
 
-      var parsed = parseConversation(rawText, myName, theirName);
+      var parsed = parseConversation(rawText, myName, theirName, groupSize >= 3 ? otherNames.slice(1) : []);
       if (parsed.length === 0) throw new Error('Could not parse conversation. Try again.');
       currentMessages = parsed;
       renderPhone(); renderAnimatePhone();
-      document.getElementById('previewSection').style.display = 'block';
+      setPreviewVisible(true);
       document.getElementById('gemTextBox').style.display = 'none';
       document.getElementById('copiedToast').style.display = 'none';
       document.getElementById('shortenBadge').style.display = 'none';
@@ -1909,7 +1995,7 @@
       + '8. CREATIVE COMPARISON — when the hook asks for a comparison/description bait ("describe X as a Y"), commenters get genuinely witty and specific with the comparison, not generic.\n\n'
       + 'Read the HOOK below and decide which of these patterns (and mix of patterns) naturally fits what the hook is asking for. A roast-me hook pulls from patterns 1, 2, 3. A hype-me hook pulls from pattern 7. A confession/advice-bait hook pulls from real specific short answers. A comparison hook pulls from pattern 8. Always mix in at least one pattern 4 (low effort) and one pattern 5 (tag a friend) somewhere in the batch for realism, regardless of hook type.\n\n';
 
-    var prompt = 'You are writing a realistic ' + platformLabel + ' comment section under a video. This is for a "reading my own comments" reaction video format where the creator screenshots and reacts to real comment sections.\n\n'
+    var prompt = 'You are writing a realistic ' + platformLabel + ' comment section under a video. The creator will screenshot these and turn the best lines into a song / sing them in a reaction video. Comments still have to look like real comments, but the funny ones should be singable: short, specific, punch word last.\n\n'
       + 'HOW TO ACTUALLY BE FUNNY — these are craft rules, not suggestions. Most AI-written comments fail because they default to safe, predictable, cliché phrasing. Actively fight that:\n\n'
       + '1. SPECIFICITY BEATS GENERIC. Concrete, oddly-specific details are funny; vague abstractions are not. "a 2019 Honda Civic with one hubcap" lands. "an old car" dies. Reach for the weirdly precise noun, the exact brand, the specific number, the unexpected detail. Never write the generic version of anything.\n\n'
       + '2. PUNCH WORD GOES LAST. The funniest or most surprising word must be the FINAL word of the comment. If it lands mid-sentence and then the sentence keeps going, the joke dies on the extra words. Cut everything after the punch. "I bought a treadmill and now it is the most expensive clothes hanger I own" works because "hanger" lands last.\n\n'
@@ -1965,7 +2051,7 @@
       if (parsed.length === 0) throw new Error('Could not parse comments. Try again.');
       currentComments = parsed;
       renderComments();
-      document.getElementById('previewSection').style.display = 'block';
+      setPreviewVisible(true);
       document.getElementById('gemTextBox').style.display = 'none';
       document.getElementById('copiedToast').style.display = 'none';
     } catch(err) { showError('Error: ' + err.message); }
@@ -3482,7 +3568,7 @@
           currentMessages = JSON.parse(JSON.stringify(item.messages));
           renderPhone(); renderAnimatePhone();
         }
-        document.getElementById('previewSection').style.display = 'block';
+        setPreviewVisible(true);
         window.scrollTo({top:0,behavior:'smooth'});
       });
       el.querySelector('.saved-del').addEventListener('click', function(e) {
@@ -3551,7 +3637,9 @@
     document.getElementById('topic').parentElement.style.display = isPaste ? 'none' : 'block';
     document.getElementById('phoneFrame').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
-    document.getElementById('shortenBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
+    var showShorten = !(isComments || isSongFormats);
+    document.getElementById('shortenRow').style.display = showShorten ? '' : 'none';
+    document.getElementById('shortenHint').style.display = showShorten ? 'block' : 'none';
     document.getElementById('animateBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
     document.getElementById('generateBtn').style.display = (isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('generateSayItBtn').style.display = isSayIt ? 'block' : 'none';
@@ -3567,7 +3655,7 @@
     document.getElementById('memeOutputCard').style.display = 'none';
     document.getElementById('renderPasteBtn').style.display = isPaste ? 'block' : 'none';
     document.getElementById('sayItOutputCard').style.display = 'none';
-    document.getElementById('previewSection').style.display = 'none';
+    setPreviewVisible(false);
 
     if (isSongFormats) {
       var hint = document.getElementById('songFormatHint');
@@ -3686,17 +3774,23 @@
   // is why Group Size never appeared on the live site.
   updateContentTypeUI();
 
+  function wordCount(text) {
+    return String(text || '').trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  function looksTelegraph(text) {
+    var t = String(text || '').trim();
+    if (!t) return true;
+    var words = t.split(/\s+/);
+    if (words.length < 3) return false;
+    var glue = (t.match(/\b(and|also|to|the|a|an|for|of|i'd|i'll|i'm|im|with|from|that|this)\b/gi) || []).length;
+    return glue === 0 && words.length <= 8;
+  }
+
   function protectShortenedLine(original, shortened) {
     var orig = String(original || '').trim();
     var next = String(shortened || '').trim();
     if (!next) return orig;
-    var origWords = orig.split(/\s+/).filter(Boolean);
-    if (origWords.length <= 12) return orig;
-    var origTokens = orig.toLowerCase().match(/[a-z0-9']{4,}/g) || [];
-    if (!origTokens.length) return next;
-    var shortLow = next.toLowerCase();
-    var missing = origTokens.filter(function(w) { return shortLow.indexOf(w) === -1; });
-    if (missing.length / origTokens.length >= 0.3) return orig;
     return next;
   }
 
@@ -3706,30 +3800,29 @@
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var myName = document.getElementById('myName').value.trim() || 'Me';
+    var extraThem = [];
+    var gs = parseInt(document.getElementById('groupSize').value) || 2;
+    if (gs >= 3) extraThem.push(document.getElementById('person3Name').value.trim() || 'Chris');
+    if (gs >= 4) extraThem.push(document.getElementById('person4Name').value.trim() || 'Zoe');
     var originalText = currentMessages.map(function(m){ return (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t; }).join('\n');
     document.getElementById('shortenLoadingDiv').style.display = 'block';
     document.getElementById('shortenBtn').disabled = true;
     document.getElementById('compareWrap').classList.remove('visible');
     hideError();
 
-    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n'
-      + '- COUNT — ABSOLUTE: the original has EXACTLY ' + currentMessages.length + ' messages. Your output must have EXACTLY ' + currentMessages.length + ' messages. Not one fewer. Every single original message must appear as its own shortened message, in the same order, from the same speaker. Never delete, merge, skip or combine any message for any reason.\n'
-      + '- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n'
-      + '- DEPENDENCY PROTECTION: messages often refer back to something said earlier using words like "exactly", "that", "it", "her", "she", "him", "this". If a later message points back at an earlier one, the earlier message MUST survive and MUST keep whatever noun the later message is referring to. Deleting or over-trimming a message that a later line depends on turns the punchline into nonsense.\n'
-      + '- Same story, same punchlines, same energy.\n'
-      + '- LENGTH: trim filler only. 10-14 words is fine. If a line is already 12 words or fewer, copy it unchanged. Never amputate a line down to a word pile just to hit a count.\n'
-      + '- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n'
-      + '- KEEP THE TEXTING VOICE — CRITICAL: match the original\'s capitalisation and punctuation habits exactly. If the original messages are lowercase, your shortened versions stay lowercase. Do NOT capitalise the first letter of a message that was lowercase. Do NOT add full stops at the end of messages that did not have them. These are text messages between real people, not formal prose.\n'
-      + '- KEEP EMPHASIS CAPS: if the original used ALL CAPS on a word or phrase for emphasis (like AND, EXACTLY, NO WAY), keep those caps exactly as they were. That capitalisation is carrying the comedic emphasis.\n'
-      + '- MEANING: keep every specific noun, name, brand, place, and object from that original line. Do not swap a specific thing for a vaguer shorter word.\n'
-      + '- GRAMMAR: every line must still read like a text a person actually sent — a complete clause, not a headline. Keep connecting words (and, also, to, the, a, I\'d, I am) when they hold the sentence together.\n'
-      + '  Pattern to avoid: dropping those words so it becomes "went store milk told mom".\n'
-      + '  Pattern to use: "i went to the store for milk and told mom".\n'
-      + '  If you cannot shorten a line without that broken style, output the original line unchanged.\n'
+    var sp = 'Turn this text conversation into singable lyric lines for a song. Leave a line alone if it already works as one sung breath. Compress the lines that ramble so they can be sung in one breath without changing the meaning or breaking grammar.\n\n' + originalText + '\n\nRules:\n'
+      + '- COUNT — ABSOLUTE: EXACTLY ' + currentMessages.length + ' messages. Same order, same speakers. Never delete, merge, skip or combine messages.\n'
+      + '- Each shortened message must ONLY use information from that SPECIFIC original message.\n'
+      + '- SINGABLE: one breath, one idea, punch word last. A typical sung line lands around 8-15 words. That is a feel, not a hard cap — a 6-word punch can stay 6 words, a 16-word line can stay if cutting it kills the joke. A 25+ word paragraph must get cut.\n'
+      + '- Do not pad short follow-ups. Do not copy a rambling paragraph unchanged.\n'
+      + '- Cut filler (like, just, really, I think, repeating the same beat). Keep one complete clause with a subject and a verb.\n'
+      + '- Same joke, same specific nouns (names, brands, objects). Do not invent new facts. Do not swap a specific thing for a vaguer word.\n'
+      + '- GRAMMAR: it still has to read like a text, not a headline. "i went to the store for milk" is good. "went store milk" is bad. Keep the few connecting words the sentence needs, then stop.\n'
+      + '- KEEP THE TEXTING VOICE: same capitalisation and punctuation habits. Lowercase stays lowercase. Do not add full stops the original did not have. Keep ALL CAPS emphasis words.\n'
       + '- No merging messages. No adding or removing messages.\n'
       + '- ' + (person === 'mom' || person === 'dad'
       ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
-      : 'EMOJI RULE: preserve the emojis from the original messages where they still fit the shortened line — do not strip them out. If a shortened line no longer has room for the emoji contextually, it is fine to drop just that one, but do not remove emojis as a blanket rule.'
+      : 'EMOJI RULE: preserve emojis that still fit the shortened line. Do not strip them as a blanket rule.'
     ) + '\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
     try {
       var shortenModel = getModel();
@@ -3760,36 +3853,44 @@
 
       document.getElementById('shortenLoadingText').textContent = 'Trimming for lyrics...';
       var rawShortenText = await runShortenModel(sp, 2048);
-      var parsed = parseConversation(rawShortenText, myName, theirName);
+      var parsed = parseConversation(rawShortenText, myName, theirName, extraThem);
       if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
       if (parsed.length !== currentMessages.length) {
         throw new Error('Shortened version came back with ' + parsed.length + ' messages instead of ' + currentMessages.length + '. Nothing was changed — hit Shorten for Song again.');
       }
+
+      var firstPass = parsed.map(function(m) { return { f: m.f, t: m.t, speaker: m.speaker }; });
 
       document.getElementById('shortenLoadingText').textContent = 'Fixing grammar and meaning...';
       var pairLines = currentMessages.map(function(m, i) {
         return (i + 1) + '.\nORIGINAL: ' + lineSpeaker(m) + ': ' + m.t
           + '\nSHORTENED: ' + lineSpeaker(parsed[i]) + ': ' + parsed[i].t;
       }).join('\n\n');
-      var polishPrompt = 'You are correcting a shortened text conversation. Pass 1 already shortened each line. Pass 1 often drops connecting words and specific nouns, which changes meaning and breaks grammar. Fix that.\n\n'
+      var polishPrompt = 'You are repairing grammar on ALREADY-SHORTENED singable lyric lines. Do not un-shorten them. Do not paste ORIGINAL.\n\n'
         + 'There are EXACTLY ' + currentMessages.length + ' messages. Output EXACTLY ' + currentMessages.length + ' messages, same speakers, same order.\n\n'
         + pairLines + '\n\n'
-        + 'For each pair, rewrite SHORTENED so that:\n'
-        + '- It means the SAME thing as ORIGINAL. Keep every specific noun, name, brand, place, object, and the same joke from that original line. Do not invent new facts. Do not swap a specific thing for a vaguer shorter word.\n'
-        + '- It reads like a real text: a complete clause, not a headline. Restore connecting words (and, also, to, the, a, I\'d) if pass 1 deleted them and the sentence now sounds broken.\n'
-        + '- Stay shorter than ORIGINAL when ORIGINAL is long, but never by deleting grammar or specific details. If a line cannot be both short and correct, prefer the original wording.\n'
-        + '- Match the original\'s capitalisation, slang, and punctuation habits.\n'
-        + '- If a shortened line is already correct, copy it unchanged.\n\n'
+        + 'For each pair:\n'
+        + '- SHORTENED is the draft. Keep it singable: one breath, typically around 8-15 words if ORIGINAL was a ramble. Leave a short punch alone.\n'
+        + '- If SHORTENED dropped connecting words and now reads like a headline ("went store milk"), add back only the few words needed so it is a real text ("i went to the store for milk"). Then stop.\n'
+        + '- Keep the same meaning and specific nouns as ORIGINAL. Do not invent facts. Do not copy ORIGINAL just because it is safer.\n'
+        + '- Match the original\'s capitalisation, slang, and punctuation.\n'
+        + '- If SHORTENED is already a grammatical singable line, copy SHORTENED unchanged.\n\n'
         + 'Format: SPEAKER: message text\nOutput ONLY the conversation.';
       try {
         var polishedRaw = await runShortenModel(polishPrompt, 2048);
-        var polished = parseConversation(polishedRaw, myName, theirName);
+        var polished = parseConversation(polishedRaw, myName, theirName, extraThem);
         if (polished.length === currentMessages.length) parsed = polished;
       } catch (polishErr) {
         console.warn('Shorten grammar pass failed, using first pass', polishErr);
       }
 
       parsed.forEach(function(m, i) {
+        var origN = wordCount(currentMessages[i].t);
+        var firstN = wordCount(firstPass[i].t);
+        var polishN = wordCount(m.t);
+        if (origN > 18 && polishN >= origN * 0.8 && firstN < polishN && !looksTelegraph(firstPass[i].t)) {
+          m.t = firstPass[i].t;
+        }
         m.t = protectShortenedLine(currentMessages[i].t, m.t);
       });
 
@@ -3896,9 +3997,48 @@
       document.getElementById('contentType').value = 'comments';
       document.getElementById('contentType').dispatchEvent(new Event('change'));
       renderComments();
-      document.getElementById('previewSection').style.display = 'block';
+      setPreviewVisible(true);
       return currentComments;
     };
+    window.__ptgLayoutFixture = function() {
+      currentMessages = [
+        { f: 'them', t: 'uncle dave i need to tell u something but u cant tell mom', speaker: 'Nina' },
+        { f: 'them', t: 'so u know jordan', speaker: 'Nina' },
+        { f: 'me', t: 'WAS knowing jordan', speaker: 'Me' },
+        { f: 'me', t: 'past tense as of 4:37pm today', speaker: 'Me' },
+        { f: 'them', t: 'what happened', speaker: 'Nina' },
+        { f: 'them', t: 'he liked his ex\'s photo from 2019 so i threw his xbox off the balcony and now maintenance wants $340 for the pool umbrella it landed on and i have $12 and a CRUSHED SOUL', speaker: 'Nina' }
+      ];
+      document.getElementById('theirName').value = 'Nina';
+      document.getElementById('myName').value = 'uncle dave';
+      renderPhone();
+      setPreviewVisible(true);
+      void document.body.offsetHeight;
+      var btn = document.getElementById('shortenBtn');
+      btn.scrollIntoView({ block: 'nearest' });
+      void document.body.offsetHeight;
+      var r = btn.getBoundingClientRect();
+      return {
+        inViewport: r.top >= 0 && r.bottom <= window.innerHeight && r.width > 0,
+        top: Math.round(r.top),
+        bottom: Math.round(r.bottom),
+        viewport: window.innerHeight,
+        display: window.getComputedStyle(btn).display,
+        hasPreview: document.getElementById('appShell').classList.contains('has-preview')
+      };
+    };
+    if (new URLSearchParams(location.search).get('layout') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgLayoutFixture();
+        var ok = !!(r.inViewport && r.hasPreview);
+        var banner = document.createElement('div');
+        banner.id = 'layoutTestBanner';
+        banner.textContent = (ok ? 'LAYOUT PASS' : 'LAYOUT FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'LAYOUT PASS' : 'LAYOUT FAIL';
+      }, 0);
+    }
     window.__ptgExtractAnthropicText = extractAnthropicText;
     window.__ptgAnthropicEmptyMessage = anthropicEmptyMessage;
     window.__ptgApplyPreset = applyPresetFields;
@@ -3906,7 +4046,37 @@
     window.__ptgSunoPresets = sunoPresets;
     window.__ptgModelDropsSampling = modelDropsSampling;
     window.__ptgBuildAnthropicBody = buildAnthropicBody;
+    window.__ptgParseConversation = parseConversation;
+    window.__ptgSpeakerRole = speakerRole;
+    window.__ptgSidesFixture = function() {
+      document.getElementById('myName').value = 'Gil';
+      document.getElementById('theirName').value = 'Nina';
+      document.getElementById('person').value = 'niece';
+      var raw = 'Nina: uncle gil i need to tell u something insane but ur not allowed to be weird about it\n'
+        + 'Nina: so jake FINALLY texted back after 11 days and it was just hey\n'
+        + 'Uncle Gil: nina i have met this man once at your graduation. he stole a mozzarella stick off my plate.\n'
+        + 'Nina: THATS not the point rn gil this is about my HEALING\n'
+        + 'Uncle Gil: your healing costs $60 and requires me committing a felony against my bank account by 11:59. got it.';
+      currentMessages = parseConversation(raw, 'Gil', 'Nina');
+      renderPhone();
+      setPreviewVisible(true);
+      return currentMessages.map(function(m){ return m.f; });
+    };
+    if (new URLSearchParams(location.search).get('sides') === '1') {
+      setTimeout(function() {
+        var sides = window.__ptgSidesFixture();
+        var ok = sides.indexOf('me') !== -1 && sides.indexOf('them') !== -1;
+        var banner = document.createElement('div');
+        banner.id = 'sidesTestBanner';
+        banner.textContent = (ok ? 'SIDES PASS' : 'SIDES FAIL') + ' ' + sides.join(',');
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'SIDES PASS' : 'SIDES FAIL';
+      }, 0);
+    }
     window.__ptgProtectShortenedLine = protectShortenedLine;
+    window.__ptgWordCount = wordCount;
+    window.__ptgLooksTelegraph = looksTelegraph;
   }
 })();
 </script>
