@@ -1386,22 +1386,82 @@
     document.getElementById('errorBox').style.display = 'none';
   }
 
-  function parseConversation(text, myName, theirName) {
+  function normalizeSpeaker(name) {
+    return String(name || '').trim().replace(/:$/, '').toLowerCase();
+  }
+
+  function lastSpeakerToken(name) {
+    var parts = normalizeSpeaker(name).split(/\s+/).filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : '';
+  }
+
+  // Your-name box vs Their-name box decide green/right vs grey/left.
+  // "Uncle Gil" and "Gil" must count as the same person.
+  function speakerRole(speaker, myName, theirName, extraThem) {
+    var s = normalizeSpeaker(speaker);
+    var mine = normalizeSpeaker(myName) || 'me';
+    var them = normalizeSpeaker(theirName);
+    extraThem = extraThem || [];
+    if (!s) return 'them';
+    if (s === 'me' || s === 'i' || s === mine) return 'me';
+    if (them && s === them) return 'them';
+    var sLast = lastSpeakerToken(s);
+    var mineLast = lastSpeakerToken(mine);
+    var themLast = lastSpeakerToken(them);
+    var mineFuzzy = sLast && mineLast && sLast === mineLast && mineLast.length >= 2;
+    var themFuzzy = sLast && themLast && sLast === themLast && themLast.length >= 2;
+    if (mineFuzzy && !themFuzzy) return 'me';
+    if (themFuzzy && !mineFuzzy) return 'them';
+    for (var i = 0; i < extraThem.length; i++) {
+      var extra = normalizeSpeaker(extraThem[i]);
+      if (extra && (s === extra || (sLast && lastSpeakerToken(extra) === sLast && sLast.length >= 2))) return 'them';
+    }
+    var dummy = (s === 'speaker' || s === 'name');
+    if (extraThem.length) return 'them';
+    if (!dummy && them && s !== them) return 'me';
+    return 'them';
+  }
+
+  function splitSpeakerLine(line) {
+    var colonIdx = line.indexOf(':');
+    if (colonIdx < 0) return null;
+    var maybeSpeaker = line.substring(0, colonIdx).trim();
+    var looksLikeSpeaker = maybeSpeaker.length > 0
+      && maybeSpeaker.length <= 28
+      && maybeSpeaker.split(/\s+/).length <= 4
+      && !/[.!?,]$/.test(maybeSpeaker)
+      && !/^\d+$/.test(maybeSpeaker)
+      && !/^https?$/i.test(maybeSpeaker);
+    if (!looksLikeSpeaker) return null;
+    var text = line.substring(colonIdx + 1).trim();
+    if (!text) return null;
+    return { speaker: maybeSpeaker, text: text };
+  }
+
+  function parseConversation(text, myName, theirName, extraThem) {
+    myName = String(myName || 'Me').trim() || 'Me';
+    theirName = String(theirName || '').trim();
+    extraThem = extraThem || [];
     var lines = text.trim().split('\n').filter(function(l){ return l.trim(); });
     var msgs = [];
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i].trim();
       if (!line) continue;
-      var lower = line.toLowerCase();
-      if (lower.startsWith('me:') || lower.startsWith(myName.toLowerCase() + ':')) {
-        var prefixLen = lower.startsWith('me:') ? 3 : myName.length + 1;
-        msgs.push({ f: 'me', t: line.substring(prefixLen).trim() });
-      } else if (line.includes(':')) {
-        var parts = line.split(':');
-        var speakerName = parts[0].trim();
-        var content = parts.slice(1).join(':').trim();
-        msgs.push({ f: 'them', t: content, speaker: speakerName });
+      var tagged = splitSpeakerLine(line);
+      if (!tagged) {
+        if (msgs.length > 0) {
+          msgs.push({ f: msgs[msgs.length - 1].f, t: line, speaker: msgs[msgs.length - 1].speaker });
+        } else {
+          msgs.push({ f: 'them', t: line, speaker: theirName });
+        }
+        continue;
       }
+      var role = speakerRole(tagged.speaker, myName, theirName, extraThem);
+      msgs.push({
+        f: role,
+        t: tagged.text,
+        speaker: role === 'me' ? myName : tagged.speaker
+      });
     }
     return msgs;
   }
@@ -1858,7 +1918,10 @@
       + '- Vary message length — some short fragments, some longer.\n'
       + '- The conversation must have ONE memorable quotable moment.\n'
       + '- DOUBLE-TEXTING: real people often send 2-4 messages in a row with no reply in between, especially when heated, anxious, excited, or venting. Include this occasionally where the mood calls for it — do not force strict back-and-forth alternation every single line. CRITICAL: double-texted messages still count toward the total message count specified above — restructuring some replies as double-texts does NOT mean you add extra messages on top of that count. The total stays exactly what was specified, no matter how the messages are grouped.\n\n'
-      + 'FORMAT: ' + (groupSize >= 3 ? myName + ' is written as "' + myName + ':". Every other person is written using their EXACT name as given above, e.g. "' + otherNames[0] + ': message text".' : 'SPEAKER: message text only.') + ' No extra text before or after.\n'
+      + 'FORMAT: ' + (groupSize >= 3
+        ? myName + ' is written as "' + myName + ':". Every other person is written using their EXACT name as given above, e.g. "' + otherNames[0] + ': message text".'
+        : 'Each line MUST start with the exact name from the name boxes. "' + myName + ':" is the phone owner (right / green bubbles). "' + theirName + ':" is the other person (left / grey bubbles). Never write SPEAKER. Never invent a different label (no Uncle/Aunt prefix unless that exact text is in the box). Never put ' + myName + '\'s messages under ' + theirName + '.')
+      + ' No extra text before or after.\n'
       + (person === 'mom' || person === 'dad'
         ? '- EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — at least 1 emoji should appear somewhere in the conversation, but keep it simple and how an older person actually texts (❤️ 🙏 😊 👍), never stacked, never more than one per message.\n\n'
         : '- EMOJI RULE: emojis should be present throughout, multiple across the conversation (not just one), but every emoji must fit the specific line it is on — read the emotional context of that exact message and pick an emoji that actually matches it, not a random default. Do not force an emoji onto every single line, but do not go sparse either — most conversations should have several placed naturally across different messages.\n\n')
@@ -1894,7 +1957,7 @@
         rawText = await callAnthropicText(key, model, prompt, 4096, 1.0);
       }
 
-      var parsed = parseConversation(rawText, myName, theirName);
+      var parsed = parseConversation(rawText, myName, theirName, groupSize >= 3 ? otherNames.slice(1) : []);
       if (parsed.length === 0) throw new Error('Could not parse conversation. Try again.');
       currentMessages = parsed;
       renderPhone(); renderAnimatePhone();
@@ -3737,6 +3800,10 @@
     var person = document.getElementById('person').value;
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var myName = document.getElementById('myName').value.trim() || 'Me';
+    var extraThem = [];
+    var gs = parseInt(document.getElementById('groupSize').value) || 2;
+    if (gs >= 3) extraThem.push(document.getElementById('person3Name').value.trim() || 'Chris');
+    if (gs >= 4) extraThem.push(document.getElementById('person4Name').value.trim() || 'Zoe');
     var originalText = currentMessages.map(function(m){ return (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t; }).join('\n');
     document.getElementById('shortenLoadingDiv').style.display = 'block';
     document.getElementById('shortenBtn').disabled = true;
@@ -3786,7 +3853,7 @@
 
       document.getElementById('shortenLoadingText').textContent = 'Trimming for lyrics...';
       var rawShortenText = await runShortenModel(sp, 2048);
-      var parsed = parseConversation(rawShortenText, myName, theirName);
+      var parsed = parseConversation(rawShortenText, myName, theirName, extraThem);
       if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
       if (parsed.length !== currentMessages.length) {
         throw new Error('Shortened version came back with ' + parsed.length + ' messages instead of ' + currentMessages.length + '. Nothing was changed — hit Shorten for Song again.');
@@ -3811,7 +3878,7 @@
         + 'Format: SPEAKER: message text\nOutput ONLY the conversation.';
       try {
         var polishedRaw = await runShortenModel(polishPrompt, 2048);
-        var polished = parseConversation(polishedRaw, myName, theirName);
+        var polished = parseConversation(polishedRaw, myName, theirName, extraThem);
         if (polished.length === currentMessages.length) parsed = polished;
       } catch (polishErr) {
         console.warn('Shorten grammar pass failed, using first pass', polishErr);
@@ -3979,6 +4046,34 @@
     window.__ptgSunoPresets = sunoPresets;
     window.__ptgModelDropsSampling = modelDropsSampling;
     window.__ptgBuildAnthropicBody = buildAnthropicBody;
+    window.__ptgParseConversation = parseConversation;
+    window.__ptgSpeakerRole = speakerRole;
+    window.__ptgSidesFixture = function() {
+      document.getElementById('myName').value = 'Gil';
+      document.getElementById('theirName').value = 'Nina';
+      document.getElementById('person').value = 'niece';
+      var raw = 'Nina: uncle gil i need to tell u something insane but ur not allowed to be weird about it\n'
+        + 'Nina: so jake FINALLY texted back after 11 days and it was just hey\n'
+        + 'Uncle Gil: nina i have met this man once at your graduation. he stole a mozzarella stick off my plate.\n'
+        + 'Nina: THATS not the point rn gil this is about my HEALING\n'
+        + 'Uncle Gil: your healing costs $60 and requires me committing a felony against my bank account by 11:59. got it.';
+      currentMessages = parseConversation(raw, 'Gil', 'Nina');
+      renderPhone();
+      setPreviewVisible(true);
+      return currentMessages.map(function(m){ return m.f; });
+    };
+    if (new URLSearchParams(location.search).get('sides') === '1') {
+      setTimeout(function() {
+        var sides = window.__ptgSidesFixture();
+        var ok = sides.indexOf('me') !== -1 && sides.indexOf('them') !== -1;
+        var banner = document.createElement('div');
+        banner.id = 'sidesTestBanner';
+        banner.textContent = (ok ? 'SIDES PASS' : 'SIDES FAIL') + ' ' + sides.join(',');
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'SIDES PASS' : 'SIDES FAIL';
+      }, 0);
+    }
     window.__ptgProtectShortenedLine = protectShortenedLine;
     window.__ptgWordCount = wordCount;
     window.__ptgLooksTelegraph = looksTelegraph;
