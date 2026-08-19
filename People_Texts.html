@@ -3686,6 +3686,20 @@
   // is why Group Size never appeared on the live site.
   updateContentTypeUI();
 
+  function protectShortenedLine(original, shortened) {
+    var orig = String(original || '').trim();
+    var next = String(shortened || '').trim();
+    if (!next) return orig;
+    var origWords = orig.split(/\s+/).filter(Boolean);
+    if (origWords.length <= 12) return orig;
+    var origTokens = orig.toLowerCase().match(/[a-z0-9']{4,}/g) || [];
+    if (!origTokens.length) return next;
+    var shortLow = next.toLowerCase();
+    var missing = origTokens.filter(function(w) { return shortLow.indexOf(w) === -1; });
+    if (missing.length / origTokens.length >= 0.3) return orig;
+    return next;
+  }
+
   document.getElementById('shortenBtn').addEventListener('click', async function() {
     var key = getKey();
     if (!currentMessages.length) { showError('Generate a conversation first.'); return; }
@@ -3703,11 +3717,15 @@
       + '- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n'
       + '- DEPENDENCY PROTECTION: messages often refer back to something said earlier using words like "exactly", "that", "it", "her", "she", "him", "this". If a later message points back at an earlier one, the earlier message MUST survive and MUST keep whatever noun the later message is referring to. Deleting or over-trimming a message that a later line depends on turns the punchline into nonsense.\n'
       + '- Same story, same punchlines, same energy.\n'
-      + '- Aim for 8-10 words per message. Never cut the punchline or the key word that makes the joke land.\n'
+      + '- LENGTH: trim filler only. 10-14 words is fine. If a line is already 12 words or fewer, copy it unchanged. Never amputate a line down to a word pile just to hit a count.\n'
       + '- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n'
       + '- KEEP THE TEXTING VOICE — CRITICAL: match the original\'s capitalisation and punctuation habits exactly. If the original messages are lowercase, your shortened versions stay lowercase. Do NOT capitalise the first letter of a message that was lowercase. Do NOT add full stops at the end of messages that did not have them. These are text messages between real people, not formal prose.\n'
       + '- KEEP EMPHASIS CAPS: if the original used ALL CAPS on a word or phrase for emphasis (like AND, EXACTLY, NO WAY), keep those caps exactly as they were. That capitalisation is carrying the comedic emphasis.\n'
-      + '- GRAMMAR: keep every line a complete, singable clause. Never drop articles (a, an, the), prepositions or conjunctions if removing them breaks the sense — telegraph or headline-style compression is wrong here. IMPORTANT: this rule is ONLY about not dropping small connecting words. It does NOT mean formalising the writing. Casual texting grammar, slang, lowercase and missing full stops are all correct and must be preserved.\n'
+      + '- MEANING LOCK: keep every proper noun, brand, and specific object (High Life, Verizon, hard seltzer, inflatable pool, etc.). "hard seltzer" must stay "hard seltzer", never just "seltzer".\n'
+      + '- GRAMMAR LOCK — NO TELEGRAPH SPEAK. The line must still read like a text a person sent. Keep and / also / I\'d / to / the / a when they are holding the sentence together.\n'
+      + '  BAD: "i will fight god told mom seltzer"\n'
+      + '  GOOD: "i will fight god and i told mom i\'d switch to hard seltzer"\n'
+      + '  If you cannot shorten a line without that BAD style, output the original line unchanged.\n'
       + '- No merging messages. No adding or removing messages.\n'
       + '- ' + (person === 'mom' || person === 'dad'
       ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
@@ -3744,6 +3762,10 @@
       if (parsed.length !== currentMessages.length) {
         throw new Error('Shortened version came back with ' + parsed.length + ' messages instead of ' + currentMessages.length + '. Nothing was changed — hit Shorten for Song again.');
       }
+
+      parsed.forEach(function(m, i) {
+        m.t = protectShortenedLine(currentMessages[i].t, m.t);
+      });
 
       originalMessages = JSON.parse(JSON.stringify(currentMessages));
       var shortenedMessages = parsed;
@@ -3854,7 +3876,7 @@
     window.__ptgSunoPresets = sunoPresets;
     window.__ptgModelDropsSampling = modelDropsSampling;
     window.__ptgBuildAnthropicBody = buildAnthropicBody;
-    window.__ptgFriendlyAnthropicError = friendlyAnthropicError;
+    window.__ptgProtectShortenedLine = protectShortenedLine;
   }
 })();
 </script>
