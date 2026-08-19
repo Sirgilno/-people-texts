@@ -1179,25 +1179,58 @@
     return 'Claude returned an empty response. Try Generate again.';
   }
 
+  // Claude Sonnet 5 / Opus 4.7+ reject temperature, top_p, top_k (400).
+  // Browsers often hide that 400 behind TypeError: Failed to fetch.
+  function modelDropsSampling(model) {
+    var m = model || '';
+    return /sonnet-5|opus-4-([7-9]|\d{2,})|opus-5|sonnet-4-([7-9]|\d{2,})/i.test(m);
+  }
+
+  function buildAnthropicBody(model, prompt, tokens, temperature, opts) {
+    opts = opts || {};
+    var body = {
+      model: model,
+      max_tokens: tokens,
+      messages: [{ role: 'user', content: prompt }]
+    };
+    var dropSampling = opts.omitSampling || modelDropsSampling(model);
+    if (!dropSampling && temperature != null) body.temperature = temperature;
+    if (opts.thinkingOff) body.thinking = { type: 'disabled' };
+    return body;
+  }
+
+  function friendlyAnthropicError(err) {
+    var m = ((err && err.message) || '').toString();
+    var low = m.toLowerCase();
+    if (/failed to fetch|networkerror|load failed/i.test(m)) {
+      return 'Could not reach Claude (Failed to fetch). Check you are online, turn off ad blockers on this page, and try Generate again.';
+    }
+    if (/temperature|top_p|top_k/.test(low) && /deprecated|not accepted|invalid/i.test(low)) {
+      return 'This Claude model no longer accepts temperature. Try Generate again — the app now omits it.';
+    }
+    return m || 'Anthropic API error';
+  }
+
   async function callAnthropicText(key, model, prompt, maxTokens, temperature) {
-    async function once(tokens, withThinkingOff) {
-      var body = {
-        model: model,
-        max_tokens: tokens,
-        temperature: temperature == null ? 1 : temperature,
-        messages: [{ role: 'user', content: prompt }]
-      };
-      if (withThinkingOff) body.thinking = { type: 'disabled' };
-      var resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify(body)
-      });
+    async function once(tokens, opts) {
+      var body = buildAnthropicBody(model, prompt, tokens, temperature, opts);
+      var resp;
+      try {
+        resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': key,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify(body)
+        });
+      } catch (netErr) {
+        var wrapped = new Error(netErr && netErr.message ? netErr.message : 'Failed to fetch');
+        wrapped.network = true;
+        throw wrapped;
+      }
       var data = await resp.json().catch(function() { return {}; });
       if (!resp.ok) {
         var msg = data.error ? data.error.message : 'Anthropic API error';
@@ -1209,23 +1242,38 @@
       return data;
     }
 
-    var tokens = maxTokens || 4096;
-    var useThinkingOff = /sonnet-5|sonnet-4|opus-4|opus-5/i.test(model || '');
-    var data;
-    try {
-      data = await once(tokens, useThinkingOff);
-    } catch (err) {
+    function isRetryable(err) {
       var raw = ((err.payload && err.payload.error && err.payload.error.message) || err.message || '').toLowerCase();
-      if (useThinkingOff && /thinking|unexpected|unknown/.test(raw)) {
-        data = await once(tokens, false);
-      } else {
-        throw err;
+      return !!(err.network || /failed to fetch|temperature|deprecated|thinking|unexpected|unknown|top_p|top_k/.test(raw));
+    }
+
+    var tokens = maxTokens || 4096;
+    var attempts = [
+      { thinkingOff: false, omitSampling: modelDropsSampling(model) },
+      { thinkingOff: false, omitSampling: true }
+    ];
+    var lastErr = null;
+    var data = null;
+    for (var i = 0; i < attempts.length; i++) {
+      try {
+        data = await once(tokens, attempts[i]);
+        lastErr = null;
+        break;
+      } catch (err) {
+        lastErr = err;
+        if (!isRetryable(err) || i === attempts.length - 1) break;
       }
     }
+    if (!data) throw new Error(friendlyAnthropicError(lastErr));
+
     var info = extractAnthropicText(data);
     if (!info.text) {
-      data = await once(Math.max(tokens * 2, 8192), false);
-      info = extractAnthropicText(data);
+      try {
+        data = await once(Math.max(tokens * 2, 8192), { thinkingOff: false, omitSampling: true });
+        info = extractAnthropicText(data);
+      } catch (err) {
+        throw new Error(friendlyAnthropicError(err));
+      }
     }
     if (!info.text) throw new Error(anthropicEmptyMessage(info));
     return info.text;
@@ -3804,6 +3852,9 @@
     window.__ptgApplyPreset = applyPresetFields;
     window.__ptgGetMode = function() { return currentMode; };
     window.__ptgSunoPresets = sunoPresets;
+    window.__ptgModelDropsSampling = modelDropsSampling;
+    window.__ptgBuildAnthropicBody = buildAnthropicBody;
+    window.__ptgFriendlyAnthropicError = friendlyAnthropicError;
   }
 })();
 </script>
