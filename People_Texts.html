@@ -3686,17 +3686,23 @@
   // is why Group Size never appeared on the live site.
   updateContentTypeUI();
 
+  function wordCount(text) {
+    return String(text || '').trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  function looksTelegraph(text) {
+    var t = String(text || '').trim();
+    if (!t) return true;
+    var words = t.split(/\s+/);
+    if (words.length < 3) return false;
+    var glue = (t.match(/\b(and|also|to|the|a|an|for|of|i'd|i'll|i'm|im|with|from|that|this)\b/gi) || []).length;
+    return glue === 0 && words.length <= 8;
+  }
+
   function protectShortenedLine(original, shortened) {
     var orig = String(original || '').trim();
     var next = String(shortened || '').trim();
     if (!next) return orig;
-    var origWords = orig.split(/\s+/).filter(Boolean);
-    if (origWords.length <= 12) return orig;
-    var origTokens = orig.toLowerCase().match(/[a-z0-9']{4,}/g) || [];
-    if (!origTokens.length) return next;
-    var shortLow = next.toLowerCase();
-    var missing = origTokens.filter(function(w) { return shortLow.indexOf(w) === -1; });
-    if (missing.length / origTokens.length >= 0.3) return orig;
     return next;
   }
 
@@ -3712,24 +3718,20 @@
     document.getElementById('compareWrap').classList.remove('visible');
     hideError();
 
-    var sp = 'Shorten this text conversation so each message works as a short song lyric line.\n\n' + originalText + '\n\nRules:\n'
-      + '- COUNT — ABSOLUTE: the original has EXACTLY ' + currentMessages.length + ' messages. Your output must have EXACTLY ' + currentMessages.length + ' messages. Not one fewer. Every single original message must appear as its own shortened message, in the same order, from the same speaker. Never delete, merge, skip or combine any message for any reason.\n'
-      + '- Each shortened message must ONLY contain information that was in that SPECIFIC original message. Never move a detail from a later message into an earlier one.\n'
-      + '- DEPENDENCY PROTECTION: messages often refer back to something said earlier using words like "exactly", "that", "it", "her", "she", "him", "this". If a later message points back at an earlier one, the earlier message MUST survive and MUST keep whatever noun the later message is referring to. Deleting or over-trimming a message that a later line depends on turns the punchline into nonsense.\n'
-      + '- Same story, same punchlines, same energy.\n'
-      + '- LENGTH: trim filler only. 10-14 words is fine. If a line is already 12 words or fewer, copy it unchanged. Never amputate a line down to a word pile just to hit a count.\n'
-      + '- PUNCHLINE PROTECTION: The last word or phrase of a funny or dramatic line is sacred. Shorten the setup, never the payoff.\n'
-      + '- KEEP THE TEXTING VOICE — CRITICAL: match the original\'s capitalisation and punctuation habits exactly. If the original messages are lowercase, your shortened versions stay lowercase. Do NOT capitalise the first letter of a message that was lowercase. Do NOT add full stops at the end of messages that did not have them. These are text messages between real people, not formal prose.\n'
-      + '- KEEP EMPHASIS CAPS: if the original used ALL CAPS on a word or phrase for emphasis (like AND, EXACTLY, NO WAY), keep those caps exactly as they were. That capitalisation is carrying the comedic emphasis.\n'
-      + '- MEANING: keep every specific noun, name, brand, place, and object from that original line. Do not swap a specific thing for a vaguer shorter word.\n'
-      + '- GRAMMAR: every line must still read like a text a person actually sent — a complete clause, not a headline. Keep connecting words (and, also, to, the, a, I\'d, I am) when they hold the sentence together.\n'
-      + '  Pattern to avoid: dropping those words so it becomes "went store milk told mom".\n'
-      + '  Pattern to use: "i went to the store for milk and told mom".\n'
-      + '  If you cannot shorten a line without that broken style, output the original line unchanged.\n'
+    var sp = 'Shorten this text conversation so each message is a singable lyric line. It MUST get shorter. Copying the original is a failure except on lines that are already 8 words or fewer.\n\n' + originalText + '\n\nRules:\n'
+      + '- COUNT — ABSOLUTE: the original has EXACTLY ' + currentMessages.length + ' messages. Your output must have EXACTLY ' + currentMessages.length + ' messages. Same order, same speakers. Never delete, merge, skip or combine messages.\n'
+      + '- Each shortened message must ONLY use information from that SPECIFIC original message.\n'
+      + '- LENGTH TARGET: 8-12 words on any original line that is longer than 8 words. Count the words. If you output 20+ words on a long original, you failed.\n'
+      + '- Cut filler (like, just, really, I think, I cannot → I can\'t, "as me", restating the same beat). Keep one complete clause with a subject and a verb.\n'
+      + '- Same joke, same specific nouns (names, brands, objects). Do not invent new facts. Do not swap a specific thing for a vaguer word.\n'
+      + '- GRAMMAR: it still has to read like a text, not a headline. "i went to the store for milk" is good. "went store milk" is bad. Keep the few connecting words the sentence needs, then stop.\n'
+      + '- PUNCHLINE: last funny/dramatic word stays last. Shorten the setup.\n'
+      + '- KEEP THE TEXTING VOICE: same capitalisation and punctuation habits. Lowercase stays lowercase. Do not add full stops the original did not have. Keep ALL CAPS emphasis words.\n'
+      + '- If a line is already 8 words or fewer, copy it unchanged. Otherwise you MUST shorten it.\n'
       + '- No merging messages. No adding or removing messages.\n'
       + '- ' + (person === 'mom' || person === 'dad'
       ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
-      : 'EMOJI RULE: preserve the emojis from the original messages where they still fit the shortened line — do not strip them out. If a shortened line no longer has room for the emoji contextually, it is fine to drop just that one, but do not remove emojis as a blanket rule.'
+      : 'EMOJI RULE: preserve emojis that still fit the shortened line. Do not strip them as a blanket rule.'
     ) + '\n- Format: SPEAKER: message text\n- Output ONLY the conversation.';
     try {
       var shortenModel = getModel();
@@ -3766,20 +3768,22 @@
         throw new Error('Shortened version came back with ' + parsed.length + ' messages instead of ' + currentMessages.length + '. Nothing was changed — hit Shorten for Song again.');
       }
 
+      var firstPass = parsed.map(function(m) { return { f: m.f, t: m.t, speaker: m.speaker }; });
+
       document.getElementById('shortenLoadingText').textContent = 'Fixing grammar and meaning...';
       var pairLines = currentMessages.map(function(m, i) {
         return (i + 1) + '.\nORIGINAL: ' + lineSpeaker(m) + ': ' + m.t
           + '\nSHORTENED: ' + lineSpeaker(parsed[i]) + ': ' + parsed[i].t;
       }).join('\n\n');
-      var polishPrompt = 'You are correcting a shortened text conversation. Pass 1 already shortened each line. Pass 1 often drops connecting words and specific nouns, which changes meaning and breaks grammar. Fix that.\n\n'
+      var polishPrompt = 'You are repairing grammar on ALREADY-SHORTENED lyric lines. Do not un-shorten them. Do not paste ORIGINAL.\n\n'
         + 'There are EXACTLY ' + currentMessages.length + ' messages. Output EXACTLY ' + currentMessages.length + ' messages, same speakers, same order.\n\n'
         + pairLines + '\n\n'
-        + 'For each pair, rewrite SHORTENED so that:\n'
-        + '- It means the SAME thing as ORIGINAL. Keep every specific noun, name, brand, place, object, and the same joke from that original line. Do not invent new facts. Do not swap a specific thing for a vaguer shorter word.\n'
-        + '- It reads like a real text: a complete clause, not a headline. Restore connecting words (and, also, to, the, a, I\'d) if pass 1 deleted them and the sentence now sounds broken.\n'
-        + '- Stay shorter than ORIGINAL when ORIGINAL is long, but never by deleting grammar or specific details. If a line cannot be both short and correct, prefer the original wording.\n'
-        + '- Match the original\'s capitalisation, slang, and punctuation habits.\n'
-        + '- If a shortened line is already correct, copy it unchanged.\n\n'
+        + 'For each pair:\n'
+        + '- SHORTENED is the draft. Keep it SHORT: 8-12 words if ORIGINAL was longer than 8 words.\n'
+        + '- If SHORTENED dropped connecting words and now reads like a headline ("went store milk"), add back only the few words needed so it is a real text ("i went to the store for milk"). Then stop.\n'
+        + '- Keep the same meaning and specific nouns as ORIGINAL. Do not invent facts. Do not copy ORIGINAL just because it is safer.\n'
+        + '- Match the original\'s capitalisation, slang, and punctuation.\n'
+        + '- If SHORTENED is already a grammatical 8-12 word line, copy SHORTENED unchanged.\n\n'
         + 'Format: SPEAKER: message text\nOutput ONLY the conversation.';
       try {
         var polishedRaw = await runShortenModel(polishPrompt, 2048);
@@ -3790,6 +3794,12 @@
       }
 
       parsed.forEach(function(m, i) {
+        var origN = wordCount(currentMessages[i].t);
+        var firstN = wordCount(firstPass[i].t);
+        var polishN = wordCount(m.t);
+        if (origN > 8 && polishN >= origN * 0.8 && firstN < polishN && !looksTelegraph(firstPass[i].t)) {
+          m.t = firstPass[i].t;
+        }
         m.t = protectShortenedLine(currentMessages[i].t, m.t);
       });
 
@@ -3907,6 +3917,8 @@
     window.__ptgModelDropsSampling = modelDropsSampling;
     window.__ptgBuildAnthropicBody = buildAnthropicBody;
     window.__ptgProtectShortenedLine = protectShortenedLine;
+    window.__ptgWordCount = wordCount;
+    window.__ptgLooksTelegraph = looksTelegraph;
   }
 })();
 </script>
