@@ -1203,10 +1203,10 @@
     var m = ((err && err.message) || '').toString();
     var low = m.toLowerCase();
     if (/failed to fetch|networkerror|load failed/i.test(m)) {
-      return 'Could not reach Claude (Failed to fetch). Check you are online, turn off ad blockers on this page, and try Generate again.';
+      return 'Could not reach Claude (Failed to fetch). Check you are online, turn off ad blockers on this page, and try again.';
     }
     if (/temperature|top_p|top_k/.test(low) && /deprecated|not accepted|invalid/i.test(low)) {
-      return 'This Claude model no longer accepts temperature. Try Generate again — the app now omits it.';
+      return 'This Claude model no longer accepts temperature. Try again — the app now omits it.';
     }
     return m || 'Anthropic API error';
   }
