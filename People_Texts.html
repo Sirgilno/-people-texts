@@ -50,9 +50,11 @@
   .key-row { display: flex; gap: 8px; margin-bottom: 8px; }
   .key-row input { flex: 1; }
   .key-save-btn { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .preview-section { display: none; margin-top: 20px; }
+  .preview-section { display: none; margin-top: 20px; flex-direction: column; }
+  .preview-toolbar { margin-bottom: 12px; }
+  .preview-toolbar .action-btns { margin-bottom: 8px; }
   .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
-  .phone { width: 448px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
+  .phone { width: 100%; max-width: 448px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
   .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .phone > * { position: relative; z-index: 1; }
   .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
@@ -177,9 +179,13 @@
     .app-shell.has-preview { max-width: 1180px; display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
     .app-shell.has-preview > #previewSection {
       grid-column: 2; grid-row: 1 / span 99; position: sticky; top: 20px; align-self: start; margin-top: 0;
-      max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain; padding-right: 4px;
+      max-height: calc(100vh - 40px); min-height: 0; overflow: hidden;
+      display: flex; flex-direction: column;
     }
     .app-shell.has-preview > *:not(#previewSection) { grid-column: 1; min-width: 0; }
+    .app-shell.has-preview .preview-toolbar { flex: 0 1 auto; min-height: 0; max-height: 46vh; overflow-y: auto; }
+    .app-shell.has-preview .phone-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; margin-bottom: 12px; }
+    .app-shell.has-preview .preview-more { flex: 0 0 auto; }
   }
 
   /* ── Searchable preset picker ── */
@@ -607,6 +613,31 @@
 </div>
 
 <div class="preview-section" id="previewSection">
+  <div class="preview-toolbar">
+    <div class="action-btns">
+      <button class="action-btn" id="regenBtn">Regenerate 🔄</button>
+      <button class="action-btn primary" id="downloadBtn">Download PNG 📸</button>
+    </div>
+    <div class="action-btns" id="shortenRow">
+      <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
+    </div>
+    <p class="edit-hint" id="shortenHint" style="display:block;margin-top:0;margin-bottom:8px;">Turns rambling lines into singable lyrics. Leaves short punches alone.</p>
+    <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span><span id="shortenLoadingText">Trimming for lyrics...</span></div>
+    <div class="shorten-badge" id="shortenBadge">✓ Shortened for song lyrics</div>
+    <div class="compare-wrap" id="compareWrap">
+      <div class="compare-col">
+        <div class="compare-col-title">📝 Original</div>
+        <div id="compareOriginal"></div>
+        <button class="compare-pick" id="pickOriginal">Use Original</button>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title">✂️ Shortened</div>
+        <div id="compareShortened"></div>
+        <button class="compare-pick" id="pickShortened">Use Shortened</button>
+      </div>
+    </div>
+  </div>
+
   <div class="phone-wrap">
     <div class="phone" id="phoneFrame">
       <div class="phone-wallpaper" id="phoneWallpaper"></div>
@@ -654,40 +685,20 @@
     </div>
   </div>
 
-  <div class="action-btns">
-    <button class="action-btn" id="regenBtn">Regenerate 🔄</button>
-    <button class="action-btn primary" id="downloadBtn">Download PNG 📸</button>
-  </div>
-  <div class="action-btns">
-    <button class="action-btn full accent" id="animateBtn">▶️ Animate for TikTok</button>
-  </div>
-  <div class="action-btns">
-    <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
-  </div>
-  <p class="edit-hint" id="editHint">✏️ Tap any message or comment to edit it directly</p>
-  <div class="action-btns">
-    <button class="action-btn full" id="shortenBtn">✂️ Shorten for Song</button>
-  </div>
-  <p class="edit-hint" style="display:block;margin-top:6px;">Turns rambling lines into singable lyrics. Leaves short punches alone.</p>
-  <div class="loading-div" id="shortenLoadingDiv"><span class="spinner"></span><span id="shortenLoadingText">Trimming for lyrics...</span></div>
-  <div class="shorten-badge" id="shortenBadge">✓ Shortened for song lyrics</div>
-  <div class="compare-wrap" id="compareWrap">
-    <div class="compare-col">
-      <div class="compare-col-title">📝 Original</div>
-      <div id="compareOriginal"></div>
-      <button class="compare-pick" id="pickOriginal">Use Original</button>
+  <div class="preview-more">
+    <div class="action-btns">
+      <button class="action-btn full accent" id="animateBtn">▶️ Animate for TikTok</button>
     </div>
-    <div class="compare-col">
-      <div class="compare-col-title">✂️ Shortened</div>
-      <div id="compareShortened"></div>
-      <button class="compare-pick" id="pickShortened">Use Shortened</button>
+    <div class="action-btns">
+      <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
     </div>
+    <p class="edit-hint" id="editHint">✏️ Tap any message or comment to edit it directly</p>
+    <div class="action-btns" id="copyBtnRow">
+      <button class="action-btn full" id="copyBtn">Copy text for Gem 📋</button>
+    </div>
+    <div class="gem-text-box" id="gemTextBox"></div>
+    <div class="copied-toast" id="copiedToast">✓ Copied to clipboard!</div>
   </div>
-  <div class="action-btns" id="copyBtnRow">
-    <button class="action-btn full" id="copyBtn">Copy text for Gem 📋</button>
-  </div>
-  <div class="gem-text-box" id="gemTextBox"></div>
-  <div class="copied-toast" id="copiedToast">✓ Copied to clipboard!</div>
 </div>
 
 <div class="card saved-convos" id="savedConvosCard">
@@ -739,6 +750,13 @@
   var currentWallpaper = 'none';
   var isAnimating = false;
   var originalMessages = [];
+
+  function setPreviewVisible(on) {
+    var el = document.getElementById('previewSection');
+    var shell = document.getElementById('appShell');
+    if (el) el.style.display = on ? 'flex' : 'none';
+    if (shell) shell.classList.toggle('has-preview', !!on);
+  }
 
   // ── MOOD SLIDER ──────────────────────────────────────────────
   var moodLabels = [
@@ -1438,7 +1456,7 @@
     currentMessages = msgs;
     renderPhone();
     renderAnimatePhone();
-    document.getElementById('previewSection').style.display = 'block';
+    setPreviewVisible(true);
     document.getElementById('gemTextBox').style.display = 'none';
     document.getElementById('compareWrap').classList.remove('visible');
   }
@@ -1880,7 +1898,7 @@
       if (parsed.length === 0) throw new Error('Could not parse conversation. Try again.');
       currentMessages = parsed;
       renderPhone(); renderAnimatePhone();
-      document.getElementById('previewSection').style.display = 'block';
+      setPreviewVisible(true);
       document.getElementById('gemTextBox').style.display = 'none';
       document.getElementById('copiedToast').style.display = 'none';
       document.getElementById('shortenBadge').style.display = 'none';
@@ -1970,7 +1988,7 @@
       if (parsed.length === 0) throw new Error('Could not parse comments. Try again.');
       currentComments = parsed;
       renderComments();
-      document.getElementById('previewSection').style.display = 'block';
+      setPreviewVisible(true);
       document.getElementById('gemTextBox').style.display = 'none';
       document.getElementById('copiedToast').style.display = 'none';
     } catch(err) { showError('Error: ' + err.message); }
@@ -3487,7 +3505,7 @@
           currentMessages = JSON.parse(JSON.stringify(item.messages));
           renderPhone(); renderAnimatePhone();
         }
-        document.getElementById('previewSection').style.display = 'block';
+        setPreviewVisible(true);
         window.scrollTo({top:0,behavior:'smooth'});
       });
       el.querySelector('.saved-del').addEventListener('click', function(e) {
@@ -3556,7 +3574,9 @@
     document.getElementById('topic').parentElement.style.display = isPaste ? 'none' : 'block';
     document.getElementById('phoneFrame').style.display = (isComments || isSongFormats) ? 'none' : 'block';
     document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
-    document.getElementById('shortenBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
+    var showShorten = !(isComments || isSongFormats);
+    document.getElementById('shortenRow').style.display = showShorten ? '' : 'none';
+    document.getElementById('shortenHint').style.display = showShorten ? 'block' : 'none';
     document.getElementById('animateBtn').style.display = (isComments || isSongFormats) ? 'none' : '';
     document.getElementById('generateBtn').style.display = (isSongFormats || isPaste) ? 'none' : 'block';
     document.getElementById('generateSayItBtn').style.display = isSayIt ? 'block' : 'none';
@@ -3572,7 +3592,7 @@
     document.getElementById('memeOutputCard').style.display = 'none';
     document.getElementById('renderPasteBtn').style.display = isPaste ? 'block' : 'none';
     document.getElementById('sayItOutputCard').style.display = 'none';
-    document.getElementById('previewSection').style.display = 'none';
+    setPreviewVisible(false);
 
     if (isSongFormats) {
       var hint = document.getElementById('songFormatHint');
@@ -3910,9 +3930,48 @@
       document.getElementById('contentType').value = 'comments';
       document.getElementById('contentType').dispatchEvent(new Event('change'));
       renderComments();
-      document.getElementById('previewSection').style.display = 'block';
+      setPreviewVisible(true);
       return currentComments;
     };
+    window.__ptgLayoutFixture = function() {
+      currentMessages = [
+        { f: 'them', t: 'uncle dave i need to tell u something but u cant tell mom', speaker: 'Nina' },
+        { f: 'them', t: 'so u know jordan', speaker: 'Nina' },
+        { f: 'me', t: 'WAS knowing jordan', speaker: 'Me' },
+        { f: 'me', t: 'past tense as of 4:37pm today', speaker: 'Me' },
+        { f: 'them', t: 'what happened', speaker: 'Nina' },
+        { f: 'them', t: 'he liked his ex\'s photo from 2019 so i threw his xbox off the balcony and now maintenance wants $340 for the pool umbrella it landed on and i have $12 and a CRUSHED SOUL', speaker: 'Nina' }
+      ];
+      document.getElementById('theirName').value = 'Nina';
+      document.getElementById('myName').value = 'uncle dave';
+      renderPhone();
+      setPreviewVisible(true);
+      void document.body.offsetHeight;
+      var btn = document.getElementById('shortenBtn');
+      btn.scrollIntoView({ block: 'nearest' });
+      void document.body.offsetHeight;
+      var r = btn.getBoundingClientRect();
+      return {
+        inViewport: r.top >= 0 && r.bottom <= window.innerHeight && r.width > 0,
+        top: Math.round(r.top),
+        bottom: Math.round(r.bottom),
+        viewport: window.innerHeight,
+        display: window.getComputedStyle(btn).display,
+        hasPreview: document.getElementById('appShell').classList.contains('has-preview')
+      };
+    };
+    if (new URLSearchParams(location.search).get('layout') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgLayoutFixture();
+        var ok = !!(r.inViewport && r.hasPreview);
+        var banner = document.createElement('div');
+        banner.id = 'layoutTestBanner';
+        banner.textContent = (ok ? 'LAYOUT PASS' : 'LAYOUT FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'LAYOUT PASS' : 'LAYOUT FAIL';
+      }, 0);
+    }
     window.__ptgExtractAnthropicText = extractAnthropicText;
     window.__ptgAnthropicEmptyMessage = anthropicEmptyMessage;
     window.__ptgApplyPreset = applyPresetFields;
