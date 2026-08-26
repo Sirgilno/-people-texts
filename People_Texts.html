@@ -2867,6 +2867,7 @@
       'gradient3': 'linear-gradient(135deg, #2d132c, #801336)',
       'gradient4': 'linear-gradient(135deg, #1e3a5f, #2e5a7e)',
       'gradient5': 'linear-gradient(135deg, #3d1a1a, #6b2d2d)',
+      'solidWhite': '#ffffff',
       'solid1': '#1a1a1a',
       'solid2': '#16213e',
       'solid3': '#2d132c',
@@ -2898,6 +2899,7 @@
         { id: 'none', label: 'None' }
       ]},
       { label: 'Solid & Simple Gradients', options: [
+        { id: 'solidWhite', label: 'White' },
         { id: 'gradient1', label: 'Deep Blue' },
         { id: 'gradient2', label: 'Purple' },
         { id: 'gradient3', label: 'Wine' },
@@ -2934,7 +2936,7 @@
     });
     select.addEventListener('change', function() {
       currentWallpaper = select.value;
-      if (currentMessages.length > 0) { applyWallpaper(); }
+      applyWallpaper();
     });
     document.getElementById('wallpaperOpacity').addEventListener('input', function() {
       if (currentMessages.length > 0) applyWallpaper();
@@ -4260,6 +4262,8 @@
       setTimeout(function() {
         var kind = new URLSearchParams(location.search).get('waquote') === 'group' ? 'group' : 'dm';
         var r = window.__ptgWaQuoteFixture(kind);
+        var wall = new URLSearchParams(location.search).get('wallpaper');
+        if (wall && window.__ptgSetWallpaper) window.__ptgSetWallpaper(wall);
         if (new URLSearchParams(location.search).get('quiet')) return;
         var ok = kind === 'group'
           ? (r.quoteCount >= 3 && r.avatars >= 2 && r.groupHeads.length >= 2 && r.quotes.some(function(q){ return q.name.indexOf('~') === 0; }))
@@ -4272,6 +4276,17 @@
         document.title = ok ? 'WAQUOTE PASS' : 'WAQUOTE FAIL';
       }, 0);
     }
+    window.__ptgSetWallpaper = function(id) {
+      currentWallpaper = id;
+      var sel = document.getElementById('wallpaperSelect');
+      if (sel) sel.value = id;
+      applyWallpaper();
+      return {
+        selected: sel ? sel.value : null,
+        labels: Array.prototype.map.call(sel ? sel.options : [], function(o){ return o.textContent; }),
+        phoneBg: document.getElementById('phoneFrame').style.background
+      };
+    };
     window.__ptgProtectShortenedLine = protectShortenedLine;
     window.__ptgWordCount = wordCount;
     window.__ptgLooksTelegraph = looksTelegraph;
