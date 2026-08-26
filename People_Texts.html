@@ -1419,7 +1419,7 @@
     var preview = quotedMsg.t.length > 56 ? quotedMsg.t.substring(0, 56) + '\u2026' : quotedMsg.t;
     var wrap = document.createElement('div');
     wrap.className = 'p-wa-quote';
-    wrap.style.background = isMe ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.06)';
+    wrap.style.background = isMe ? '#014d40' : '#1a252c';
     var bar = document.createElement('div');
     bar.className = 'p-wa-quote-bar';
     bar.style.background = color;
@@ -4205,14 +4205,17 @@
         document.getElementById('person4Name').value = 'Bibian';
         currentMessages = [
           { f: 'them', t: 'I already have a video', speaker: 'Joshua' },
+          { f: 'them', t: 'the one from yesterday', speaker: 'Joshua' },
           { f: 'them', t: 'just send me the video', speaker: 'Chola' },
           { f: 'them', t: 'The one I sent you', speaker: 'Joshua' },
           { f: 'them', t: 'You sent it to me?', speaker: 'Chola' },
           { f: 'them', t: 'Yes', speaker: 'Joshua' },
           { f: 'them', t: 'When?', speaker: 'Chola' },
-          { f: 'them', t: 'Yesterday I think', speaker: 'Joshua' }
+          { f: 'them', t: 'Yesterday I think', speaker: 'Joshua' },
+          { f: 'me', t: 'just drop it in the group', speaker: 'Gil' },
+          { f: 'them', t: 'ok wait', speaker: 'Chola' }
         ];
-        replies = new Set([1, 3, 4, 5, 6]);
+        replies = new Set([2, 3, 4, 6, 9]);
       } else {
         document.getElementById('groupSize').value = '2';
         document.getElementById('groupSize').dispatchEvent(new Event('change'));
@@ -4225,7 +4228,7 @@
           { f: 'me', t: 'To town later', speaker: 'Gil' },
           { f: 'them', t: 'Ah okay let me see', speaker: 'Bibian' }
         ];
-        replies = new Set([1, 3, 5]);
+        replies = new Set([1, 2, 3, 5]);
       }
       window.__ptgForcedReplyIndices = replies;
       renderPhone();
@@ -4257,6 +4260,7 @@
       setTimeout(function() {
         var kind = new URLSearchParams(location.search).get('waquote') === 'group' ? 'group' : 'dm';
         var r = window.__ptgWaQuoteFixture(kind);
+        if (new URLSearchParams(location.search).get('quiet')) return;
         var ok = kind === 'group'
           ? (r.quoteCount >= 3 && r.avatars >= 2 && r.groupHeads.length >= 2 && r.quotes.some(function(q){ return q.name.indexOf('~') === 0; }))
           : (r.quoteCount >= 2 && r.quotes.some(function(q){ return q.name === 'You'; }) && r.quotes.some(function(q){ return q.name === 'Bibian'; }));
