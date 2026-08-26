@@ -4263,7 +4263,28 @@
         var kind = new URLSearchParams(location.search).get('waquote') === 'group' ? 'group' : 'dm';
         var r = window.__ptgWaQuoteFixture(kind);
         var wall = new URLSearchParams(location.search).get('wallpaper');
-        if (wall && window.__ptgSetWallpaper) window.__ptgSetWallpaper(wall);
+        if (wall && window.__ptgSetWallpaper) {
+          var winfo = window.__ptgSetWallpaper(wall);
+          var sel = document.getElementById('wallpaperSelect');
+          var inSolid = false;
+          if (sel) Array.prototype.forEach.call(sel.querySelectorAll('optgroup'), function(g) {
+            if (g.label.indexOf('Solid') !== -1) {
+              Array.prototype.forEach.call(g.querySelectorAll('option'), function(o) {
+                if (o.value === 'solidWhite' && o.textContent === 'White') inSolid = true;
+              });
+            }
+          });
+          var bg = (document.getElementById('phoneFrame') && document.getElementById('phoneFrame').style.background) || '';
+          var wallOk = !!(winfo && winfo.selected === 'solidWhite' && inSolid && /#fff|#ffffff|rgb\(\s*255,\s*255,\s*255\s*\)/i.test(bg));
+          if (!new URLSearchParams(location.search).get('quiet')) {
+            var wb = document.createElement('div');
+            wb.id = 'whiteWallBanner';
+            wb.textContent = (wallOk ? 'WHITE WALL PASS' : 'WHITE WALL FAIL') + ' selected=' + (sel && sel.value) + ' bg=' + bg;
+            wb.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#111;background:' + (wallOk ? '#bbf7d0' : '#fecaca');
+            document.body.appendChild(wb);
+          }
+          document.title = wallOk ? 'WHITE WALL PASS' : 'WHITE WALL FAIL';
+        }
         if (new URLSearchParams(location.search).get('quiet')) return;
         var ok = kind === 'group'
           ? (r.quoteCount >= 3 && r.avatars >= 2 && r.groupHeads.length >= 2 && r.quotes.some(function(q){ return q.name.indexOf('~') === 0; }))
