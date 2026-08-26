@@ -89,6 +89,19 @@
   .p-gm-read { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
   .p-date-chip { align-self: center; font-size: 11px; padding: 4px 10px; border-radius: 8px; margin: 8px auto; opacity: 1; }
   .p-reply-quote { font-size: 10px; padding: 4px 8px; border-left: 2px solid; border-radius: 4px; margin-bottom: 3px; max-width: 75%; opacity: 0.7; line-height: 1.3; }
+  .p-wa-quote { display: flex; flex: 1 1 100%; width: 100%; border-radius: 8px; overflow: hidden; margin: 0 0 5px; min-width: 0; }
+  .p-wa-quote-bar { width: 4px; flex-shrink: 0; }
+  .p-wa-quote-body { flex: 1; min-width: 0; padding: 5px 8px 5px 7px; }
+  .p-wa-quote-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .p-wa-quote-name { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
+  .p-wa-quote-num { font-size: 11px; color: #8696a0; flex-shrink: 0; }
+  .p-wa-quote-text { font-size: 12px; line-height: 1.3; opacity: 0.78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .p-wa-group-av { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; margin: 0 0 1px; }
+  .p-wa-group-av-spacer { visibility: hidden; background: transparent !important; }
+  .p-wa-in-wrap { display: flex; flex-direction: row; align-items: flex-end; max-width: 92%; gap: 5px; min-width: 0; }
+  .p-wa-group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex: 1 1 100%; width: 100%; margin-bottom: 2px; }
+  .p-wa-group-name { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
+  .p-wa-group-num { font-size: 11px; color: #8696a0; flex-shrink: 0; }
   .p-typing { display: none; align-items: flex-start; margin: 2px 0; }
   .p-typing-bubble { background: #e5e5ea; border-radius: 18px 18px 18px 4px; padding: 10px 14px; display: flex; gap: 3px; align-items: center; }
   .p-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; animation: typingBounce 1.2s infinite; }
@@ -1366,11 +1379,73 @@
     return timestamps;
   }
 
-  function pickReplyIndices(count) {
+  function pickReplyIndices(messages) {
     var set = new Set();
-    if (count > 3) set.add(Math.floor(count * 0.4));
-    if (count > 5) set.add(Math.floor(count * 0.7));
+    if (!messages || !messages.length) return set;
+    var candidates = [];
+    for (var i = 1; i < messages.length; i++) {
+      if (findQuotedMessage(messages, i)) candidates.push(i);
+    }
+    if (!candidates.length) return set;
+    set.add(candidates[Math.min(1, candidates.length - 1)]);
+    if (candidates.length >= 4) set.add(candidates[Math.floor(candidates.length * 0.65)]);
     return set;
+  }
+
+  function findQuotedMessage(messages, i) {
+    var cur = messages[i];
+    for (var j = i - 1; j >= 0; j--) {
+      var prev = messages[j];
+      var samePerson = prev.f === cur.f && (cur.f === 'me' || String(prev.speaker || '') === String(cur.speaker || ''));
+      if (!samePerson) return prev;
+    }
+    return null;
+  }
+
+  function fakeWaNumber(name) {
+    var h = 2166136261;
+    var s = String(name || 'x');
+    for (var i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+    var n = Math.abs(h >>> 0) % 10000000;
+    var body = String(770000000 + n);
+    return '+260 ' + body.slice(0, 3) + ' ' + body.slice(3);
+  }
+
+  function buildWhatsAppQuote(quotedMsg, isMe, ctx) {
+    var quotedMe = quotedMsg.f === 'me';
+    var otherName = quotedMsg.speaker || ctx.theirName;
+    var color = quotedMe ? '#00a884' : (ctx.isGroupChat ? ctx.colorForSender(otherName) : (ctx.theme.quoteNameThem || '#c084fc'));
+    var label = quotedMe ? 'You' : ((ctx.isGroupChat ? '~ ' : '') + otherName);
+    var preview = quotedMsg.t.length > 56 ? quotedMsg.t.substring(0, 56) + '\u2026' : quotedMsg.t;
+    var wrap = document.createElement('div');
+    wrap.className = 'p-wa-quote';
+    wrap.style.background = isMe ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.06)';
+    var bar = document.createElement('div');
+    bar.className = 'p-wa-quote-bar';
+    bar.style.background = color;
+    var body = document.createElement('div');
+    body.className = 'p-wa-quote-body';
+    var head = document.createElement('div');
+    head.className = 'p-wa-quote-head';
+    var nameEl = document.createElement('div');
+    nameEl.className = 'p-wa-quote-name';
+    nameEl.style.color = color;
+    nameEl.textContent = label;
+    head.appendChild(nameEl);
+    if (ctx.isGroupChat && !quotedMe) {
+      var num = document.createElement('div');
+      num.className = 'p-wa-quote-num';
+      num.textContent = fakeWaNumber(otherName);
+      head.appendChild(num);
+    }
+    var text = document.createElement('div');
+    text.className = 'p-wa-quote-text';
+    text.textContent = preview;
+    body.appendChild(head);
+    body.appendChild(text);
+    wrap.appendChild(bar);
+    wrap.appendChild(body);
+    return wrap;
   }
 
   function showLoading(show) {
@@ -2224,7 +2299,9 @@
       var sameAsPrev = i > 0 && messages[i-1].f === msg.f && (msg.f === 'me' || !isGroupChat || messages[i-1].speaker === msg.speaker);
       row.style.marginTop = i === 0 ? '0' : (sameAsPrev ? '2px' : '10px');
 
-      if (isGroupChat && !isMe && !theme.isDiscord && !sameAsPrev) {
+      var isWhatsApp = theme.composer === 'whatsapp';
+      // WhatsApp groups put ~name + number INSIDE the bubble, not above it.
+      if (isGroupChat && !isMe && !theme.isDiscord && !sameAsPrev && !isWhatsApp) {
         var senderLabel = document.createElement('div');
         senderLabel.style.cssText = 'font-size:11px;font-weight:600;color:' + colorForSender(msg.speaker || theirName) + ';margin:0 0 2px 4px;';
         senderLabel.textContent = msg.speaker || theirName;
@@ -2239,7 +2316,11 @@
       } else {
         var qStyle = theme.quoteStyle || 'nested';
         var quoteEl = null;
-        if (replyIndices && replyIndices.has(i) && i > 0 && qStyle !== 'none') {
+        var quotedMsg = (isWhatsApp && replyIndices && replyIndices.has(i) && qStyle !== 'none')
+          ? findQuotedMessage(messages, i) : null;
+        if (quotedMsg && isWhatsApp) {
+          quoteEl = buildWhatsAppQuote(quotedMsg, isMe, ctx);
+        } else if (replyIndices && replyIndices.has(i) && i > 0 && qStyle !== 'none') {
           var prevMsg = messages[i-1];
           var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
 
@@ -2269,7 +2350,7 @@
             quoteEl.style.cssText = 'font-size:10px;padding:4px 8px;border-left:3px solid ' + qBar + ';border-radius:6px;margin-bottom:4px;opacity:0.85;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.06)') + ';color:' + bTheme.color + ';';
             quoteEl.textContent = preview;
           }
-        } else if (!ctx.literal && theme.hasStories && !sameAsPrev && Math.random() < 0.08) {
+        } else if (!isWhatsApp && !ctx.literal && theme.hasStories && !sameAsPrev && Math.random() < 0.08) {
           var storyReply = document.createElement('div');
           storyReply.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;opacity:0.75;margin-bottom:3px;color:' + bTheme.color + ';';
           var storyThumb = document.createElement('div');
@@ -2314,6 +2395,20 @@
         }
 
         bubble.style.cssText = bubbleStyle;
+        if (isWhatsApp && isGroupChat && !isMe && !sameAsPrev) {
+          var waHead = document.createElement('div');
+          waHead.className = 'p-wa-group-head';
+          var waName = document.createElement('span');
+          waName.className = 'p-wa-group-name';
+          waName.style.color = colorForSender(msg.speaker || theirName);
+          waName.textContent = '~ ' + (msg.speaker || theirName);
+          var waNum = document.createElement('span');
+          waNum.className = 'p-wa-group-num';
+          waNum.textContent = fakeWaNumber(msg.speaker || theirName);
+          waHead.appendChild(waName);
+          waHead.appendChild(waNum);
+          bubble.appendChild(waHead);
+        }
         if (quoteEl && theme.quoteInBubble !== false) {
           bubble.appendChild(quoteEl);
         } else if (quoteEl) {
@@ -2347,7 +2442,7 @@
           bubble.style.flexWrap = 'wrap';
           bubble.style.gap = '0';
           bubble.appendChild(timeSpan);
-          row.appendChild(bubble);
+          mountWhatsAppBubble(row, bubble, isWhatsApp, isGroupChat, isMe, sameAsNext, msg, theirName, colorForSender);
         } else if (tsStyle === 'hidden') {
           var gmWrap = document.createElement('div');
           gmWrap.style.cssText = 'position:relative;max-width:82%;';
@@ -2378,13 +2473,13 @@
           divider.style.color = theme.timeColor;
           divider.textContent = divLabel;
           if (ctx.targetEl) ctx.targetEl.appendChild(divider);
-          row.appendChild(bubble);
+          mountWhatsAppBubble(row, bubble, isWhatsApp, isGroupChat, isMe, sameAsNext, msg, theirName, colorForSender);
         } else {
           var timeSpan = document.createElement('div');
           timeSpan.className = 'p-bubble-time outside';
           timeSpan.style.color = theme.timeBubble;
           timeSpan.textContent = ts;
-          row.appendChild(bubble);
+          mountWhatsAppBubble(row, bubble, isWhatsApp, isGroupChat, isMe, sameAsNext, msg, theirName, colorForSender);
           row.appendChild(timeSpan);
         }
 
@@ -2407,6 +2502,26 @@
     return row;
   }
 
+  function mountWhatsAppBubble(row, bubble, isWhatsApp, isGroupChat, isMe, sameAsNext, msg, theirName, colorForSender) {
+    if (isWhatsApp && isGroupChat && !isMe) {
+      var wrap = document.createElement('div');
+      wrap.className = 'p-wa-in-wrap';
+      var av = document.createElement('div');
+      var speaker = msg.speaker || theirName || '?';
+      av.className = 'p-wa-group-av' + (sameAsNext ? ' p-wa-group-av-spacer' : '');
+      if (!sameAsNext) {
+        av.style.background = colorForSender(speaker);
+        av.textContent = String(speaker).trim().charAt(0).toUpperCase();
+      }
+      wrap.appendChild(av);
+      bubble.style.maxWidth = '100%';
+      wrap.appendChild(bubble);
+      row.appendChild(wrap);
+    } else {
+      row.appendChild(bubble);
+    }
+  }
+
   function buildPhoneMessages(targetEl, theme, messages, timestamps, showAll, replyIndices, literal) {
     targetEl.innerHTML = '';
     var dateLabel = document.createElement('div');
@@ -2423,7 +2538,7 @@
     var groupSizeEl = document.getElementById('groupSize');
     var isGroupChat = groupSizeEl && parseInt(groupSizeEl.value) >= 3;
     var groupSenderColors = {};
-    var groupPalette = ['#f56040', '#00b0f4', '#7c3aed', '#25d366', '#fe2c55', '#ffb300'];
+    var groupPalette = ['#53bdeb', '#06cf9c', '#e5a623', '#df2e8a', '#00a5f4', '#ffa97a', '#7c3aed'];
     function colorForSender(name) {
       if (!groupSenderColors[name]) {
         var keys = Object.keys(groupSenderColors);
@@ -2444,11 +2559,13 @@
 
   var platformThemes = {
     whatsapp: {
-      hasStories: true,
+      hasStories: false,
       quoteStyle: 'nested',
       quoteInBubble: true,
-      quoteBarMe: '#25d366',
-      quoteBarThem: '#53bdeb',
+      quoteBarMe: '#00a884',
+      quoteBarThem: '#c084fc',
+      quoteNameMe: '#00a884',
+      quoteNameThem: '#c084fc',
       headerLayout: 'bar',
       headerActions: true,
       headerSubtitle: 'online',
@@ -3326,7 +3443,7 @@
     // render it EXACTLY as pasted — no invented reply-quotes, voice notes or
     // story replies. Those exist to add variety to AI-generated threads only.
     var isLiteral = document.getElementById('contentType').value === 'paste';
-    var replyIndices = isLiteral ? new Set() : pickReplyIndices(currentMessages.length);
+    var replyIndices = window.__ptgForcedReplyIndices || (isLiteral ? new Set() : pickReplyIndices(currentMessages));
     buildPhoneMessages(ma, theme, currentMessages, timestamps, true, replyIndices, isLiteral);
     applyWallpaper();
 
@@ -3398,7 +3515,7 @@
     if (!currentMessages.length) return;
     animTimestamps = generateTimestamps(currentMessages.length);
     var animIsLiteral = document.getElementById('contentType').value === 'paste';
-    animReplyIndices = animIsLiteral ? new Set() : pickReplyIndices(currentMessages.length);
+    animReplyIndices = window.__ptgForcedReplyIndices || (animIsLiteral ? new Set() : pickReplyIndices(currentMessages));
     renderAnimatePhone();
     document.getElementById('animateOverlay').style.display = 'flex';
     document.getElementById('startAnimBtn').textContent = '▶ Play';
@@ -4072,6 +4189,83 @@
         banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
         document.body.appendChild(banner);
         document.title = ok ? 'SIDES PASS' : 'SIDES FAIL';
+      }, 0);
+    }
+    window.__ptgWaQuoteFixture = function(kind) {
+      document.getElementById('msgStyle').value = 'whatsapp';
+      document.getElementById('contentType').value = 'paste';
+      document.getElementById('contentType').dispatchEvent(new Event('change'));
+      document.getElementById('myName').value = 'Gil';
+      var replies;
+      if (kind === 'group') {
+        document.getElementById('groupSize').value = '4';
+        document.getElementById('groupSize').dispatchEvent(new Event('change'));
+        document.getElementById('theirName').value = 'Joshua';
+        document.getElementById('person3Name').value = 'Chola';
+        document.getElementById('person4Name').value = 'Bibian';
+        currentMessages = [
+          { f: 'them', t: 'I already have a video', speaker: 'Joshua' },
+          { f: 'them', t: 'just send me the video', speaker: 'Chola' },
+          { f: 'them', t: 'The one I sent you', speaker: 'Joshua' },
+          { f: 'them', t: 'You sent it to me?', speaker: 'Chola' },
+          { f: 'them', t: 'Yes', speaker: 'Joshua' },
+          { f: 'them', t: 'When?', speaker: 'Chola' },
+          { f: 'them', t: 'Yesterday I think', speaker: 'Joshua' }
+        ];
+        replies = new Set([1, 3, 4, 5, 6]);
+      } else {
+        document.getElementById('groupSize').value = '2';
+        document.getElementById('groupSize').dispatchEvent(new Event('change'));
+        document.getElementById('theirName').value = 'Bibian';
+        currentMessages = [
+          { f: 'me', t: "I'm just waiting to hear from you", speaker: 'Gil' },
+          { f: 'them', t: 'Waiting to hear what?', speaker: 'Bibian' },
+          { f: 'me', t: 'If you coming or not', speaker: 'Gil' },
+          { f: 'them', t: 'Coming where now', speaker: 'Bibian' },
+          { f: 'me', t: 'To town later', speaker: 'Gil' },
+          { f: 'them', t: 'Ah okay let me see', speaker: 'Bibian' }
+        ];
+        replies = new Set([1, 3, 5]);
+      }
+      window.__ptgForcedReplyIndices = replies;
+      renderPhone();
+      window.__ptgForcedReplyIndices = null;
+      document.getElementById('pName').textContent = kind === 'group' ? 'Family' : 'Bibian';
+      setPreviewVisible(true);
+      var quotes = Array.prototype.map.call(document.querySelectorAll('#pMessages .p-wa-quote'), function(q) {
+        var name = (q.querySelector('.p-wa-quote-name') || {}).textContent || '';
+        var num = (q.querySelector('.p-wa-quote-num') || {}).textContent || '';
+        var bar = (q.querySelector('.p-wa-quote-bar') || {}).style.background || '';
+        return { name: name, num: num, bar: bar };
+      });
+      var heads = Array.prototype.map.call(document.querySelectorAll('#pMessages .p-wa-group-head'), function(h) {
+        return {
+          name: (h.querySelector('.p-wa-group-name') || {}).textContent || '',
+          num: (h.querySelector('.p-wa-group-num') || {}).textContent || ''
+        };
+      });
+      var avatars = document.querySelectorAll('#pMessages .p-wa-group-av:not(.p-wa-group-av-spacer)').length;
+      return {
+        quoteCount: quotes.length,
+        quotes: quotes,
+        groupHeads: heads,
+        avatars: avatars,
+        isGroup: kind === 'group'
+      };
+    };
+    if (new URLSearchParams(location.search).get('waquote')) {
+      setTimeout(function() {
+        var kind = new URLSearchParams(location.search).get('waquote') === 'group' ? 'group' : 'dm';
+        var r = window.__ptgWaQuoteFixture(kind);
+        var ok = kind === 'group'
+          ? (r.quoteCount >= 3 && r.avatars >= 2 && r.groupHeads.length >= 2 && r.quotes.some(function(q){ return q.name.indexOf('~') === 0; }))
+          : (r.quoteCount >= 2 && r.quotes.some(function(q){ return q.name === 'You'; }) && r.quotes.some(function(q){ return q.name === 'Bibian'; }));
+        var banner = document.createElement('div');
+        banner.id = 'waQuoteTestBanner';
+        banner.textContent = (ok ? 'WAQUOTE PASS' : 'WAQUOTE FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'WAQUOTE PASS' : 'WAQUOTE FAIL';
       }, 0);
     }
     window.__ptgProtectShortenedLine = protectShortenedLine;
