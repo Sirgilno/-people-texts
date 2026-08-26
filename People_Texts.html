@@ -280,6 +280,10 @@
       <option value="4">Group chat — 4 people</option>
     </select>
   </div>
+  <div id="groupNameWrap" style="margin-bottom:12px;display:none;">
+    <label>Group name</label>
+    <input type="text" id="groupName" value="" placeholder="e.g. Family" />
+  </div>
   <div id="extraNamesRow" class="row" style="display:none;">
     <div><label>Person 3 name</label><input type="text" id="person3Name" value="" placeholder="e.g. Uncle Chris" /></div>
     <div id="person4NameWrap" style="display:none;"><label>Person 4 name</label><input type="text" id="person4Name" value="" placeholder="e.g. Cousin Zoe" /></div>
@@ -763,6 +767,47 @@
   var currentWallpaper = 'none';
   var isAnimating = false;
   var originalMessages = [];
+
+  function isGroupChatActive() {
+    var el = document.getElementById('groupSize');
+    return !!(el && parseInt(el.value) >= 3);
+  }
+
+  function chatTitleName() {
+    if (isGroupChatActive()) {
+      var el = document.getElementById('groupName');
+      var n = el && el.value.trim();
+      return n || 'Group';
+    }
+    var person = document.getElementById('person').value;
+    return document.getElementById('theirName').value.trim() || personData[person].defaultName;
+  }
+
+  function groupHeaderSubtitle() {
+    var person = document.getElementById('person').value;
+    var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
+    var names = [theirName];
+    var gs = parseInt(document.getElementById('groupSize').value) || 2;
+    var p3 = document.getElementById('person3Name').value.trim();
+    var p4 = document.getElementById('person4Name').value.trim();
+    if (gs >= 3) names.push(p3 || 'Chris');
+    if (gs >= 4) names.push(p4 || 'Zoe');
+    return names.join(', ') + ', You';
+  }
+
+  function applyChatTitle(nameId, avatarId, subId, theme) {
+    var title = chatTitleName();
+    var nameEl = document.getElementById(nameId);
+    var avEl = document.getElementById(avatarId);
+    if (nameEl) nameEl.textContent = title;
+    if (avEl) avEl.textContent = title.charAt(0).toUpperCase();
+    var sub = subId ? document.getElementById(subId) : null;
+    if (sub && isGroupChatActive()) {
+      sub.textContent = groupHeaderSubtitle();
+      sub.style.display = 'block';
+      if (theme && theme.headerSubColor) sub.style.color = theme.headerSubColor;
+    }
+  }
 
   function setPreviewVisible(on) {
     var el = document.getElementById('previewSection');
@@ -1954,6 +1999,7 @@
     var otherNames = [theirName];
     if (groupSize >= 3) otherNames.push(person3Name || 'Chris');
     if (groupSize >= 4) otherNames.push(person4Name || 'Zoe');
+    var groupTitle = document.getElementById('groupName').value.trim() || 'Group';
 
     showLoading(true);
 
@@ -1981,7 +2027,7 @@
       + '- Let personality-appropriate slang/expressions show up naturally where the VIBE and PERSON below call for it — do not force it if it does not fit, but do not sand it down into blandness either.\n\n'
       + 'Generate a text ' + (groupSize >= 3 ? 'group chat conversation' : 'message conversation') + ' with ' + msgCount + ' messages total.\n\n'
       + (groupSize >= 3
-        ? 'THIS IS A GROUP CHAT with ' + groupSize + ' people: ' + myName + ' (the receiver/main character reading this) plus ' + otherNames.join(', ') + '. Give EACH of the ' + otherNames.length + ' other people their own distinct personality and voice — do not make them interchangeable. In a real group chat people talk over each other, react to different parts of the conversation, some go quiet then jump back in, some pile on a joke together. Format each line as "Name: message" using their exact name.\n\n'
+        ? 'THIS IS A GROUP CHAT named "' + groupTitle + '" — that is the chat title at the top of the phone, NOT a person in the thread. Do not write lines as "' + groupTitle + ':". The ' + groupSize + ' people in the chat are: ' + myName + ' (the receiver/main character reading this) plus ' + otherNames.join(', ') + '. Give EACH of the ' + otherNames.length + ' other people their own distinct personality and voice — do not make them interchangeable. In a real group chat people talk over each other, react to different parts of the conversation, some go quiet then jump back in, some pile on a joke together. Format each line as "Name: message" using their exact name.\n\n'
         : 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n')
       + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
       + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic.\n\n' : '')
@@ -3409,8 +3455,6 @@
     var now = new Date();
     var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
     document.getElementById('pTime').textContent = timeStr;
-    document.getElementById('pName').textContent = theirName;
-    document.getElementById('pAvatar').textContent = theirName.charAt(0).toUpperCase();
 
     var sb = document.getElementById('pStatusBar');
     var ch = document.getElementById('pChatHeader');
@@ -3428,6 +3472,7 @@
       inputBar: 'pInputBar', lead: 'pComposeLead', fakeInput: 'pFakeInput', trail: 'pComposeTrail',
       sendBtn: 'pSendBtn', sendPath: 'pSendPath'
     });
+    applyChatTitle('pName', 'pAvatar', 'pHeaderSub', theme);
     ma.style.background = 'transparent';
 
     if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
@@ -3474,8 +3519,6 @@
     var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
     var now = new Date();
     document.getElementById('aTime').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
-    document.getElementById('aN').textContent = theirName;
-    document.getElementById('aAv').textContent = theirName.charAt(0).toUpperCase();
 
     var aSb = document.getElementById('aSb');
     var aCh = document.getElementById('aCh');
@@ -3492,6 +3535,7 @@
       inputBar: 'aIb', lead: 'aComposeLead', fakeInput: 'aFi', trail: 'aComposeTrail',
       sendBtn: 'aSend', sendPath: 'aSendPath'
     });
+    applyChatTitle('aN', 'aAv', 'aHeaderSub', theme);
     document.getElementById('aMessages').style.background = 'transparent';
     document.getElementById('animatePhone').style.background = theme.bgMessages;
     if (theme.avatarBg && theme.avatarBg.includes('gradient')) {
@@ -3654,7 +3698,7 @@
       var person = document.getElementById('person').value;
       var theirName = document.getElementById('theirName').value.trim() || personData[person].defaultName;
       var preview = currentMessages[0].t.substring(0, 50) + (currentMessages[0].t.length > 50 ? '...' : '');
-      var item = { type: 'messages', messages: JSON.parse(JSON.stringify(currentMessages)), label: theirName + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
+      var item = { type: 'messages', messages: JSON.parse(JSON.stringify(currentMessages)), label: chatTitleName() + ' — ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), preview: preview };
       savedConversations.unshift(item);
     }
     if (savedConversations.length > 5) savedConversations = savedConversations.slice(0, 5);
@@ -3717,8 +3761,16 @@
   });
   document.getElementById('groupSize').addEventListener('change', function() {
     var size = parseInt(this.value);
+    document.getElementById('groupNameWrap').style.display = size >= 3 ? 'block' : 'none';
     document.getElementById('extraNamesRow').style.display = size >= 3 ? 'grid' : 'none';
     document.getElementById('person4NameWrap').style.display = size >= 4 ? 'block' : 'none';
+    var theirNameInput = document.getElementById('theirName');
+    var theirNameLabel = theirNameInput && theirNameInput.parentNode && theirNameInput.parentNode.querySelector('label');
+    if (theirNameLabel) theirNameLabel.textContent = size >= 3 ? 'Person 2 name' : 'Their name';
+    if (currentMessages.length > 0) renderPhone();
+  });
+  document.getElementById('groupName').addEventListener('input', function() {
+    if (currentMessages.length > 0) renderPhone();
   });
 
   function updateContentTypeUI() {
@@ -4205,6 +4257,7 @@
         document.getElementById('theirName').value = 'Joshua';
         document.getElementById('person3Name').value = 'Chola';
         document.getElementById('person4Name').value = 'Bibian';
+        document.getElementById('groupName').value = 'Family';
         currentMessages = [
           { f: 'them', t: 'I already have a video', speaker: 'Joshua' },
           { f: 'them', t: 'the one from yesterday', speaker: 'Joshua' },
@@ -4235,7 +4288,6 @@
       window.__ptgForcedReplyIndices = replies;
       renderPhone();
       window.__ptgForcedReplyIndices = null;
-      document.getElementById('pName').textContent = kind === 'group' ? 'Family' : 'Bibian';
       setPreviewVisible(true);
       var quotes = Array.prototype.map.call(document.querySelectorAll('#pMessages .p-wa-quote'), function(q) {
         var name = (q.querySelector('.p-wa-quote-name') || {}).textContent || '';
@@ -4255,7 +4307,10 @@
         quotes: quotes,
         groupHeads: heads,
         avatars: avatars,
-        isGroup: kind === 'group'
+        isGroup: kind === 'group',
+        headerName: document.getElementById('pName').textContent,
+        headerSub: document.getElementById('pHeaderSub').textContent,
+        headerInitial: document.getElementById('pAvatar').textContent
       };
     };
     if (new URLSearchParams(location.search).get('waquote')) {
@@ -4287,8 +4342,8 @@
         }
         if (new URLSearchParams(location.search).get('quiet')) return;
         var ok = kind === 'group'
-          ? (r.quoteCount >= 3 && r.avatars >= 2 && r.groupHeads.length >= 2 && r.quotes.some(function(q){ return q.name.indexOf('~') === 0; }))
-          : (r.quoteCount >= 2 && r.quotes.some(function(q){ return q.name === 'You'; }) && r.quotes.some(function(q){ return q.name === 'Bibian'; }));
+          ? (r.quoteCount >= 3 && r.avatars >= 2 && r.groupHeads.length >= 2 && r.quotes.some(function(q){ return q.name.indexOf('~') === 0; }) && r.headerName === 'Family' && r.headerInitial === 'F' && r.headerName !== 'Joshua')
+          : (r.quoteCount >= 2 && r.quotes.some(function(q){ return q.name === 'You'; }) && r.quotes.some(function(q){ return q.name === 'Bibian'; }) && r.headerName === 'Bibian');
         var banner = document.createElement('div');
         banner.id = 'waQuoteTestBanner';
         banner.textContent = (ok ? 'WAQUOTE PASS' : 'WAQUOTE FAIL') + ' ' + JSON.stringify(r);
