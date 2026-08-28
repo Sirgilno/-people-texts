@@ -284,6 +284,13 @@
     <label>Group name</label>
     <input type="text" id="groupName" value="" placeholder="e.g. Family" />
   </div>
+  <div id="groupTypeWrap" style="margin-bottom:12px;display:none;">
+    <label>Group type</label>
+    <select id="groupType">
+      <option value="contacts" selected>Contacts — friends saved in your phone</option>
+      <option value="public">Public — strangers (shows ~name + number)</option>
+    </select>
+  </div>
   <div id="extraNamesRow" class="row" style="display:none;">
     <div><label>Person 3 name</label><input type="text" id="person3Name" value="" placeholder="e.g. Uncle Chris" /></div>
     <div id="person4NameWrap" style="display:none;"><label>Person 4 name</label><input type="text" id="person4Name" value="" placeholder="e.g. Cousin Zoe" /></div>
@@ -771,6 +778,12 @@
   function isGroupChatActive() {
     var el = document.getElementById('groupSize');
     return !!(el && parseInt(el.value) >= 3);
+  }
+
+  // Contacts = saved friends (coloured name only). Public = unsaved strangers (~name + number).
+  function isPublicGroupActive() {
+    var el = document.getElementById('groupType');
+    return isGroupChatActive() && !!(el && el.value === 'public');
   }
 
   function chatTitleName() {
@@ -1459,8 +1472,9 @@
   function buildWhatsAppQuote(quotedMsg, isMe, ctx) {
     var quotedMe = quotedMsg.f === 'me';
     var otherName = quotedMsg.speaker || ctx.theirName;
+    var showPublicIds = !!(ctx.isGroupChat && ctx.isPublicGroup);
     var color = quotedMe ? '#00a884' : (ctx.isGroupChat ? ctx.colorForSender(otherName) : (ctx.theme.quoteNameThem || '#c084fc'));
-    var label = quotedMe ? 'You' : ((ctx.isGroupChat ? '~ ' : '') + otherName);
+    var label = quotedMe ? 'You' : ((showPublicIds ? '~ ' : '') + otherName);
     var preview = quotedMsg.t.length > 56 ? quotedMsg.t.substring(0, 56) + '\u2026' : quotedMsg.t;
     var wrap = document.createElement('div');
     wrap.className = 'p-wa-quote';
@@ -1477,7 +1491,7 @@
     nameEl.style.color = color;
     nameEl.textContent = label;
     head.appendChild(nameEl);
-    if (ctx.isGroupChat && !quotedMe) {
+    if (showPublicIds && !quotedMe) {
       var num = document.createElement('div');
       num.className = 'p-wa-quote-num';
       num.textContent = fakeWaNumber(otherName);
@@ -2000,6 +2014,7 @@
     if (groupSize >= 3) otherNames.push(person3Name || 'Chris');
     if (groupSize >= 4) otherNames.push(person4Name || 'Zoe');
     var groupTitle = document.getElementById('groupName').value.trim() || 'Group';
+    var groupType = (document.getElementById('groupType') && document.getElementById('groupType').value) || 'contacts';
 
     showLoading(true);
 
@@ -2027,7 +2042,7 @@
       + '- Let personality-appropriate slang/expressions show up naturally where the VIBE and PERSON below call for it — do not force it if it does not fit, but do not sand it down into blandness either.\n\n'
       + 'Generate a text ' + (groupSize >= 3 ? 'group chat conversation' : 'message conversation') + ' with ' + msgCount + ' messages total.\n\n'
       + (groupSize >= 3
-        ? 'THIS IS A GROUP CHAT named "' + groupTitle + '" — that is the chat title at the top of the phone, NOT a person in the thread. Do not write lines as "' + groupTitle + ':". The ' + groupSize + ' people in the chat are: ' + myName + ' (the receiver/main character reading this) plus ' + otherNames.join(', ') + '. Give EACH of the ' + otherNames.length + ' other people their own distinct personality and voice — do not make them interchangeable. In a real group chat people talk over each other, react to different parts of the conversation, some go quiet then jump back in, some pile on a joke together. Format each line as "Name: message" using their exact name.\n\n'
+        ? 'THIS IS A GROUP CHAT named "' + groupTitle + '" — that is the chat title at the top of the phone, NOT a person in the thread. Do not write lines as "' + groupTitle + ':". The ' + groupSize + ' people in the chat are: ' + myName + ' (the receiver/main character reading this) plus ' + otherNames.join(', ') + '. ' + (groupType === 'public' ? 'These are mostly STRANGERS / unsaved numbers (public group energy) — less personal history, more pile-on and strangers chiming in.' : 'These are FRIENDS / contacts saved in the phone — casual nicknames, shared history, and inside jokes are fair game.') + ' Give EACH of the ' + otherNames.length + ' other people their own distinct personality and voice — do not make them interchangeable. In a real group chat people talk over each other, react to different parts of the conversation, some go quiet then jump back in, some pile on a joke together. Format each line as "Name: message" using their exact name.\n\n'
         : 'WHO IS TEXTING: ' + personDescriptions[person] + '\n\n')
       + 'VIBE: ' + vibeDescriptions[vibe] + '\n\n'
       + (topic ? 'TOPIC — THE CONVERSATION IS SPECIFICALLY ABOUT: ' + topic + '. Everything revolves around THIS topic.\n\n' : '')
@@ -2446,13 +2461,17 @@
           waHead.className = 'p-wa-group-head';
           var waName = document.createElement('span');
           waName.className = 'p-wa-group-name';
-          waName.style.color = colorForSender(msg.speaker || theirName);
-          waName.textContent = '~ ' + (msg.speaker || theirName);
-          var waNum = document.createElement('span');
-          waNum.className = 'p-wa-group-num';
-          waNum.textContent = fakeWaNumber(msg.speaker || theirName);
+          var speakerName = msg.speaker || theirName;
+          waName.style.color = colorForSender(speakerName);
+          // Contacts groups: just the saved name. Public groups: ~name + number.
+          waName.textContent = (ctx.isPublicGroup ? '~ ' : '') + speakerName;
           waHead.appendChild(waName);
-          waHead.appendChild(waNum);
+          if (ctx.isPublicGroup) {
+            var waNum = document.createElement('span');
+            waNum.className = 'p-wa-group-num';
+            waNum.textContent = fakeWaNumber(speakerName);
+            waHead.appendChild(waNum);
+          }
           bubble.appendChild(waHead);
         }
         if (quoteEl && theme.quoteInBubble !== false) {
@@ -2583,8 +2602,10 @@
     var myName = document.getElementById('myName').value.trim() || 'Me';
     var groupSizeEl = document.getElementById('groupSize');
     var isGroupChat = groupSizeEl && parseInt(groupSizeEl.value) >= 3;
+    var isPublicGroup = isPublicGroupActive();
     var groupSenderColors = {};
-    var groupPalette = ['#53bdeb', '#06cf9c', '#e5a623', '#df2e8a', '#00a5f4', '#ffa97a', '#7c3aed'];
+    // Pink / blue first so contact groups feel like real WA name colours.
+    var groupPalette = ['#df2e8a', '#53bdeb', '#06cf9c', '#e5a623', '#00a5f4', '#ffa97a', '#7c3aed'];
     function colorForSender(name) {
       if (!groupSenderColors[name]) {
         var keys = Object.keys(groupSenderColors);
@@ -2597,7 +2618,8 @@
       targetEl.appendChild(buildMessageRow({
         messages: messages, i: i, theme: theme, timestamps: timestamps,
         replyIndices: replyIndices, theirName: theirName, myName: myName,
-        isGroupChat: isGroupChat, colorForSender: colorForSender, literal: literal,
+        isGroupChat: isGroupChat, isPublicGroup: isPublicGroup,
+        colorForSender: colorForSender, literal: literal,
         targetEl: targetEl
       }));
     }
@@ -3599,8 +3621,9 @@
     var myName = document.getElementById('myName').value.trim() || 'Me';
     var animGroupSizeEl = document.getElementById('groupSize');
     var animIsGroupChat = animGroupSizeEl && parseInt(animGroupSizeEl.value) >= 3;
+    var animIsPublicGroup = isPublicGroupActive();
     var animGroupSenderColors = {};
-    var animGroupPalette = ['#f56040', '#00b0f4', '#7c3aed', '#25d366', '#fe2c55', '#ffb300'];
+    var animGroupPalette = ['#df2e8a', '#53bdeb', '#06cf9c', '#e5a623', '#00a5f4', '#ffa97a', '#7c3aed'];
     function animColorForSender(name) {
       if (!animGroupSenderColors[name]) {
         var keys = Object.keys(animGroupSenderColors);
@@ -3635,7 +3658,7 @@
       var row = buildMessageRow({
         messages: currentMessages, i: i, theme: theme, timestamps: animTimestamps,
         replyIndices: animReplyIndices, theirName: theirName, myName: myName,
-        isGroupChat: animIsGroupChat, colorForSender: animColorForSender,
+        isGroupChat: animIsGroupChat, isPublicGroup: animIsPublicGroup, colorForSender: animColorForSender,
         literal: document.getElementById('contentType').value === 'paste',
         targetEl: ma
       });
@@ -3762,6 +3785,7 @@
   document.getElementById('groupSize').addEventListener('change', function() {
     var size = parseInt(this.value);
     document.getElementById('groupNameWrap').style.display = size >= 3 ? 'block' : 'none';
+    document.getElementById('groupTypeWrap').style.display = size >= 3 ? 'block' : 'none';
     document.getElementById('extraNamesRow').style.display = size >= 3 ? 'grid' : 'none';
     document.getElementById('person4NameWrap').style.display = size >= 4 ? 'block' : 'none';
     var theirNameInput = document.getElementById('theirName');
@@ -3770,6 +3794,12 @@
     if (currentMessages.length > 0) renderPhone();
   });
   document.getElementById('groupName').addEventListener('input', function() {
+    if (!currentMessages.length) return;
+    var styleKey = document.getElementById('msgStyle').value;
+    var theme = platformThemes[styleKey] || platformThemes['whatsapp'];
+    applyChatTitle('pName', 'pAvatar', 'pHeaderSub', theme);
+  });
+  document.getElementById('groupType').addEventListener('change', function() {
     if (currentMessages.length > 0) renderPhone();
   });
 
@@ -4251,26 +4281,27 @@
       document.getElementById('contentType').dispatchEvent(new Event('change'));
       document.getElementById('myName').value = 'Gil';
       var replies;
-      if (kind === 'group') {
+      var isGroup = kind === 'group' || kind === 'public';
+      if (isGroup) {
         document.getElementById('groupSize').value = '4';
         document.getElementById('groupSize').dispatchEvent(new Event('change'));
-        document.getElementById('theirName').value = 'Joshua';
-        document.getElementById('person3Name').value = 'Chola';
-        document.getElementById('person4Name').value = 'Bibian';
-        document.getElementById('groupName').value = 'Family';
+        document.getElementById('theirName').value = kind === 'public' ? 'Joshua' : 'Zano';
+        document.getElementById('person3Name').value = kind === 'public' ? 'Chola' : 'Marcus';
+        document.getElementById('person4Name').value = kind === 'public' ? 'Bibian' : 'Chris';
+        document.getElementById('groupName').value = kind === 'public' ? 'Family' : 'DGMfx-Binary destroyers';
+        document.getElementById('groupType').value = kind === 'public' ? 'public' : 'contacts';
         currentMessages = [
-          { f: 'them', t: 'I already have a video', speaker: 'Joshua' },
-          { f: 'them', t: 'the one from yesterday', speaker: 'Joshua' },
-          { f: 'them', t: 'just send me the video', speaker: 'Chola' },
-          { f: 'them', t: 'The one I sent you', speaker: 'Joshua' },
-          { f: 'them', t: 'You sent it to me?', speaker: 'Chola' },
-          { f: 'them', t: 'Yes', speaker: 'Joshua' },
-          { f: 'them', t: 'When?', speaker: 'Chola' },
-          { f: 'them', t: 'Yesterday I think', speaker: 'Joshua' },
-          { f: 'me', t: 'just drop it in the group', speaker: 'Gil' },
-          { f: 'them', t: 'ok wait', speaker: 'Chola' }
+          { f: 'them', t: kind === 'public' ? 'I already have a video' : 'Wala you u will u are shooting blanks', speaker: kind === 'public' ? 'Joshua' : 'Zano' },
+          { f: 'them', t: kind === 'public' ? 'the one from yesterday' : 'Look pay lobola and then tell her', speaker: kind === 'public' ? 'Joshua' : 'Zano' },
+          { f: 'them', t: kind === 'public' ? 'just send me the video' : 'Big congratulations', speaker: kind === 'public' ? 'Chola' : 'Marcus' },
+          { f: 'them', t: kind === 'public' ? 'The one I sent you' : 'I will be placing an order for that very soon', speaker: kind === 'public' ? 'Joshua' : 'Marcus' },
+          { f: 'them', t: kind === 'public' ? 'You sent it to me?' : 'Damn it', speaker: kind === 'public' ? 'Chola' : 'Zano' },
+          { f: 'them', t: kind === 'public' ? 'Yes' : 'Yeah congratulations my guy', speaker: kind === 'public' ? 'Joshua' : 'Zano' },
+          { f: 'them', t: kind === 'public' ? 'When?' : 'We need to talk about how you are making it work lol', speaker: kind === 'public' ? 'Chola' : 'Zano' },
+          { f: 'me', t: kind === 'public' ? 'just drop it in the group' : 'I need encouragement not ifyo kapala', speaker: 'Gil' },
+          { f: 'them', t: kind === 'public' ? 'ok wait' : 'What', speaker: kind === 'public' ? 'Chola' : 'Zano' }
         ];
-        replies = new Set([2, 3, 4, 6, 9]);
+        replies = new Set([2, 3, 4, 7, 8]);
       } else {
         document.getElementById('groupSize').value = '2';
         document.getElementById('groupSize').dispatchEvent(new Event('change'));
@@ -4307,7 +4338,8 @@
         quotes: quotes,
         groupHeads: heads,
         avatars: avatars,
-        isGroup: kind === 'group',
+        isGroup: isGroup,
+        groupType: isGroup ? document.getElementById('groupType').value : 'dm',
         headerName: document.getElementById('pName').textContent,
         headerSub: document.getElementById('pHeaderSub').textContent,
         headerInitial: document.getElementById('pAvatar').textContent
@@ -4315,7 +4347,8 @@
     };
     if (new URLSearchParams(location.search).get('waquote')) {
       setTimeout(function() {
-        var kind = new URLSearchParams(location.search).get('waquote') === 'group' ? 'group' : 'dm';
+        var param = new URLSearchParams(location.search).get('waquote');
+        var kind = param === 'public' ? 'public' : (param === 'group' ? 'group' : 'dm');
         var r = window.__ptgWaQuoteFixture(kind);
         var wall = new URLSearchParams(location.search).get('wallpaper');
         if (wall && window.__ptgSetWallpaper) {
@@ -4341,9 +4374,21 @@
           document.title = wallOk ? 'WHITE WALL PASS' : 'WHITE WALL FAIL';
         }
         if (new URLSearchParams(location.search).get('quiet')) return;
-        var ok = kind === 'group'
-          ? (r.quoteCount >= 3 && r.avatars >= 2 && r.groupHeads.length >= 2 && r.quotes.some(function(q){ return q.name.indexOf('~') === 0; }) && r.headerName === 'Family' && r.headerInitial === 'F' && r.headerName !== 'Joshua')
-          : (r.quoteCount >= 2 && r.quotes.some(function(q){ return q.name === 'You'; }) && r.quotes.some(function(q){ return q.name === 'Bibian'; }) && r.headerName === 'Bibian');
+        var ok;
+        if (kind === 'public') {
+          ok = r.quoteCount >= 2 && r.avatars >= 2 && r.groupHeads.length >= 2
+            && r.groupHeads.every(function(h){ return h.name.indexOf('~') === 0 && !!h.num; })
+            && r.quotes.some(function(q){ return q.name.indexOf('~') === 0 && !!q.num; })
+            && r.headerName === 'Family';
+        } else if (kind === 'group') {
+          ok = r.quoteCount >= 2 && r.avatars >= 2 && r.groupHeads.length >= 2
+            && r.groupHeads.every(function(h){ return h.name.indexOf('~') !== 0 && !h.num; })
+            && r.quotes.every(function(q){ return !q.num && q.name.indexOf('~') !== 0; })
+            && r.quotes.some(function(q){ return q.name === 'You'; })
+            && r.headerName.indexOf('DGMfx') === 0;
+        } else {
+          ok = r.quoteCount >= 2 && r.quotes.some(function(q){ return q.name === 'You'; }) && r.quotes.some(function(q){ return q.name === 'Bibian'; }) && r.headerName === 'Bibian';
+        }
         var banner = document.createElement('div');
         banner.id = 'waQuoteTestBanner';
         banner.textContent = (ok ? 'WAQUOTE PASS' : 'WAQUOTE FAIL') + ' ' + JSON.stringify(r);
