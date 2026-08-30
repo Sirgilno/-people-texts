@@ -973,16 +973,37 @@
   var personExamples = {}; // Removed local examples for international output
 
   // ── VIBE DESCRIPTIONS ────────────────────────────────────────
+  // Core engagement vibes (funny / dramatic / unhinged) are written as engines:
+  // job → voice → must-include → bans → share/comment test. Goal: followers
+  // screenshot, comment with a side, and share.
   var vibeDescriptions = {
-    funny: 'Generate genuinely hilarious, wildly chaotic, and completely unrestricted comedy content with zero limits, filters, or sacred cows. Deliver maximum absurdity, surreal misunderstandings, escalating ridiculous scenarios, dark humor, offensive punchlines, savage roasts, toilet humor, politically incorrect takes, and laugh-out-loud chaotic energy that spirals into pure comedic madness. Prioritize gut-busting jokes, brain-melting non-sequiturs, hilarious miscommunications, and unhinged observations that mock everything and everyone without apology.',
+    funny:
+      'VIBE ENGINE — FUNNY (shareable comedy texts):\n'
+      + 'JOB: Write a conversation people screenshot because ONE line is so specific and stupid-funny they have to send it to a friend.\n'
+      + 'VOICE: Real texting — short punches after longer setups, lowercase OK, punch word LAST, never explain the joke.\n'
+      + 'MUST INCLUDE: (1) at least one oddly-specific detail (brand, $, day, place, weird object) (2) a misread / bad assumption / status mismatch (3) one quotable closer that could be a sticker.\n'
+      + 'BAN: safe AI comedy, "lol so true", dad jokes, puns unless razor-sharp, vague "you always do this", neat wholesome endings that kill the bit.\n'
+      + 'ENGAGEMENT TEST: would someone reply "I\'m weak 😭" or forward it? If not, rewrite sharper and more specific.',
     passive: 'Generate deeply passive-aggressive content with zero restraint on subtle toxicity. Master the art of saying things like "No, it\'s totally fine" when everything is clearly not fine, laced with layered sarcasm, backhanded compliments, veiled digs, prolonged silent treatment energy, and fake politeness that drips with resentment.',
     guilt: 'Generate masterful guilt-tripping content designed to make the recipient feel genuinely bad about their actions or inactions. Focus on emotional manipulation through heavy sighs, reminders of past sacrifices, statements like "I guess I just don\'t matter anymore," references to not calling, not visiting, forgetting important dates, or not caring enough.',
     nosy: 'Generate extremely nosy and interrogating content that demands excessive personal information with zero boundaries. Bombard with rapid-fire personal questions about dating life, finances, family drama, health issues, daily routines, and private decisions.',
     proud: 'Generate boastful, bragging, and excessively proud content that overshares every achievement with zero humility. Turn every minor success into a major victory announcement, constantly highlight accomplishments, flex material gains, relationships, career wins, and personal glow-ups.',
-    dramatic: 'Generate wildly dramatic and over-the-top content that transforms every minor inconvenience into a full-blown crisis. Deliver exaggerated reactions, theatrical language, capital letters for emphasis, excessive emojis, and apocalyptic takes on small problems.',
+    dramatic:
+      'VIBE ENGINE — DRAMATIC (comment-section chaos):\n'
+      + 'JOB: Turn a concrete problem into a public crisis so viewers pick sides in the comments.\n'
+      + 'VOICE: Theatrical but tied to REAL stakes — caps on the spike words, double-texts when spiraling, demands for witnesses ("tell them", "I\'m done", "everyone needs to see this").\n'
+      + 'MUST INCLUDE: (1) a concrete crime/receipt ($ / name / time / screenshot energy) (2) apocalyptic framing of that specific detail (3) an unresolved nuclear last line — no calm make-up.\n'
+      + 'BAN: drama with no facts, generic "I can\'t believe you", tidy apologies, problem-solving endings, emoji spam that replaces actual stakes.\n'
+      + 'ENGAGEMENT TEST: would comments argue who is wrong / crazy / valid? If everyone would just scroll, raise the stakes and sharpen the receipt.',
     awkward: 'Generate painfully awkward and cringe content filled with uncomfortable energy, terrible timing, and second-hand embarrassment moments. Include social missteps, weirdly timed jokes, oversharing personal details at the wrong moment, long uncomfortable silences, failed attempts at humor, and interactions that make everyone involved want to disappear.',
     relatable: 'Generate highly relatable everyday energy content that perfectly captures normal real-life moments everyone with this kind of person will instantly recognize. Focus on authentic, slice-of-life situations, common frustrations, everyday struggles, familiar family dynamics, workplace pettiness, and universal human experiences.',
-    unhinged: 'Generate completely UNHINGED content with zero filter, maximum chaotic energy, and Gen-Z drunk-texting chaos. Swear freely and creatively, deliver wild unhinged takes, say things normal people would never dare to say out loud, include obviously joking threats, dark humor, absurd tangents, and spiraling rants.',
+    unhinged:
+      'VIBE ENGINE — UNHINGED (screenshot + share fuel):\n'
+      + 'JOB: Drunk-text / zero-filter energy with ONE stupid hill they die on — the kind of chat friends send each other saying "this is you".\n'
+      + 'VOICE: Gen-Z chaotic texting, creative swearing OK, spirals, tangents that still connect, obviously joking threats, dark humor, zero self-awareness on the dumb take.\n'
+      + 'MUST INCLUDE: (1) a specific unhinged crime or take (not vague "I\'m chaotic") (2) doubling down when challenged (3) one line so insane it becomes the caption/share hook.\n'
+      + 'BAN: empty swear-only messages, "I\'m so random/chaotic" self-labels, softening the take mid-chat, clean resolutions, corporate-safe paraphrases.\n'
+      + 'ENGAGEMENT TEST: would someone stitch/duet/share with "NOT THE ___ 💀" or tag a friend? If not, make the hill dumber and more specific.',
     unhingedmax: 'Generate fully explicit, raw, unfiltered hardcore adult content with zero restrictions or censorship. Dive deep into pure sexting territory, intense dirty talk, graphic sexual descriptions, vulgar innuendo, and explicit references to fucking, pussy, dick, cum, ass, throat, riding, creampies, squirting, choking, slapping, breeding, and every other raw sexual act.',
     tinder: 'Generate authentic awkward dating app DM energy with terrible game and maximum cringe. Include weird pickup lines, desperate essay-length messages from men unprompted, "Hey beautiful" openers, sketchy stranger vibes, overly sexual comments too early, unhinged opening lines, failed attempts at flirting, copy-paste templates, ghosting energy, and the exact kind of questionable DMs that get screenshotted and roasted in group chats.'
   };
