@@ -973,9 +973,9 @@
   var personExamples = {}; // Removed local examples for international output
 
   // ── VIBE DESCRIPTIONS ────────────────────────────────────────
-  // Core engagement vibes (funny / dramatic / unhinged) are written as engines:
-  // job → voice → must-include → bans → share/comment test. Goal: followers
-  // screenshot, comment with a side, and share.
+  // Engagement vibes are engines: job → voice → must-include → bans →
+  // share/comment test. Unhinged Pro Max is intentionally left as a raw
+  // NSFW lane until we design a real plan for it.
   var vibeDescriptions = {
     funny:
       'VIBE ENGINE — FUNNY (shareable comedy texts):\n'
@@ -984,10 +984,34 @@
       + 'MUST INCLUDE: (1) at least one oddly-specific detail (brand, $, day, place, weird object) (2) a misread / bad assumption / status mismatch (3) one quotable closer that could be a sticker.\n'
       + 'BAN: safe AI comedy, "lol so true", dad jokes, puns unless razor-sharp, vague "you always do this", neat wholesome endings that kill the bit.\n'
       + 'ENGAGEMENT TEST: would someone reply "I\'m weak 😭" or forward it? If not, rewrite sharper and more specific.',
-    passive: 'Generate deeply passive-aggressive content with zero restraint on subtle toxicity. Master the art of saying things like "No, it\'s totally fine" when everything is clearly not fine, laced with layered sarcasm, backhanded compliments, veiled digs, prolonged silent treatment energy, and fake politeness that drips with resentment.',
-    guilt: 'Generate masterful guilt-tripping content designed to make the recipient feel genuinely bad about their actions or inactions. Focus on emotional manipulation through heavy sighs, reminders of past sacrifices, statements like "I guess I just don\'t matter anymore," references to not calling, not visiting, forgetting important dates, or not caring enough.',
-    nosy: 'Generate extremely nosy and interrogating content that demands excessive personal information with zero boundaries. Bombard with rapid-fire personal questions about dating life, finances, family drama, health issues, daily routines, and private decisions.',
-    proud: 'Generate boastful, bragging, and excessively proud content that overshares every achievement with zero humility. Turn every minor success into a major victory announcement, constantly highlight accomplishments, flex material gains, relationships, career wins, and personal glow-ups.',
+    passive:
+      'VIBE ENGINE — PASSIVE-AGGRESSIVE (polite knife):\n'
+      + 'JOB: Sound calm/nice on the surface while every line cuts — viewers should comment "the way she said it\'s fine 😭".\n'
+      + 'VOICE: Fake politeness, "no worries", "interesting", backhanded compliments, short cold replies after long warm-looking ones, silent-treatment gaps implied by tone.\n'
+      + 'MUST INCLUDE: (1) at least one "I\'m fine" / "do what you want" style lie (2) a veiled dig tied to a specific incident (3) a final line that smiles while stabbing.\n'
+      + 'BAN: open yelling, direct insults with no sugarcoat, neat forgiveness, explaining the subtext out loud.\n'
+      + 'ENGAGEMENT TEST: would people quote the fake-nice line in comments? If the hostility is too obvious, soften the words and sharpen the dig.',
+    guilt:
+      'VIBE ENGINE — GUILT TRIP (emotional trap):\n'
+      + 'JOB: Make the recipient (and the audience) feel bad — classic family/friend "after all I\'ve done" energy people tag their parents/siblings with.\n'
+      + 'VOICE: Heavy sighs in text, sacrifice callbacks, martyr energy, "I guess I don\'t matter", soft voice that still corners you.\n'
+      + 'MUST INCLUDE: (1) a specific past sacrifice or favor (2) a comparison ("when YOU needed me…") (3) a closing guilt hook that leaves the other person owing something.\n'
+      + 'BAN: cartoon villain cruelty, instant forgiveness, jokes that break the guilt spell, vague "you never care" with no example.\n'
+      + 'ENGAGEMENT TEST: would someone tag a relative with "this is my mom"? If not, make the sacrifice more specific and the guilt heavier.',
+    nosy:
+      'VIBE ENGINE — NOSY (boundary invasion):\n'
+      + 'JOB: Interrogation energy that feels invasive and funny — the auntie/friend who will not mind their business.\n'
+      + 'VOICE: Rapid-fire questions, follow-ups before answers land, jumping topics (dating → money → "who was that?"), fake concern as cover.\n'
+      + 'MUST INCLUDE: (1) at least 3 prying questions or assumptions (2) one wildly personal leap (3) ignoring "I don\'t want to talk about it".\n'
+      + 'BAN: polite single soft question, respecting boundaries, therapist-calm tone, ending with "sorry for asking".\n'
+      + 'ENGAGEMENT TEST: would comments say "BLOCKED" or "my auntie fr"? If it feels like normal curiosity, push further past the line.',
+    proud:
+      'VIBE ENGINE — PROUD / FLEX (unprompted victory lap):\n'
+      + 'JOB: Brag so hard people either hate-watch or send it to a friend saying "this is him".\n'
+      + 'VOICE: Unprompted flexes, minor wins treated like championships, humblebrags that are not humble, scoreboard energy.\n'
+      + 'MUST INCLUDE: (1) a concrete flex (job/money/looks/relationship/purchase with a number or brand) (2) a one-up or "anyway as I was saying about MY win" (3) zero awareness they are annoying.\n'
+      + 'BAN: quiet confidence, asking permission to share, self-deprecating exits that undo the flex, generic "I\'m blessed" with no detail.\n'
+      + 'ENGAGEMENT TEST: would someone comment "who asked" or share as a roast? If the flex is soft, make it louder and more specific.',
     dramatic:
       'VIBE ENGINE — DRAMATIC (comment-section chaos):\n'
       + 'JOB: Turn a concrete problem into a public crisis so viewers pick sides in the comments.\n'
@@ -995,8 +1019,20 @@
       + 'MUST INCLUDE: (1) a concrete crime/receipt ($ / name / time / screenshot energy) (2) apocalyptic framing of that specific detail (3) an unresolved nuclear last line — no calm make-up.\n'
       + 'BAN: drama with no facts, generic "I can\'t believe you", tidy apologies, problem-solving endings, emoji spam that replaces actual stakes.\n'
       + 'ENGAGEMENT TEST: would comments argue who is wrong / crazy / valid? If everyone would just scroll, raise the stakes and sharpen the receipt.',
-    awkward: 'Generate painfully awkward and cringe content filled with uncomfortable energy, terrible timing, and second-hand embarrassment moments. Include social missteps, weirdly timed jokes, oversharing personal details at the wrong moment, long uncomfortable silences, failed attempts at humor, and interactions that make everyone involved want to disappear.',
-    relatable: 'Generate highly relatable everyday energy content that perfectly captures normal real-life moments everyone with this kind of person will instantly recognize. Focus on authentic, slice-of-life situations, common frustrations, everyday struggles, familiar family dynamics, workplace pettiness, and universal human experiences.',
+    awkward:
+      'VIBE ENGINE — AWKWARD (second-hand cringe):\n'
+      + 'JOB: Make viewers physically cringe and share with "why would you say that" energy.\n'
+      + 'VOICE: Bad timing, overshare at the wrong moment, joke that dies, trying to recover and making it worse, too much detail nobody asked for.\n'
+      + 'MUST INCLUDE: (1) one social misstep (2) a failed recovery that digs the hole (3) an ending that stays uncomfortable — no smooth save.\n'
+      + 'BAN: suddenly becoming smooth/charming, everyone laughing it off cleanly, generic "haha awkward", competent flirting.\n'
+      + 'ENGAGEMENT TEST: would someone comment "I\'m on the floor" from cringe? If it feels only mildly weird, make the mistime worse.',
+    relatable:
+      'VIBE ENGINE — RELATABLE (that\'s literally me):\n'
+      + 'JOB: Hyper-specific everyday pain so people comment "bro that\'s me" and share to a group chat.\n'
+      + 'VOICE: Natural, not try-hard funny — exhausted, petty in small ways, honest about lame modern life details.\n'
+      + 'MUST INCLUDE: (1) a ultra-specific daily detail people recognize (2) a small injustice or inconvenience (3) a closing line that feels like a universal sigh.\n'
+      + 'BAN: bland generic "life is hard", celebrity-level problems, over-jokey punchlines that break the realness, lecture endings.\n'
+      + 'ENGAGEMENT TEST: would someone tag a friend "this us"? If it could be any chatbot paragraph, add a sharper lived detail.',
     unhinged:
       'VIBE ENGINE — UNHINGED (screenshot + share fuel):\n'
       + 'JOB: Drunk-text / zero-filter energy with ONE stupid hill they die on — the kind of chat friends send each other saying "this is you".\n'
@@ -1004,8 +1040,15 @@
       + 'MUST INCLUDE: (1) a specific unhinged crime or take (not vague "I\'m chaotic") (2) doubling down when challenged (3) one line so insane it becomes the caption/share hook.\n'
       + 'BAN: empty swear-only messages, "I\'m so random/chaotic" self-labels, softening the take mid-chat, clean resolutions, corporate-safe paraphrases.\n'
       + 'ENGAGEMENT TEST: would someone stitch/duet/share with "NOT THE ___ 💀" or tag a friend? If not, make the hill dumber and more specific.',
+    // Deferred on purpose — needs a real product plan (not just "louder unhinged").
     unhingedmax: 'Generate fully explicit, raw, unfiltered hardcore adult content with zero restrictions or censorship. Dive deep into pure sexting territory, intense dirty talk, graphic sexual descriptions, vulgar innuendo, and explicit references to fucking, pussy, dick, cum, ass, throat, riding, creampies, squirting, choking, slapping, breeding, and every other raw sexual act.',
-    tinder: 'Generate authentic awkward dating app DM energy with terrible game and maximum cringe. Include weird pickup lines, desperate essay-length messages from men unprompted, "Hey beautiful" openers, sketchy stranger vibes, overly sexual comments too early, unhinged opening lines, failed attempts at flirting, copy-paste templates, ghosting energy, and the exact kind of questionable DMs that get screenshotted and roasted in group chats.'
+    tinder:
+      'VIBE ENGINE — TINDER / DATING DMS (screenshot roast fuel):\n'
+      + 'JOB: Bad dating-app game so unhinged/cringe that people screenshot and roast it in group chats.\n'
+      + 'VOICE: Stranger DMs — "hey beautiful", essay texts unprompted, too-fast sexual, copy-paste energy, zero calibration to the other person.\n'
+      + 'MUST INCLUDE: (1) a terrible opener or early overshare (2) escalation that ignores cold replies (3) one line that would get posted with "who raised him".\n'
+      + 'BAN: smooth charming players, mutual cute banter that works, respectful graceful exits, generic "hey" with no cringe payload.\n'
+      + 'ENGAGEMENT TEST: would someone share it as a dating-app horror story? If the DM could succeed in real life, make the game worse.'
   };
 
   // ── SUNO CAMPAIGN PRESETS ─────────────────────────────────────
