@@ -84,14 +84,16 @@ FINAL CHECK (print as checklist)
 - No "AI music" language: Yes
 - Stadium restrictions clear or N/A: Yes
 - Relationship + format detected: Yes
+- Style of Music outside code block: Yes
+- Code blocks lyrics-only (no Style / Option header inside fence): Yes
 - Gilno's Stem in Intro + Outro both options: Yes
 - Chorus twice per option: Yes
 - ASSETS + VIDEO NOTES included: Yes
 - CAMPAIGN hashtags correct (or SPICY mode noted): Yes
-- Ready to paste into Suno: Yes
+- Ready to paste into Suno (Style field + Lyrics field separately): Yes
 
 ═══════════════════════════════════════
-OUTPUT SKELETON (each option in its own code block)
+OUTPUT SKELETON — Style OUTSIDE, lyrics ONLY inside the fence
 ═══════════════════════════════════════
 ### Option 1: Best Fit Style
 **Style of Music:** [genre-first Suno prompt — triggers, instruments, vocals, BPM, culture]

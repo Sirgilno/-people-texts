@@ -39,8 +39,11 @@ DAILY WORKFLOW
 1. People Texts → generate chat (JoHo preset + Full Chaos + vibe)
 2. Copy conversation (optional header below)
 3. Open Gem OR Claude Project → paste / screenshot
-4. Copy Style of Music + lyrics code block → Suno → Create
-5. Use ASSETS captions/hashtags when posting (CAMPAIGN mode)
+4. Copy **Style of Music** (plain text above the fence) → Suno Style field
+5. Copy the **lyrics code block** (lyrics only) → Suno Lyrics field → Create
+6. Use ASSETS captions/hashtags when posting (CAMPAIGN mode)
+
+Important: Style and lyrics must stay separate. If Claude puts Style inside the code block, re-paste updated 01_CORE_INSTRUCTIONS.txt into Project instructions.
 
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
@@ -59,3 +62,4 @@ WHAT CHANGED VS OLD MEGA-PROMPT
 - Hashtags aligned to audit: #sunopartner #sunoambassador #suno
 - CAMPAIGN vs SPICY modes
 - Explicit Suno handoff language
+- Style of Music OUTSIDE the fence; lyrics-only code block (two separate Suno pastes)
