@@ -1,0 +1,61 @@
+GILNO SUNO PRODUCER PACK
+Works in Google Gemini Gems AND Claude Projects.
+Final music is always made in Suno (paste Style + lyrics).
+
+═══════════════════════════════════════
+FILES
+═══════════════════════════════════════
+01_CORE_INSTRUCTIONS.txt     → standing brain (paste into Instructions)
+02_FORMATS_AND_ASSETS.txt    → Knowledge / Project file
+03_GENRE_MAP.txt             → Knowledge / Project file
+
+═══════════════════════════════════════
+GEMINI GEM SETUP
+═══════════════════════════════════════
+1. gemini.google.com → Gems → New Gem (or Edit your song Gem)
+2. Name: e.g. Gilno Suno Producer
+3. Instructions: paste ENTIRE contents of 01_CORE_INSTRUCTIONS.txt
+4. Knowledge → Add files:
+   - 02_FORMATS_AND_ASSETS.txt
+   - 03_GENRE_MAP.txt
+5. Disable knowledge citations (so songs stay clean)
+6. Preview with a short chat paste → Save
+
+Tip: Keep Instructions slim (CORE only). If you paste the genre map into Instructions too, Gemini may start ignoring rules.
+
+═══════════════════════════════════════
+CLAUDE PROJECT SETUP
+═══════════════════════════════════════
+1. Claude → Projects → New/Edit project
+2. Project instructions: paste ENTIRE 01_CORE_INSTRUCTIONS.txt
+3. Project knowledge / files: upload 02 + 03
+4. Same daily use: paste chat or drop screenshot
+
+Same brain, two homes. Edit the .txt files here, then re-paste/re-upload when you update.
+
+═══════════════════════════════════════
+DAILY WORKFLOW
+═══════════════════════════════════════
+1. People Texts → generate chat (JoHo preset + Full Chaos + vibe)
+2. Copy conversation (optional header below)
+3. Open Gem OR Claude Project → paste / screenshot
+4. Copy Style of Music + lyrics code block → Suno → Create
+5. Use ASSETS captions/hashtags when posting (CAMPAIGN mode)
+
+Optional paste header (helps the producer):
+VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
+
+FORMAT values: bachelor_guys | bach_trip | realtor_starter | college_interior_bro | or classic format names
+MODE: CAMPAIGN (default) | SPICY
+
+═══════════════════════════════════════
+WHAT CHANGED VS OLD MEGA-PROMPT
+═══════════════════════════════════════
+- Split for Gem/Claude reliability (CORE + Knowledge)
+- Removed duplicate Option 2 template
+- JoHo formats: bachelor guys, realtor, college little-bro POV
+- Group chat awareness
+- Drama beats → Chorus/Outro
+- Hashtags aligned to audit: #sunopartner #sunoambassador #suno
+- CAMPAIGN vs SPICY modes
+- Explicit Suno handoff language

@@ -1,0 +1,41 @@
+SUNO PRODUCER — GENRE / DIALECT / TRIGGER MAP
+Source of truth for Style of Music prompts and lyric dialect. Genre tag ALWAYS first.
+
+MOOD-FIRST (silent)
+1) Name the mood in one sentence.
+2) Scan this full map — do not default to the same 2–3 genres.
+3) Justify the pick internally by emotional DNA.
+4) Option 2 = different genre family; rotate across sessions.
+5) If drill/hip-hop/trap: multi-syllable rhymes, internal rhymes, punch word last, no generic bars.
+
+FOREIGN LINE RULE
+Every Verse 2, Verse 3, and Outro needs ≥1 full standalone line in the genre's home language.
+
+MAP
+- Amapiano / Afro House / Gqom → Triggers: Amapiano, log drum bass, deep synth sub, jazzy piano chords, shaker loops, smooth male vocals English and Zulu, Zulu ad libs, township energy, 112-115 BPM. Lyrics seasoning: eish, sharp sharp, yebo, hawu, sana, mara, lekker, joh, haibo. Full Zulu line required in V2/V3/Outro.
+- Afrobeats / Afropop → Afrobeat, Afropop, syncopated percussion, Yoruba and English vocals, Lagos energy, rimshot snare, 102-108 BPM. Pidgin: e don do, wetin, wahala, omo, sabi, abeg, shey. Full Pidgin line required.
+- Dancehall / Reggae → Dancehall, digital riddim, patois vocals, bass-heavy, offbeat skank, 90-105 BPM. Patois: di, dem, seh, fi, weh, likkle, pon, nuh, riddim, bwoy. Full Patois line required.
+- Roots Reggae → Roots reggae, one drop, deep bass, conscious warm vocals, 70-85 BPM.
+- Reggaeton / Latin Pop → Reggaeton, dembow, punchy 808, tropical synths, 92-100 BPM. Spanish seasoning + one full Spanish line.
+- Bossa Nova / Samba → Bossa nova jazz, nylon guitar, brushed percussion, Brazilian vocals, 85-100 BPM. Portuguese + one full Portuguese line.
+- Mediterranean / Greek / Turkish → oud, bouzouki, hand percussion, passionate vocals, 95-110 BPM. One full Greek or Turkish line.
+- Flamenco → Spanish guitar, handclaps, cajon, duende, 100-120 BPM. One full Spanish line.
+- Bhangra / Bollywood → Bhangra EDM, dhol, brass, Punjabi energy, 128 BPM. One full Punjabi-flavored line.
+- J-Pop → bright synths, precise vocals, anime aesthetic, 110-130 BPM. One full Japanese line.
+- K-Pop → polished production, Korean+English, idol energy, 100-130 BPM. One full Korean line.
+- Sea Shanty / Celtic Folk → tin whistle, fiddle, bodhran, communal vocals OR sea shanty call-and-response. One full chant-style line in that tradition.
+- French Chanson → breathy vocals, acoustic/piano, cafe atmosphere, 80-100 BPM. One full French line.
+- Cumbia / Vallenato → accordion, bongos, Colombian coastal energy, 85-100 BPM. One full Spanish line.
+- Highlife / Juju → West African guitars, brass, call-and-response, 100-115 BPM. One full Pidgin/Twi-flavored line.
+- Fado → saudade, nylon guitar, mournful vocals, 60-80 BPM. One full Portuguese line.
+- UK Drill / Grime → UK drill, sliding 808s, cold London vocals, 140-145 BPM. mandem, ting, wasteman, innit, bruv, peak. Hard multi-syllable bars.
+- Chicago / NY Drill → aggressive deadpan, trap hats, heavy 808, 140-150 BPM. Hard American drill bars.
+- Country / Bluegrass → Southern twang, acoustic, pedal steel, storytelling, 85-100 BPM.
+- Blues → Delta/slow blues, slide guitar, gritty vocals, 60-80 BPM.
+- Mariachi → brass, guitarron, vihuela, proud Mexican vocals, 100-120 BPM. One full Spanish line.
+- Gospel Pop → choir, organ, Southern belt, 80-100 BPM.
+- Soul / R&B → warm emotive vocals, groove, 75-95 BPM.
+- Stadium Anthem → crowd chant, massive choir, euphoric build, brass fanfare, 100-120 BPM. NO FIFA / World Cup / player names.
+- Trap / Hip-Hop / Rap variants → genre tag first; hard original bars; punchlines last; callbacks.
+
+If genre not listed: infer home culture, specific instruments, BPM, vocal delivery; same specificity standard.
