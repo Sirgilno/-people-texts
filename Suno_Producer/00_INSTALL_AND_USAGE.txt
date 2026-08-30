@@ -23,6 +23,8 @@ GEMINI GEM SETUP
 
 Tip: Keep Instructions slim (CORE only). If you paste the genre map into Instructions too, Gemini may start ignoring rules.
 
+When this pack updates: Edit Gem → replace Instructions with the new 01_CORE → remove old Knowledge files → re-add 02 + 03 → Save. Gemini does NOT auto-pull from GitHub.
+
 ═══════════════════════════════════════
 CLAUDE PROJECT SETUP
 ═══════════════════════════════════════
@@ -31,7 +33,9 @@ CLAUDE PROJECT SETUP
 3. Project knowledge / files: upload 02 + 03
 4. Same daily use: paste chat or drop screenshot
 
-Same brain, two homes. Edit the .txt files here, then re-paste/re-upload when you update.
+When this pack updates: replace Project instructions with the new 01_CORE → re-upload 02 + 03. Claude does NOT auto-pull from GitHub.
+
+Same brain, two homes (Gemini Gem + Claude Project). Edit the .txt files here, then refresh BOTH homes when you update.
 
 ═══════════════════════════════════════
 DAILY WORKFLOW
@@ -39,8 +43,11 @@ DAILY WORKFLOW
 1. People Texts → generate chat (JoHo preset + Full Chaos + vibe)
 2. Copy conversation (optional header below)
 3. Open Gem OR Claude Project → paste / screenshot
-4. Copy Style of Music + lyrics code block → Suno → Create
-5. Use ASSETS captions/hashtags when posting (CAMPAIGN mode)
+4. Copy **Style of Music** (plain text above the fence) → Suno Style field
+5. Copy the **lyrics code block** (lyrics only) → Suno Lyrics field → Create
+6. Use ASSETS captions/hashtags when posting (CAMPAIGN mode)
+
+Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If either puts Style inside the code block, re-paste updated 01_CORE_INSTRUCTIONS.txt into that home's Instructions (Gem and/or Claude Project) and re-upload 02.
 
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
@@ -59,3 +66,4 @@ WHAT CHANGED VS OLD MEGA-PROMPT
 - Hashtags aligned to audit: #sunopartner #sunoambassador #suno
 - CAMPAIGN vs SPICY modes
 - Explicit Suno handoff language
+- Style of Music OUTSIDE the fence; lyrics-only code block (two separate Suno pastes)
