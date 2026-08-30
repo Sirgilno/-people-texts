@@ -1201,8 +1201,8 @@
     },
     bachelor_guys: {
       label: 'Bachelor — Guys Trip Drama (male)',
-      desc: '🍻 JoHo push for male creators. Bachelor / boys trip group chat — someone already did something dumb. Use Group Chat 3–4 + Full Chaos. You are in the chat as the working guy in the friend group.',
-      person: 'bestfriend', vibe: 'unhinged', mode: 'song', msgStyle: 'whatsapp',
+      desc: '🍻 JoHo push for male creators. Bachelor / boys trip group chat — someone already did something dumb. Use Group Chat 3–4 + Full Chaos. You are in the chat as the working guy in the friend group. Uses Dramatic + Claude by default (reliable); switch Vibe to Unhinged if you want Grok.',
+      person: 'bestfriend', vibe: 'dramatic', mode: 'song', msgStyle: 'whatsapp',
       groupSize: 3, groupType: 'contacts', groupName: 'Bachelor Weekend', mood: 2,
       topic: 'bachelor / boys trip group chat already on fire — one of the guys did something dumb and unhinged (stripper booked without asking, rings almost lost, bride\'s banned stories posted, villa Venmo war, or almost missed the flight wasted). Specific $ / photo / story receipts. One guy defends it, one panics the bride will find out, one piles on. End unresolved — bride is typing OR the video is already up. Comment-bait.',
       dramaPack:
@@ -1215,8 +1215,8 @@
     },
     bach_trip: {
       label: 'Bachelorette — Trip Group Chat Chaos',
-      desc: '🍾 Girls trip / bachelorette group chat imploding. Best in Group Chat 3–4 + Full Chaos. Song Mode → Gem.',
-      person: 'bestfriend', vibe: 'unhinged', mode: 'song', msgStyle: 'imessage',
+      desc: '🍾 Girls trip / bachelorette group chat imploding. Best in Group Chat 3–4 + Full Chaos. Song Mode → Gem. Uses Dramatic + Claude by default; switch Vibe to Unhinged for Grok.',
+      person: 'bestfriend', vibe: 'dramatic', mode: 'song', msgStyle: 'imessage',
       groupSize: 3, groupType: 'contacts', groupName: 'Bachelorette', mood: 2,
       topic: 'bachelorette trip group chat falling apart — secret ex invite, Airbnb money fight, bride adding insane rules, someone posting banned stories. Specific receipts. Loyalty split. End on a cliffhanger, not a make-up.',
       dramaPack:
@@ -1241,8 +1241,8 @@
     },
     college_interior_bro: {
       label: 'College — Interior Designer (little bro POV)',
-      desc: '🛋️ JoHo college format without pretending you are a student. You are the working older brother reacting to what your younger bro is doing in college (aesthetic suite / interior-design chaos). Followers already know you work — this is brother POV, not a lie.',
-      person: 'brother', vibe: 'unhinged', mode: 'song', msgStyle: 'whatsapp',
+      desc: '🛋️ JoHo college format without pretending you are a student. You are the working older brother reacting to what your younger bro is doing in college (aesthetic suite / interior-design chaos). Followers already know you work — this is brother POV, not a lie. Uses Funny + Claude by default; switch Vibe to Unhinged for Grok.',
+      person: 'brother', vibe: 'funny', mode: 'song', msgStyle: 'whatsapp',
       mood: 2,
       topic: 'texts from my younger brother in college about his "interior designer" era — he and his roommates are in an aesthetic arms race (expensive mirror, LED wall, fake plant haul, "it\'s for the dorm TikTok"), spending money he does not have, asking me (the working older brother) to bail him out or take his side vs roommates/parents. Specific $ receipts. I am not in college — I am roasting / panicking from the outside. Comment-bait: spoiling him or teaching him a lesson?',
       dramaPack:
@@ -1535,6 +1535,42 @@
     }
     if (!info.text) throw new Error(anthropicEmptyMessage(info));
     return info.text;
+  }
+
+  // xAI Grok — browser fetch can fail with opaque "Failed to fetch" (CORS / adblock / bad key).
+  // Always sanitize model id and surface a useful message. Callers may Claude-fallback on .network.
+  async function callGrokText(key, model, prompt, maxTokens, temperature) {
+    var grokModel = (model && String(model).indexOf('grok') !== -1) ? model : 'grok-4.3';
+    var resp;
+    try {
+      resp = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: grokModel,
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: maxTokens || 2000,
+          temperature: temperature != null ? temperature : 0.9
+        })
+      });
+    } catch (netErr) {
+      var wrapped = new Error(
+        'Could not reach xAI Grok (Failed to fetch). Check your xAI key is saved, turn off ad blockers on this page, or switch AI Provider to Anthropic Claude.'
+      );
+      wrapped.network = true;
+      throw wrapped;
+    }
+    var data = await resp.json().catch(function() { return {}; });
+    if (!resp.ok) {
+      var msg = (data.error && data.error.message) ? data.error.message : 'xAI API error';
+      var err = new Error(msg);
+      err.status = resp.status;
+      err.payload = data;
+      throw err;
+    }
+    var text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (!text || !String(text).trim()) throw new Error('Grok returned an empty response. Try Generate again.');
+    return String(text).trim();
   }
 
   document.getElementById('saveKeyBtn').addEventListener('click', function() {
@@ -1878,15 +1914,7 @@
       if (useGrok) {
         var grokKey = getGrokKey();
         if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('memeLoadingDiv').style.display='none'; document.getElementById('generateMemeBtn').disabled=false; return; }
-        var gm = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
-        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-          body: JSON.stringify({ model: gm, messages: [{ role: 'user', content: prompt }], max_tokens: 1200, temperature: 0.9 })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-        var data = await resp.json();
-        rawText = data.choices?.[0]?.message?.content?.trim();
+        rawText = await callGrokText(grokKey, model, prompt, 1200, 0.9);
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('memeLoadingDiv').style.display='none'; document.getElementById('generateMemeBtn').disabled=false; return; }
@@ -1958,15 +1986,7 @@
       if (useGrok) {
         var grokKey = getGrokKey();
         if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('dateNightLoadingDiv').style.display='none'; document.getElementById('generateDateNightBtn').disabled=false; return; }
-        var gm = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
-        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-          body: JSON.stringify({ model: gm, messages: [{ role: 'user', content: prompt }], max_tokens: 1800, temperature: 0.9 })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-        var data = await resp.json();
-        rawText = data.choices?.[0]?.message?.content?.trim();
+        rawText = await callGrokText(grokKey, model, prompt, 1800, 0.9);
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('dateNightLoadingDiv').style.display='none'; document.getElementById('generateDateNightBtn').disabled=false; return; }
@@ -2042,15 +2062,7 @@
       if (useGrok) {
         var grokKey = getGrokKey();
         if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('reactLoadingDiv').style.display='none'; document.getElementById('generateReactBtn').disabled=false; return; }
-        var gm = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
-        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-          body: JSON.stringify({ model: gm, messages: [{ role: 'user', content: prompt }], max_tokens: 1500, temperature: 0.95 })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-        var data = await resp.json();
-        rawText = data.choices?.[0]?.message?.content?.trim();
+        rawText = await callGrokText(grokKey, model, prompt, 1500, 0.95);
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('reactLoadingDiv').style.display='none'; document.getElementById('generateReactBtn').disabled=false; return; }
@@ -2121,14 +2133,7 @@
       if (useGrok) {
         var grokKey = getGrokKey();
         if (!grokKey) { showError('Unhinged / Unhinged Spicy / Unhinged Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
-        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-          body: JSON.stringify({ model: model, messages: [{ role: 'user', content: prompt }], max_tokens: 1200, temperature: 0.9 })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-        var data = await resp.json();
-        rawText = data.choices?.[0]?.message?.content?.trim();
+        rawText = await callGrokText(grokKey, model, prompt, 1200, 0.9);
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
@@ -2247,20 +2252,29 @@
 
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged / Unhinged Spicy / Unhinged Max require your xAI Grok key. Add it in the API Key section above.'); showLoading(false); return; }
-        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-          body: JSON.stringify({
-            model: model,
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 2000,
-            temperature: 0.9
-          })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-        var data = await resp.json();
-        rawText = data.choices?.[0]?.message?.content?.trim();
+        var claudeKey = getKey();
+        if (!grokKey && !claudeKey) {
+          showError('Unhinged / Unhinged Spicy / Unhinged Max need an xAI Grok key — or save an Anthropic key and switch Provider to Claude.');
+          showLoading(false);
+          return;
+        }
+        if (grokKey) {
+          try {
+            rawText = await callGrokText(grokKey, model, prompt, 2000, 0.9);
+          } catch (grokErr) {
+            // Bachelor / JoHo presets used to hard-fail here with bare "Failed to fetch".
+            // If Claude is available, fall back so campaign formats still generate.
+            if (grokErr && grokErr.network && claudeKey) {
+              var claudeModel = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
+              rawText = await callAnthropicText(claudeKey, claudeModel, prompt, 4096, 1.0);
+            } else {
+              throw grokErr;
+            }
+          }
+        } else {
+          var claudeModelOnly = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
+          rawText = await callAnthropicText(claudeKey, claudeModelOnly, prompt, 4096, 1.0);
+        }
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); showLoading(false); return; }
@@ -2341,16 +2355,23 @@
 
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Add your xAI Grok key in the API Key section above, or switch Provider to Claude.'); showLoading(false); return; }
-        var grokModel = (model && model.indexOf('grok') !== -1) ? model : 'grok-4.3';
-        var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-          body: JSON.stringify({ model: grokModel, messages: [{ role: 'user', content: prompt }], max_tokens: 2000, temperature: 0.95 })
-        });
-        if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-        var data = await resp.json();
-        rawText = data.choices?.[0]?.message?.content?.trim();
+        var claudeKeyC = getKey();
+        if (!grokKey && !claudeKeyC) { showError('Add your xAI Grok key, or save an Anthropic key and switch Provider to Claude.'); showLoading(false); return; }
+        if (grokKey) {
+          try {
+            rawText = await callGrokText(grokKey, model, prompt, 2000, 0.95);
+          } catch (grokErrC) {
+            if (grokErrC && grokErrC.network && claudeKeyC) {
+              var cmC = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
+              rawText = await callAnthropicText(claudeKeyC, cmC, prompt, 4096, 1.0);
+            } else {
+              throw grokErrC;
+            }
+          }
+        } else {
+          var cmOnly = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
+          rawText = await callAnthropicText(claudeKeyC, cmOnly, prompt, 4096, 1.0);
+        }
       } else {
         var key = getKey();
         if (!key) { showError('Please save your Anthropic API key first, or switch Provider to xAI Grok.'); showLoading(false); return; }
@@ -4210,14 +4231,14 @@
 
       async function runShortenModel(prompt, maxTokens) {
         if (shortenUseGrok) {
-          var resp = await fetch('https://api.x.ai/v1/chat/completions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
-            body: JSON.stringify({ model: shortenModel, messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens || 1200, temperature: 0.7 })
-          });
-          if (!resp.ok) { var e = await resp.json(); throw new Error(e.error ? e.error.message : 'xAI API error'); }
-          var data = await resp.json();
-          return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '').trim();
+          try {
+            return await callGrokText(grokKey, shortenModel, prompt, maxTokens || 1200, 0.7);
+          } catch (shortGrokErr) {
+            if (shortGrokErr && shortGrokErr.network && key) {
+              return callAnthropicText(key, (shortenModel && String(shortenModel).indexOf('claude') !== -1) ? shortenModel : 'claude-sonnet-5', prompt, maxTokens || 2048, 0.7);
+            }
+            throw shortGrokErr;
+          }
         }
         return callAnthropicText(key, shortenModel, prompt, maxTokens || 2048, 0.7);
       }
