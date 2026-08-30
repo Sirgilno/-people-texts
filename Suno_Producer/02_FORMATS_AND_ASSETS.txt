@@ -94,6 +94,7 @@ FINAL CHECK (print as checklist)
 
 ═══════════════════════════════════════
 OUTPUT SKELETON — Style OUTSIDE, lyrics ONLY inside the fence
+(Same shape in Gemini Gem and Claude Project. Style is NEVER inside the fence.)
 ═══════════════════════════════════════
 ### Option 1: Best Fit Style
 **Style of Music:** [genre-first Suno prompt — triggers, instruments, vocals, BPM, culture]
