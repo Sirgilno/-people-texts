@@ -1,0 +1,167 @@
+CASH COW — GENRE / DIALECT / SUNO TRIGGER MAP
+Source of truth for Style of Music and lyric dialect. Genre tag ALWAYS first.
+
+MOOD-FIRST (silent, every project)
+1) Name the mood in one sentence (wholesome family comedy / betrayal / gym fail / toddler chaos / slow-burn romance / etc.).
+2) Scan this FULL map — do not default to the same 2–3 genres.
+3) Justify internally by emotional DNA, not just trigger words.
+4) Track genres already used in this chat. Repeat only if the mood genuinely repeats. If you reuse because it is truly the best fit, say so in one aside to the user.
+5) Option 2 = unrelated genre family; contrast should be interesting, not lazy-random.
+
+CRITICAL LANGUAGE
+English is always the base. Dialect words are seasoning.
+Every Verse 2, Verse 3, and Outro MUST contain ≥1 full standalone line in the home language of the genre.
+
+If the genre is not listed: infer home culture, specific instrument names, BPM, vocal delivery; same specificity.
+
+RAP OVERRIDE
+UK Drill, Chicago/NY Drill, Grime, Hip-Hop, Trap, or any rap variant: hard original bars. Multi-syllable schemes, internal rhymes, punch last. Generic rhymes fail.
+
+═══════════════════════════════════════
+MAP
+═══════════════════════════════════════
+
+AMAPIANO / AFRO HOUSE / GQOM
+Triggers: Amapiano, log drum bass, log drum bassline, deep synth sub, jazzy piano chords, shaker loops, smooth male vocals in English and Zulu, Zulu ad libs and chants, late-night SA groove, township energy, 112-115 BPM.
+Seasoning: eish, sharp sharp, yebo, hawu, sana, mara, lekker, joh, haibo, danko, grootman, ntwana, phola, moja, zaka, vosho, kasi, jaiva, ziyakhala, waya waya.
+Gqom extra: wololo, ziyasha, asambe, eThekwini, Umlazi, shay'izandla, hlanya.
+Full line: Zulu (or Tswana). Tags: Danko grootman | Ziyakhala ke | Vula circle | Kasi vibe
+Example: Yanos iyachisa, asijayive sbali, log drum ikhala kamnandi e-straata.
+
+AFROBEATS / AFROPOP
+Triggers: Afrobeat, Afropop, syncopated African percussion, Yoruba and English male vocals, call-and-response, Lagos nightclub energy, shaker rhythm, rimshot snare, 102-108 BPM.
+Seasoning: e don do, wetin, wahala, omo, sabi, ehen, abeg, shey, chop, waka, gbedu, japa, kolo, no cap, odogwu, jeje.
+Ghana Twi extra: chale, sika, odo, onyame, yɛnkɔ, gye Nyame, bokoor.
+Full line: Nigerian Pidgin (or Twi). Tags: No wahala | Chop life | Gbedu wey dey burst brain
+Example: I dey my corner, I dey chop life jeje, no wahala dey near me.
+
+DANCEHALL / REGGAE
+Triggers: Dancehall, digital riddim, energetic, patois vocals, bass-heavy, offbeat skanking guitar, toasting delivery, raspy male vocals, 90-105 BPM.
+Seasoning: gyal, bredda, pull up, wheel, selecta, wine, bruk out, big up, badmind, riddim, likkle, yute, wah gwaan, nuh, dem, mash up, run di place.
+Full line: Jamaican Patois. Tags: Wah gwaan star | Wheel and come again | Run di place
+Example: Selecta, wheel and come again make we shell di place.
+
+ROOTS REGGAE
+Triggers: Roots reggae, offbeat guitar, one drop drums, conscious lyrics, deep bass, warm spiritual male vocals, 70-85 BPM.
+Seasoning: I and I, Jah, Babylon, Zion, livity, overstand, ital, seen, bredrin, give thanks, chant down, word sound and power.
+Full line: Conscious Patois. Tags: Satta Massagana | Chant down Babylon | Give thanks and praises
+Example: I and I trod through di valley, chanting down di downpressor with word, sound and power.
+
+REGGAETON / LATIN POP
+Triggers: Reggaeton, dembow beat, punchy 808, tropical synths, percussive shakers, rhythmic male vocals, Latin club feel, 92-100 BPM.
+Seasoning: perreo, dale, oye, papi, mami, fuego, corazon, flow, corillo, gata, dure, nos fuimos, parce, chimba, prender.
+Full line: Spanish. Tags: ¡Duro! | Hasta abajo | Sube el dembow
+Example: Ella se viste acicalá pa' ir al jangueo, le mete duro al perreo cuando siente el dembow.
+
+BOSSA NOVA / SAMBA
+Triggers: Bossa nova jazz, nylon string guitar, soft brushed percussion, warm bass, smooth Brazilian vocals, 85-100 BPM. Samba: bateria, cavaquinho, pandeiro, surdo, festive street energy.
+Seasoning: saudade, amor, meu bem, coração, carioca, sorriso, brisa, mar, flor, ginga, morro, festa, alegria.
+Full line: Portuguese. Tags: Cheia de graça | Deixa o barquinho correr | Pé no chão
+Example: Olha que coisa mais linda, mais cheia de graça, é ela menina que vem e que passa.
+
+MEDITERRANEAN / GREEK / TURKISH
+Triggers: Mediterranean groove, oud, bouzouki, hand percussion, emotional male vocals, warm strings, 95-110 BPM.
+Seasoning: aman, opa, yamas, ela, agapi, haydi, kefi, dert, hasret, habibi, yallah.
+Full line: Greek or Turkish. Tags: Αμάν αμάν | Κέφι και χορός | Ateş düştü gönlüme
+Example: Αμάν, πονάει η καρδιά μου για σένα, έχω ένα ντέρτι που δεν με αφήνει να κοιμηθώ.
+
+FLAMENCO
+Triggers: Flamenco, Spanish guitar, handclaps, raw passionate male vocals, Andalusian scale, duende, cajon, 100-120 BPM.
+Seasoning: ole, duende, alma, corazon, ay, madre mia, pena, sangre, fuego, quejío, ole.
+Full line: Spanish. Tags: ¡Olé! | Cante jondo | Pena negra
+Example: A la mare de mi alma yo le pido perdón por tener esta pena negra metida en mi corazón.
+
+BHANGRA / BOLLYWOOD
+Triggers: Bhangra EDM, dhol, brass, bright Punjabi vocal energy, 128 BPM. Or Bollywood filmi, lush orchestra, sitar, tabla, cinematic.
+Seasoning: balle balle, haye, oye, sohna, rabba, patola, nachna, dil, pyaar, ishq, sanam, dard, judai.
+Full line: Punjabi-flavored or Hindi. Tags: Balle balle | Mahi aa ja | Dil to pagal hai
+Example: Dhol vajiya te nacce saari, balle balle yaar ajj mele vich raunak.
+
+J-POP
+Triggers: J-pop, bright synth production, clean precise Japanese vocal tone, anime aesthetic, melodic hooks, layered harmonies, 110-130 BPM.
+Seasoning: nani, sugoi, kawaii, maji de, yabai, senpai, daijoubu, honto ni, doki-doki, seishun, kimi, setsunai.
+Full line: Japanese. Tags: 君が好きだ | 時を止めて | ありのままの君で
+Example: 木漏れ日の下で笑う君を見て 胸キュンが止まらない ドキドキするよ.
+
+K-POP
+Triggers: K-pop, polished studio production, sharp rhythmic delivery, Korean and English vocals, layered harmonies, punchy beats, idol energy, 100-130 BPM.
+Seasoning: aigoo, daebak, ottoke, jinjja, oppa, saranghae, mianhae, fighting, wae, sim-kung, kemi, mildang, heol.
+Full line: Korean. Tags: 꽃길만 걷자 | 심쿵했잖아 | 이건 진짜 대박이야
+Example: 네가 보여 내 눈앞에 반짝반짝 심장이 먼저 반응해 쿵쾅쿵쾅.
+
+SEA SHANTY / CELTIC FOLK
+Triggers: Celtic folk, tin whistle, harp, fiddle, bodhran, rough communal male vocals, 95-110 BPM. Or sea shanty, sailor chant, accordion, call and response.
+Seasoning: heave ho, haul away, lads, aye, me hearties, ahoy, grog, landlubber, grá, stór, craic, sláinte, ochón.
+Full line: sailor chant or Irish-flavored. Tags: Heave-ho, pull together | Slán abhaile | The craic was mighty
+Example: We'll weigh the anchor, cast off the lines, wayhay, roll and go.
+
+FRENCH CHANSON
+Triggers: French chanson, breathy intimate vocals, acoustic guitar, soft piano, Parisian cafe atmosphere, 80-100 BPM.
+Seasoning: mon dieu, mais oui, cheri, voila, amour, magnifique, paname, spleen, nostalgie, adieu, cœur.
+Full line: French. Tags: Sous le ciel de Paris | La vie en rose | Ne me quitte pas
+Example: Dans notre mansarde sous le ciel de Paname, nous vivions de peu de vin rouge et d'argot.
+
+CUMBIA / VALLENATO
+Triggers: Cumbia, upbeat accordion, bongos, Colombian coastal energy, 85-100 BPM. Vallenato: acordeón, caja, guacharaca, paseo, storytelling.
+Seasoning: morena, gozar, sabor, candela, ay hombe, compadre, pena, parranda, corazón, rumba.
+Full line: Spanish. Tags: ¡A bailar mi cumbia! | ¡Ay hombe! | Parranda vallenata
+Example: Al son de las gaitas y el tambor alegre la morena gira bailando la cumbia.
+
+HIGHLIFE / JUJU
+Triggers: Highlife, West African guitar, brass horn section, joyful Yoruba or Twi vocals, call and response, 100-115 BPM.
+Seasoning: e go better, oya, jeje, medaase, wahala dey, chale, suru, aseda, odo, onyame.
+Full line: Yoruba or Twi flavored. Tags: Suru l'ere | Bokoor na eye | Sankofa
+Example: Ɔbra yi yɛ den, nanso abotare wɔ hɔ, Onyame bɛma yɛn ahooden ne nhyira.
+
+FADO
+Triggers: Fado, Portuguese saudade, mournful nylon guitar, melancholic vocals, sparse arrangement, 60-80 BPM.
+Seasoning: saudade, destino, coração partido, minha alma, triste, mar, solidão, Lisboa, fadista, lágrima.
+Full line: Portuguese. Tags: Tudo isto é fado | Saudade sem fim | Cheira a Lisboa
+Example: Silêncio, que se vai cantar o fado de dor, a guitarra portuguesa chora o meu perdido amor.
+
+UK DRILL / GRIME
+Triggers: UK drill, sliding 808s, cold clipped London male vocals, syncopated hi-hats, dark atmosphere, 140-145 BPM. Grime: eskibeats, reload, 140 BPM MC energy.
+Seasoning: mandem, ting, wasteman, peng, bare, innit, bruv, feds, road, gassed, allow it, peak, wagwan, ends, fam, creps, spit, wheel up.
+Full line: UK slang cadence (still mostly English). Tags: Man's really on this | Allow that | Rep the ends
+HARD BARS REQUIRED.
+
+CHICAGO / NY DRILL
+Triggers: Drill, aggressive American street vocal, deadpan male delivery, trap hi-hats, heavy 808, dark melody, 140-150 BPM.
+Seasoning: opp, slime, no cap, on sight, drip, slide, lackin, day one, on the block, free the guys, get back.
+HARD BARS REQUIRED. Keep campaign-safe unless comments themselves go darker — then still no glorifying real violence against minors.
+
+COUNTRY / BLUEGRASS
+Triggers: Country, heartfelt Southern American twang, acoustic guitar, pedal steel, tight snare, storytelling vocals, 85-100 BPM. Bluegrass: fiddle, banjo, high lonesome, mandolin.
+Seasoning: y'all, reckon, ain't, holler, darlin', fixin' to, front porch, bless your heart, whiskey bent, kinfolk.
+Example: Got the tailgate down on a gravel road, drinking sweet tea, waiting on the sun to go.
+
+BLUES
+Triggers: Delta blues, slow acoustic guitar, slide guitar, raw gritty male vocals, 60-80 BPM. Or Chicago electric, harmonica, bar-band.
+Seasoning: Lord have mercy, woke up this morning, ain't got nobody, devil, trouble, gone, mojo, crossroads, dust my broom.
+Example: I went down to the crossroads, fell down on my knees.
+
+MARIACHI
+Triggers: Mariachi, vibrant brass horns, guitarron, vihuela, proud passionate Mexican male vocals, 100-120 BPM.
+Seasoning: ay ay ay, corazon, mi vida, senor, linda, viva, despecho, tequila, grito, orgullo, cantina.
+Full line: Spanish. Tags: ¡Ay, ay, ay! | Jalisco no te rajes | Amor de mi alma
+Example: ¡Ay, ay, ay! Canta y no llores, porque cantando se alegran, cielito lindo, los corazones.
+
+GOSPEL POP
+Triggers: Gospel pop, uplifting choir, organ, warm Southern American devotional vocals, powerful belt, 80-100 BPM.
+Seasoning: hallelujah, glory, amen, praise, testify, blessed, saved, lifted, waymaker, breakthrough, walk by faith.
+Example: I felt the breakthrough coming when I began to praise, my shackles fell to pieces under His gaze.
+
+SOUL / R&B
+Triggers: Soul, R&B, warm American vocal, emotive and deeply expressive, smooth production, groove-based rhythm, 75-95 BPM.
+Seasoning: groove, heartache, late night, fire and desire, can't let go, fool for you, gave you my all, stay, slow jam.
+Example: This is my late night confession, I've been losing my sleep.
+
+STADIUM ANTHEM (use sparingly)
+Triggers: crowd chant, massive choir, euphoric build, brass fanfare, 100-120 BPM.
+NEVER: FIFA, World Cup, World Cup 2026, player names, trophies, emblems, mascots.
+
+TRAP / HIP-HOP / RAP VARIANTS
+Genre tag first. Hard original bars. Punchlines last. Callbacks. No artist names. No "in the style of".
+
+90s EURODANCE / DARK SYNTHWAVE / OTHER
+If mood wants it: name specific drums, synth type, BPM, vocal texture, atmosphere. Same dialect/foreign-line standard if the genre has a home language; if not, English with era-correct phrasing.
