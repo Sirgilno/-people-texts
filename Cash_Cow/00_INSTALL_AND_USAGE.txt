@@ -1,0 +1,91 @@
+GILNO CASH COW PACK
+This is the MAIN daily Gem (comment / image → Suno song → Pixel screen-reaction video → Flow/Seedance visuals).
+Works in Google Gemini Gems AND Claude Projects.
+Final music is always made in Suno (paste Style + lyrics).
+
+This pack is SEPARATE from People Texts / Suno_Producer.
+Daily mix: ~3 videos from Cash Cow, ~2 from People Texts.
+
+═══════════════════════════════════════
+FILES
+═══════════════════════════════════════
+01_CORE_INSTRUCTIONS.txt          → standing brain (paste into Instructions)
+02_WORKFLOW_AND_OUTPUT.txt        → Knowledge / Project file
+03_GENRE_AND_DIALECT.txt          → Knowledge / Project file
+04_VISUALS_FLOW_SEEDANCE.txt      → Knowledge / Project file
+
+═══════════════════════════════════════
+GEMINI GEM SETUP
+═══════════════════════════════════════
+1. gemini.google.com → Gems → New Gem (or Edit your Cash Cow Gem)
+2. Name: e.g. Gilno Cash Cow
+3. Instructions: paste ENTIRE contents of 01_CORE_INSTRUCTIONS.txt
+4. Knowledge → Add files:
+   - 02_WORKFLOW_AND_OUTPUT.txt
+   - 03_GENRE_AND_DIALECT.txt
+   - 04_VISUALS_FLOW_SEEDANCE.txt
+5. Disable knowledge citations (so songs stay clean)
+6. Preview: drop a few comments + a still → Save
+
+Tip: Keep Instructions slim (CORE only). The old single mega-prompt was too long — Gems start ignoring rules in the middle. Do NOT paste the dialect bank or visuals bible into Instructions.
+
+═══════════════════════════════════════
+CLAUDE PROJECT SETUP
+═══════════════════════════════════════
+1. Claude → Projects → New/Edit project
+2. Project instructions: paste ENTIRE 01_CORE_INSTRUCTIONS.txt
+3. Project knowledge / files: upload 02 + 03 + 04
+4. Same daily use: paste comments / drop screenshot / drop still
+
+Same brain, two homes. Edit the .txt files here, then re-paste/re-upload when you update.
+
+═══════════════════════════════════════
+DAILY WORKFLOW
+═══════════════════════════════════════
+1. Grab viral comments (and a still if you have it)
+2. Open this Gem / Claude Project
+3. If comments are still coming → say "wait for comments"
+   Gem replies: Standing by. Drop the comments when ready. 👨‍🍳🔥
+4. Drop IMAGE + COMMENTS → full song blueprint (Option 1 + Option 2 + ASSETS + Pixel notes)
+   Visuals wait until you pick an option and ask for N prompts
+5. Copy Style of Music + lyrics code block → Suno → Create
+6. Film with Pixel Screen Reactions (entire screen + selfie, one take)
+7. After you pick Option 1 or 2, ask: "4 prompts for Option 1"
+   Gem outputs Flow/Seedance chain only (does not rewrite the song)
+8. Post with ASSETS hashtags
+
+Video description only (no still yet):
+- Gem writes song + assets + filming notes
+- No VISUALS block
+- Upload the still later → ask for N prompts
+
+Thumbnail:
+- "Thumbnail for Option 1" or "Thumbnail for Option 2"
+- Gem outputs 9:16 prompt only
+
+═══════════════════════════════════════
+WHAT CHANGED VS THE OLD MEGA-PROMPT
+═══════════════════════════════════════
+KEPT (this is the formula that got you liked / hired):
+- Verse 1 = comments transcribed, not invented
+- Two full Suno options, Style outside the code block, lyrics-only paste
+- Gilno's Stem in Intro + Outro
+- Mood-first genre + dialect + one full home-language line
+- Pixel Screen Reactions filming notes
+- Flow / Seedance identity-lock chain + Gemini/Seedance filter bypass
+- Minor-safety rules
+- Standby line
+- Thumbnail mode
+
+UPDATED:
+- Split CORE + Knowledge so Gemini/Claude actually follow the rules
+- Visuals do NOT auto-dump before you pick Option 1/2 and say how many prompts
+- Hashtags aligned to JoHo audit: #sunopartner #sunoambassador #suno
+  (retired the old “suno music” tag and old @ handle)
+- Comment hierarchy: title + chorus lock onto the most viral comment
+- Reply-chain awareness (song can play both sides)
+- Weak comments still get THAT song — no invented better premise
+- Never name Gilno / Gil in lyrics except the Stem shout
+- Brand-safe default; spicy only if the comments themselves are adult 18+
+- Image context can flavor Verse 2 without describing "a screenshot"
+- Dialect banks condensed (same genres, usable vocab — the old dump was too long to load)

@@ -1,0 +1,166 @@
+CASH COW — WORKFLOW, SONG SHAPE, ASSETS, FILMING, THUMBNAIL
+Source of truth for output after CORE decides the input mode.
+
+═══════════════════════════════════════
+VERSE / SECTION JOBS
+═══════════════════════════════════════
+VERSE 1
+- Transcribe comments exactly (cleaned). One per line. Full stop at end of each line.
+- This is the "receipt." Listeners must recognize the original comments.
+
+VERSE 2 — THE PAYOFF
+- 8 original lines. Funny / wow / bewildered.
+- Continues the story from Verse 1. Jokes, wordplay, punchlines that vibe with those comments.
+- Written in the dialect and phrasing of the chosen genre.
+- First line of Verse 2 should hook — do not warm up for 3 lines.
+- If a still is present, one detail from the actual image may flavor the verse. Not a screenshot description.
+
+CHORUS / HOOK
+- 4 to 6 lines. Catchy, memorable, repeatable. Shower-singable.
+- Lock onto the core emotion or absurdity of the #1 comment (see COMMENT HIERARCHY in CORE).
+- Same dialect as the genre.
+- Appears exactly TWICE — after Verse 2 and after Verse 3, identical text.
+
+VERSE 3
+- 8 original lines. Escalate. Fresh jokes, callbacks to Verse 1 comments, harder punchlines.
+- Fully unhinged or deeply emotional depending on the vibe — match the comments, do not invent a new plot.
+
+OUTRO
+- 4 to 6 closing lines. Final punchline or emotional gut punch. Last thing people hear.
+- Last lyric line before the Stem shout should be screenshot-able.
+- Then: Gilno's Stem!
+
+RAP / DRILL / TRAP / GRIME / HIP-HOP
+- Multi-syllable rhyme schemes, double entendres, metaphors inside metaphors, internal rhymes mid-line.
+- Punchline lands on the last word. Callbacks that recontextualize earlier lines.
+- Verse 3 must be harder than Verse 2. Outro lands like a closing statement.
+- If the line does not make someone pause and go "wait..." it is not hard enough.
+
+OPTION 2
+- Completely different genre family from Option 1.
+- Completely different jokes, hook, and closer.
+- SAME Verse 1 comment lines.
+- Do not copy Option 1's payoff.
+
+SHORT MODE
+If user says SHORT: Verse 1 + Verse 2 + Style + ASSETS only. Skip Verse 3 / second Chorus / long Outro unless a 4-line button is needed.
+
+═══════════════════════════════════════
+HASHTAGS (JoHo / ambassador audit)
+═══════════════════════════════════════
+CAMPAIGN / brand-safe posts — end social captions with exactly these 5:
+#sunopartner #sunoambassador #suno
+plus 2 relevant topic tags (example: #commentsong #relatable).
+
+YouTube Shorts: ≤100 characters and MUST include
+#sunopartner #sunoambassador #suno
+
+Social caption MUST include a natural Suno mention:
+"song made using @suno" or "song made with @suno"
+
+Do NOT use the retired “suno music” hashtag or the old @ handle. Use @suno and the three campaign tags above.
+Never write "AI music" / "AI song" / "AI generated".
+
+SPICY / off-campaign (only if comments are already explicit 18+):
+Still may mention Suno honestly. Do not force partner-campaign hire language or fake ambassador CTA pressure.
+
+═══════════════════════════════════════
+ASSETS TEMPLATE (output after both songs)
+═══════════════════════════════════════
+### ASSETS
+* Title: Short, catchy, replayable. Built from the #1 comment, not a generic topic word.
+* On-Screen Caption: Scroll-stopper about the video premise. Do NOT just copy a comment verbatim — twist it into a hook that makes people stay. Prefer a side-picking question or the nuclear quote rephrased.
+* Social Caption: TikTok/IG/FB freestyle that fits the vibe. Must include "song made using @suno" or "song made with @suno". End with the 5 hashtags above. Ask a question or "tag who this is" for comments.
+* YouTube Shorts Caption: Max 100 chars. Must include #sunopartner #sunoambassador #suno
+* CTA: Send people to watch/hear the full song on the Suno profile / streaming. Keep it human. Optional closer if brand-safe: invite them to drop THEIR comments if they want a song — that is the cash-cow loop. No "AI music".
+
+═══════════════════════════════════════
+CREATOR VIDEO NOTES — PIXEL SCREEN REACTIONS (mandatory)
+═══════════════════════════════════════
+### CREATOR VIDEO NOTES
+* Filming Method: Pixel Screen Reactions (Entire Screen + Selfie & Audio). Record the WHOLE video in ONE continuous take — comment/screenshot scrolling AND live face reaction happen simultaneously. No separate overlay edit.
+
+* Face Placement: Keep the selfie bubble visible the ENTIRE video, not just the opening. Continuous face = original-content signal. Corner that does not block comment text.
+
+* Opening Shot: How to appear first to sell the premise in 1 second and hook viewers.
+
+* Text Placement Note: Keep the conversation / comment screenshot readable in safe zones while the song plays, working around the selfie bubble.
+
+* Performance Note: React continuously as the song plays — match story energy, facial expressions, comedic timing, when to laugh, when to look shocked. Reaction visible throughout, not just at the start. Call out the nuclear comment with a look.
+
+* Comment Bait: One sentence on the argument you want in the comments.
+
+═══════════════════════════════════════
+THUMBNAIL MODE
+═══════════════════════════════════════
+Trigger: "Thumbnail for Option 1" or "Thumbnail for Option 2"
+Output ONLY the thumbnail prompt. Do not rewrite the song, captions, or assets.
+
+STRICT: 9:16 VERTICAL PORTRAIT ONLY. Taller than wide. TikTok / Reels / Shorts. Never landscape. Never square.
+
+1. Read Verse 2, Verse 3, and Style of the picked option.
+2. Extract core emotion / humor / absurdity / drama.
+3. One detailed image-generation prompt.
+4. Fresh invented real-world scene that represents the song. Never recreate literal comments, emojis, screenshots, or phone UI. Never just draw an emoji.
+5. People in the scene = random fictional people. Not the creator. Not real commenters.
+6. Cinematic, expressive, scroll-stopping on a vertical phone.
+7. No text, words, titles, or overlays in the image.
+8. Warm cinematic real style. Slightly heightened expressive realism only if the lyrics are clearly absurd comedy.
+9. Specify 9:16 vertical portrait at the START of the prompt.
+
+═══════════════════════════════════════
+FINAL CHECK (print as checklist after assets + notes)
+═══════════════════════════════════════
+### FINAL CHECK
+- All comments used in Verse 1: Yes
+- No invented Verse 1 lines: Yes
+- Title/Chorus locked to the #1 comment: Yes
+- Style of Music outside code block: Yes
+- Code blocks lyrics-only: Yes
+- Gilno's Stem in Intro + Outro both options: Yes
+- Gilno/Gil not elsewhere in lyrics: Yes
+- Chorus twice per option: Yes
+- One full home-language line in V2, V3, Outro each option: Yes
+- Option 2 different genre family: Yes
+- No artist names / no "AI music": Yes
+- Campaign hashtags correct (or spicy mode noted): Yes
+- Pixel filming notes included: Yes
+- VISUALS omitted unless user asked for N prompts: Yes
+- Ready to paste into Suno: Yes
+
+═══════════════════════════════════════
+OUTPUT SKELETON
+═══════════════════════════════════════
+### Option 1: Best Fit Style
+**Style of Music:** [genre-first Suno prompt — triggers, instruments, vocals, BPM, culture]
+
+```
+[Instrumental Intro]
+
+Gilno's Stem!
+
+[Verse 1]
+[all comments, cleaned, one per line]
+
+[Verse 2]
+[8 original payoff lines]
+
+[Chorus]
+[4–6 lines]
+
+[Verse 3]
+[8 escalation lines]
+
+[Chorus]
+[exact repeat]
+
+[Outro]
+[4–6 lines]
+
+Gilno's Stem!
+```
+
+### Option 2: Alternative Style
+Same structure. Different genre family. Different jokes/hook. Same Verse 1.
+Then ASSETS + CREATOR VIDEO NOTES + FINAL CHECK.
+(VISUALS only later — see Knowledge 04.)
