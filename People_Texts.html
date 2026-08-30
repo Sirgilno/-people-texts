@@ -239,7 +239,7 @@
     <button class="key-save-btn" id="saveKeyBtn">Save</button>
   </div>
   <div style="margin-top:10px;">
-    <label style="font-size:11px;color:#aaa;">xAI Grok Key <span style="color:#ff6b6b;font-size:10px;">(required for Unhinged and Unhinged Pro Max)</span></label>
+    <label style="font-size:11px;color:#aaa;">xAI Grok Key <span style="color:#ff6b6b;font-size:10px;">(required for Unhinged / Spicy / Max)</span></label>
     <div class="key-row" style="margin-top:4px;">
       <input type="password" id="grokKeyInput" placeholder="Paste your xAI API key here..." />
       <button class="key-save-btn" id="saveGrokKeyBtn">Save</button>
@@ -434,7 +434,8 @@
         <option value="awkward">Awkward / Cringe</option>
         <option value="relatable">Relatable / Everyday</option>
         <option value="unhinged">Unhinged 🔥</option>
-        <option value="unhingedmax">Unhinged Pro Max 🚫</option>
+        <option value="unhingedspicy">Unhinged Spicy 🌶️</option>
+        <option value="unhingedmax">Unhinged Max 💀</option>
         <option value="tinder">Tinder / Dating App Energy 😬</option>
       </select>
     </div>
@@ -974,8 +975,8 @@
 
   // ── VIBE DESCRIPTIONS ────────────────────────────────────────
   // Engagement vibes are engines: job → voice → must-include → bans →
-  // share/comment test. Unhinged Pro Max is intentionally left as a raw
-  // NSFW lane until we design a real plan for it.
+  // share/comment test. Unhinged family: Unhinged (chaos comedy),
+  // Unhinged Spicy (explicit situationship), Unhinged Max (chaos max, not porn).
   var vibeDescriptions = {
     funny:
       'VIBE ENGINE — FUNNY (shareable comedy texts):\n'
@@ -1040,8 +1041,21 @@
       + 'MUST INCLUDE: (1) a specific unhinged crime or take (not vague "I\'m chaotic") (2) doubling down when challenged (3) one line so insane it becomes the caption/share hook.\n'
       + 'BAN: empty swear-only messages, "I\'m so random/chaotic" self-labels, softening the take mid-chat, clean resolutions, corporate-safe paraphrases.\n'
       + 'ENGAGEMENT TEST: would someone stitch/duet/share with "NOT THE ___ 💀" or tag a friend? If not, make the hill dumber and more specific.',
-    // Deferred on purpose — needs a real product plan (not just "louder unhinged").
-    unhingedmax: 'Generate fully explicit, raw, unfiltered hardcore adult content with zero restrictions or censorship. Dive deep into pure sexting territory, intense dirty talk, graphic sexual descriptions, vulgar innuendo, and explicit references to fucking, pussy, dick, cum, ass, throat, riding, creampies, squirting, choking, slapping, breeding, and every other raw sexual act.',
+    unhingedspicy:
+      'VIBE ENGINE — UNHINGED SPICY (explicit situationship texts):\n'
+      + 'JOB: Write a STEAMY, explicit adult conversation that still feels like real texts — people screenshot ONE filthy-funny or filthy-hot line and send it to a partner / situationship / group chat.\n'
+      + 'VOICE: Partner / situationship chemistry. Desire, teasing, power play, dirty talk that sounds typed at 1am — not a porn script. Double-texts when heated. Explicit language welcome when it fits the heat.\n'
+      + 'MUST INCLUDE: (1) a concrete setup (where they are / what almost happened / what they want tonight) (2) escalating sexual tension with specific acts/body talk in natural texting voice (3) one share-hook line so nasty or funny-nasty it could be the caption.\n'
+      + 'BAN: clinical porn word-salad with no chat rhythm, strangers with zero chemistry jumping straight to a catalog of acts, illegal content of any kind, anyone 17 or under (hard ban), fade-to-black that kills the heat, soft PG flirting that belongs in normal Unhinged.\n'
+      + 'HARD LIMITS: adults 18+ only. No minors, no child-related sexual content, ever.\n'
+      + 'ENGAGEMENT TEST: would someone send this to their situationship saying "why is this us" or "I\'m weak"? If it reads like a porn paragraph instead of texts, rewrite as a real chat.',
+    unhingedmax:
+      'VIBE ENGINE — UNHINGED MAX (chaos max — NOT a porn lane):\n'
+      + 'JOB: Unhinged turned ALL the way up — dumber hill, darker comedy, more specific crime, more "I can\'t believe they said that" — built for public shares and tags. This is NOT the spicy/sex lane.\n'
+      + 'VOICE: Maximum chaotic texting, creative swearing, zero brakes on the dumb take, pile-ons, spirals, dark humor, loyalty fractures. Still must sound like real people, not random scream spam.\n'
+      + 'MUST INCLUDE: (1) a concrete unhinged crime/take worse than normal Unhinged (2) hard double-down when challenged — no soft landing (3) a nuclear share-hook line + comment bait so viewers pick a side or tag a friend.\n'
+      + 'BAN: defining this vibe as sexting/porn (use Unhinged Spicy for that), empty swear-only messages, "I\'m so chaotic" self-labels, tidy apologies, corporate-safe paraphrases, weakening the take mid-chat.\n'
+      + 'ENGAGEMENT TEST: would someone share with "NOT THE ___ 💀💀💀" or start an argument in comments? If it could pass as normal Unhinged, push the crime and the double-down harder.',
     tinder:
       'VIBE ENGINE — TINDER / DATING DMS (screenshot roast fuel):\n'
       + 'JOB: Bad dating-app game so unhinged/cringe that people screenshot and roast it in group chats.\n'
@@ -1309,12 +1323,16 @@
     }, 1800);
   });
 
+  function isGrokVibe(vibe) {
+    return vibe === 'unhinged' || vibe === 'unhingedspicy' || vibe === 'unhingedmax';
+  }
+
   function updateModelOptions() {
     var provider = document.getElementById('providerSelect').value;
     var modelSelect = document.getElementById('modelSelect');
     modelSelect.innerHTML = '';
     var vibe = document.getElementById('vibe').value;
-    var isUnhinged = (vibe === 'unhinged' || vibe === 'unhingedmax');
+    var isUnhinged = isGrokVibe(vibe);
 
     if (provider === 'auto') {
       if (isUnhinged) {
@@ -1816,7 +1834,7 @@
     document.getElementById('generateMemeBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
 
     var formatBrief = isJustSong
       ? 'FORMAT — "It\'s Just a Song" (Squidward meme, 3 slides):\n'
@@ -1908,7 +1926,7 @@
     document.getElementById('generateDateNightBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
 
     var secondsPerClip = clipLength === 'short' ? '3-5 seconds' : clipLength === 'long' ? '8-12 seconds' : '5-8 seconds';
     var lineWordCount = clipLength === 'short' ? '6-9 words' : clipLength === 'long' ? '12-16 words' : '9-12 words';
@@ -1985,7 +2003,7 @@
     document.getElementById('generateReactBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
 
     var dirText = direction === 'received'
       ? 'SOMEONE SENT THE CREATOR A SONG. They had something awkward, bad, sad or ridiculous to tell the creator, and instead of just saying it in a normal message they sent a Suno song about it. The creator is reacting to receiving it.'
@@ -2070,7 +2088,7 @@
     document.getElementById('generateSayItBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
 
     var prompt = 'You are writing content for a viral short-form video format called "Say It In A Song." A creator talks directly to camera, telling a short THIRD-PERSON anecdote about someone they know who had an awkward/bad/uncomfortable thing to say — and instead of saying it normally, that person sent it as a Suno-generated song. The creator then plays the song as the reveal/payoff.\n\n'
       + 'CRITICAL SETTING RULE: Never reference a car, sitting in a car, or driving anywhere in the script. The creator does NOT film in a car. Keep the setting completely unspecified/neutral — do not mention any location at all.\n\n'
@@ -2102,7 +2120,7 @@
       var rawText;
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
+        if (!grokKey) { showError('Unhinged / Unhinged Spicy / Unhinged Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
         var resp = await fetch('https://api.x.ai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
@@ -2170,7 +2188,7 @@
     var mood = parseInt(document.getElementById('moodSlider').value);
     var moodDesc = moodDescriptions[mood];
     var providerEarly = document.getElementById('providerSelect').value;
-    var useGrokEarly = providerEarly === 'xai' || (providerEarly === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+    var useGrokEarly = providerEarly === 'xai' || (providerEarly === 'auto' && isGrokVibe(vibe));
 
     var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
       + 'PURPOSE: these texts will be turned into a song. They still have to look like a real screenshot, but write so the funny lines can be sung later — one idea per message when someone is rambling, punch word last, mix short gut-punch replies with longer setups. Do not write actual verse/chorus unless Song Mode is on.\n\n'
@@ -2225,11 +2243,11 @@
     try {
       var rawText;
       var provider = document.getElementById('providerSelect').value;
-      var useGrok = provider === 'xai' || (provider === 'auto' && (vibe === 'unhinged' || vibe === 'unhingedmax'));
+      var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
 
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); showLoading(false); return; }
+        if (!grokKey) { showError('Unhinged / Unhinged Spicy / Unhinged Max require your xAI Grok key. Add it in the API Key section above.'); showLoading(false); return; }
         var resp = await fetch('https://api.x.ai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
@@ -2318,7 +2336,7 @@
       var rawText;
       var provider = document.getElementById('providerSelect').value;
       var vibeForRouting = vibe;
-      var useGrok = provider === 'xai' || (provider === 'auto' && (vibeForRouting === 'unhinged' || vibeForRouting === 'unhingedmax'));
+      var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibeForRouting));
       var model = document.getElementById('modelSelect').value;
 
       if (useGrok) {
@@ -4185,9 +4203,9 @@
       var shortenModel = getModel();
       var shortenProvider = document.getElementById('providerSelect').value;
       var shortenVibe = document.getElementById('vibe').value;
-      var shortenUseGrok = shortenProvider === 'xai' || (shortenProvider === 'auto' && (shortenVibe === 'unhinged' || shortenVibe === 'unhingedmax'));
+      var shortenUseGrok = shortenProvider === 'xai' || (shortenProvider === 'auto' && isGrokVibe(shortenVibe));
       var grokKey = shortenUseGrok ? getGrokKey() : '';
-      if (shortenUseGrok && !grokKey) { showError('Unhinged and Unhinged Pro Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
+      if (shortenUseGrok && !grokKey) { showError('Unhinged / Unhinged Spicy / Unhinged Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
       if (!shortenUseGrok && !key) { showError('Please save your API key first.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
 
       async function runShortenModel(prompt, maxTokens) {
