@@ -1766,6 +1766,8 @@
     if (show) setProviderLoadingText('loadingText', 'typing');
     document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
     document.getElementById('generateBtn').disabled = show;
+    var regen = document.getElementById('regenBtn');
+    if (regen) regen.disabled = show;
   }
   function showError(msg) {
     var box = document.getElementById('errorBox');
@@ -4334,7 +4336,7 @@
     finally {
       document.getElementById('shortenLoadingDiv').style.display='none';
       document.getElementById('shortenBtn').disabled=false;
-      document.getElementById('shortenLoadingText').textContent = 'Trimming for lyrics...';
+      document.getElementById('shortenLoadingText').textContent = 'Claude is trimming for lyrics...';
     }
   });
 
