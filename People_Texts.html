@@ -433,9 +433,9 @@
         <option value="dramatic">Dramatic / Over the top</option>
         <option value="awkward">Awkward / Cringe</option>
         <option value="relatable">Relatable / Everyday</option>
-        <option value="unhinged">Unhinged 🔥</option>
-        <option value="unhingedspicy">Unhinged Spicy 🌶️</option>
-        <option value="unhingedmax">Unhinged Max 💀</option>
+        <option value="unhinged">Unhinged 🔥 (zero filter)</option>
+        <option value="unhingedspicy">Unhinged Spicy 🌶️ (explicit / old Pro Max)</option>
+        <option value="unhingedmax">Unhinged Max 💀 (chaos amp — not sex)</option>
         <option value="tinder">Tinder / Dating App Energy 😬</option>
       </select>
     </div>
@@ -974,9 +974,9 @@
   var personExamples = {}; // Removed local examples for international output
 
   // ── VIBE DESCRIPTIONS ────────────────────────────────────────
-  // Engagement vibes are engines: job → voice → must-include → bans →
-  // share/comment test. Unhinged family: Unhinged (chaos comedy),
-  // Unhinged Spicy (explicit situationship), Unhinged Max (chaos max, not porn).
+  // Engagement vibes: job → voice → must-include → bans → share test.
+  // Unhinged family stays on Grok (Claude sands these down):
+  // Unhinged = zero-filter chaos; Spicy = old Pro Max explicit; Max = chaos amp (not sex).
   var vibeDescriptions = {
     funny:
       'VIBE ENGINE — FUNNY (shareable comedy texts):\n'
@@ -1035,27 +1035,27 @@
       + 'BAN: bland generic "life is hard", celebrity-level problems, over-jokey punchlines that break the realness, lecture endings.\n'
       + 'ENGAGEMENT TEST: would someone tag a friend "this us"? If it could be any chatbot paragraph, add a sharper lived detail.',
     unhinged:
-      'VIBE ENGINE — UNHINGED (screenshot + share fuel):\n'
-      + 'JOB: Drunk-text / zero-filter energy with ONE stupid hill they die on — the kind of chat friends send each other saying "this is you".\n'
-      + 'VOICE: Gen-Z chaotic texting, creative swearing OK, spirals, tangents that still connect, obviously joking threats, dark humor, zero self-awareness on the dumb take.\n'
-      + 'MUST INCLUDE: (1) a specific unhinged crime or take (not vague "I\'m chaotic") (2) doubling down when challenged (3) one line so insane it becomes the caption/share hook.\n'
-      + 'BAN: empty swear-only messages, "I\'m so random/chaotic" self-labels, softening the take mid-chat, clean resolutions, corporate-safe paraphrases.\n'
-      + 'ENGAGEMENT TEST: would someone stitch/duet/share with "NOT THE ___ 💀" or tag a friend? If not, make the hill dumber and more specific.',
+      'VIBE ENGINE — UNHINGED (zero filter / old Unhinged restored):\n'
+      + 'JOB: Completely UNHINGED content with zero filter and maximum chaotic energy — Gen-Z drunk-texting chaos friends screenshot saying "this is you".\n'
+      + 'VOICE: Swear freely and creatively. Wild takes. Say things normal people would never dare say out loud. Obviously joking threats, dark humor, absurd tangents, spiraling rants. Short punches + double-texts. Zero self-awareness on the dumb hill.\n'
+      + 'MUST INCLUDE: (1) a specific unhinged crime or take (not vague "I\'m chaotic") (2) doubling down when challenged — no soft landing (3) one line so insane it becomes the caption/share hook.\n'
+      + 'BAN: polite paraphrases, PG softening, tidy apologies, "I\'m so random/chaotic" self-labels, corporate-safe wording, clean resolutions.\n'
+      + 'ENGAGEMENT TEST: would someone stitch/duet/share with "NOT THE ___ 💀" or tag a friend? If it reads normal or Funny-tier, rewrite harder and swear more.',
     unhingedspicy:
-      'VIBE ENGINE — UNHINGED SPICY (explicit situationship texts):\n'
-      + 'JOB: Write a STEAMY, explicit adult conversation that still feels like real texts — people screenshot ONE filthy-funny or filthy-hot line and send it to a partner / situationship / group chat.\n'
-      + 'VOICE: Partner / situationship chemistry. Desire, teasing, power play, dirty talk that sounds typed at 1am — not a porn script. Double-texts when heated. Explicit language welcome when it fits the heat.\n'
-      + 'MUST INCLUDE: (1) a concrete setup (where they are / what almost happened / what they want tonight) (2) escalating sexual tension with specific acts/body talk in natural texting voice (3) one share-hook line so nasty or funny-nasty it could be the caption.\n'
-      + 'BAN: clinical porn word-salad with no chat rhythm, strangers with zero chemistry jumping straight to a catalog of acts, illegal content of any kind, anyone 17 or under (hard ban), fade-to-black that kills the heat, soft PG flirting that belongs in normal Unhinged.\n'
+      'VIBE ENGINE — UNHINGED SPICY (old Unhinged Pro Max — explicit adult texts):\n'
+      + 'JOB: Fully explicit, raw, unfiltered hardcore adult situationship / sexting energy with zero censorship — the old Pro Max lane. Still formatted as real texts people screenshot, not a polished essay.\n'
+      + 'VOICE: Partner / situationship chemistry at 1am. Intense dirty talk, graphic sexual descriptions, vulgar innuendo. Explicit references welcome when the heat calls for them (fucking, body parts, acts, power play, breeding talk, choking/slapping fantasy between consenting adults, etc.). Double-texts when heated. Zero fade-to-black.\n'
+      + 'MUST INCLUDE: (1) concrete setup (where they are / what almost happened / what they want) (2) escalating explicit tension with specific acts/body talk in natural texting voice (3) one filthy or filthy-funny share-hook line that could be the caption.\n'
+      + 'BAN: soft PG flirting that belongs in normal Unhinged, clinical word-salad with no chat rhythm, strangers with zero chemistry dumping a catalog of acts with no conversation, illegal content of any kind, anyone 17 or under (hard ban).\n'
       + 'HARD LIMITS: adults 18+ only. No minors, no child-related sexual content, ever.\n'
-      + 'ENGAGEMENT TEST: would someone send this to their situationship saying "why is this us" or "I\'m weak"? If it reads like a porn paragraph instead of texts, rewrite as a real chat.',
+      + 'ENGAGEMENT TEST: would someone send this to their situationship saying "why is this us" or "I\'m weak"? If Claude-safe soft, turn the heat back up to old Pro Max.',
     unhingedmax:
-      'VIBE ENGINE — UNHINGED MAX (chaos max — NOT a porn lane):\n'
-      + 'JOB: Unhinged turned ALL the way up — dumber hill, darker comedy, more specific crime, more "I can\'t believe they said that" — built for public shares and tags. This is NOT the spicy/sex lane.\n'
-      + 'VOICE: Maximum chaotic texting, creative swearing, zero brakes on the dumb take, pile-ons, spirals, dark humor, loyalty fractures. Still must sound like real people, not random scream spam.\n'
-      + 'MUST INCLUDE: (1) a concrete unhinged crime/take worse than normal Unhinged (2) hard double-down when challenged — no soft landing (3) a nuclear share-hook line + comment bait so viewers pick a side or tag a friend.\n'
-      + 'BAN: defining this vibe as sexting/porn (use Unhinged Spicy for that), empty swear-only messages, "I\'m so chaotic" self-labels, tidy apologies, corporate-safe paraphrases, weakening the take mid-chat.\n'
-      + 'ENGAGEMENT TEST: would someone share with "NOT THE ___ 💀💀💀" or start an argument in comments? If it could pass as normal Unhinged, push the crime and the double-down harder.',
+      'VIBE ENGINE — UNHINGED MAX (chaos amp — NOT the sex lane; use Spicy for that):\n'
+      + 'JOB: Unhinged turned ALL THE WAY UP — dumber hill, darker comedy (death jokes / memorial absurdity / loyalty fractures OK), more specific crime, more "I can\'t believe they said that". Built for public shares and tags. This is NOT sexting / porn (that is Unhinged Spicy).\n'
+      + 'VOICE: Maximum chaotic Gen-Z texting. Creative swearing REQUIRED across the chat — not one mild damn. Zero brakes on the dumb take. Pile-ons, spirals, dark humor, obviously joking threats. Sound like real people losing it, not a polite writer summarizing chaos.\n'
+      + 'MUST INCLUDE: (1) a concrete unhinged crime/take WORSE than normal Unhinged (2) hard double-down when challenged — no soft landing (3) a nuclear share-hook line + comment bait so viewers pick a side or tag a friend.\n'
+      + 'BAN: defining this vibe as sexting/porn (use Spicy), PG softening, tidy apologies, corporate-safe paraphrases, weakening the take mid-chat, writing that could pass as normal Funny or calm Unhinged.\n'
+      + 'ENGAGEMENT TEST: would someone share with "NOT THE ___ 💀💀💀" or start an argument in comments? If it could pass as normal Unhinged, push the crime, the swearing, and the double-down harder.',
     tinder:
       'VIBE ENGINE — TINDER / DATING DMS (screenshot roast fuel):\n'
       + 'JOB: Bad dating-app game so unhinged/cringe that people screenshot and roast it in group chats.\n'
@@ -2240,7 +2240,13 @@
             + '- Do NOT flatten this into polite paraphrases — keep texting texture.\n\n'
           : 'SONG MODE CRITICAL: Every message must be a ready-to-sing lyric line. Minimum 8 words, maximum 15 words per message. A rap line can carry up to 15 words if they flow fast. Write compressed punchy lines that hit like a lyric when sung. Punchline word must be the last word. Each line stands alone when sung. Do NOT write normal conversation text.\n\n')
         : '')
-      + (useGrokEarly ? 'UNRESTRICTED MODE — THIS VIBE HAS NO CONTENT LIMITS: this generation is running on a provider with no content restrictions. Full permission to write crude physical/body humor, explicit profanity, raunchy innuendo, dirty talk, and explicit sexual language/description where the VIBE calls for it, with zero softening or self-censorship. Match the intensity the vibe description above asks for exactly, do not tone it down.\n\n' : '')
+      + (useGrokEarly
+        ? (vibe === 'unhingedmax'
+          ? 'UNRESTRICTED MODE — UNHINGED MAX: zero content limits. Creative swearing required. Dark humor / death jokes / loyalty fractures allowed. Do NOT soften into Funny or PG. Do NOT turn this into sexting (that is Spicy). Match Max intensity exactly — if it could pass as normal Unhinged, escalate harder.\n\n'
+          : vibe === 'unhingedspicy'
+            ? 'UNRESTRICTED MODE — UNHINGED SPICY (old Pro Max): zero content limits for explicit adult 18+ situationship / sexting texts. Full dirty talk and graphic sexual language where the vibe calls for it. Zero fade-to-black. Do not sand this down to PG flirting.\n\n'
+            : 'UNRESTRICTED MODE — UNHINGED: zero content limits. Full permission for crude humor, creative profanity, dark jokes, raunchy innuendo where it fits. Zero softening. Match the vibe intensity exactly.\n\n')
+        : '')
       + moodDesc
       + (activeDramaPack ? '\n\n' + activeDramaPack : '')
       + '\n\nVARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous generation): ' + Math.random().toString(36).substring(2, 10);
@@ -2251,30 +2257,14 @@
       var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
 
       if (useGrok) {
+        // Unhinged family must stay on Grok. Silent Claude fallback sands these vibes into "normal".
         var grokKey = getGrokKey();
-        var claudeKey = getKey();
-        if (!grokKey && !claudeKey) {
-          showError('Unhinged / Unhinged Spicy / Unhinged Max need an xAI Grok key — or save an Anthropic key and switch Provider to Claude.');
+        if (!grokKey) {
+          showError('Unhinged / Spicy / Max need your xAI Grok key. Claude will sand this vibe down — do not use Claude fallback here.');
           showLoading(false);
           return;
         }
-        if (grokKey) {
-          try {
-            rawText = await callGrokText(grokKey, model, prompt, 2000, 0.9);
-          } catch (grokErr) {
-            // Bachelor / JoHo presets used to hard-fail here with bare "Failed to fetch".
-            // If Claude is available, fall back so campaign formats still generate.
-            if (grokErr && grokErr.network && claudeKey) {
-              var claudeModel = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
-              rawText = await callAnthropicText(claudeKey, claudeModel, prompt, 4096, 1.0);
-            } else {
-              throw grokErr;
-            }
-          }
-        } else {
-          var claudeModelOnly = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
-          rawText = await callAnthropicText(claudeKey, claudeModelOnly, prompt, 4096, 1.0);
-        }
+        rawText = await callGrokText(grokKey, model, prompt, 2000, 0.9);
       } else {
         var key = getKey();
         if (!key) { showError('Please paste and save your Anthropic API key first.'); showLoading(false); return; }
@@ -2355,23 +2345,8 @@
 
       if (useGrok) {
         var grokKey = getGrokKey();
-        var claudeKeyC = getKey();
-        if (!grokKey && !claudeKeyC) { showError('Add your xAI Grok key, or save an Anthropic key and switch Provider to Claude.'); showLoading(false); return; }
-        if (grokKey) {
-          try {
-            rawText = await callGrokText(grokKey, model, prompt, 2000, 0.95);
-          } catch (grokErrC) {
-            if (grokErrC && grokErrC.network && claudeKeyC) {
-              var cmC = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
-              rawText = await callAnthropicText(claudeKeyC, cmC, prompt, 4096, 1.0);
-            } else {
-              throw grokErrC;
-            }
-          }
-        } else {
-          var cmOnly = (model && String(model).indexOf('claude') !== -1) ? model : 'claude-sonnet-5';
-          rawText = await callAnthropicText(claudeKeyC, cmOnly, prompt, 4096, 1.0);
-        }
+        if (!grokKey) { showError('Unhinged / Spicy / Max need your xAI Grok key. Claude will sand this vibe down.'); showLoading(false); return; }
+        rawText = await callGrokText(grokKey, model, prompt, 2000, 0.95);
       } else {
         var key = getKey();
         if (!key) { showError('Please save your Anthropic API key first, or switch Provider to xAI Grok.'); showLoading(false); return; }
@@ -4231,14 +4206,8 @@
 
       async function runShortenModel(prompt, maxTokens) {
         if (shortenUseGrok) {
-          try {
-            return await callGrokText(grokKey, shortenModel, prompt, maxTokens || 1200, 0.7);
-          } catch (shortGrokErr) {
-            if (shortGrokErr && shortGrokErr.network && key) {
-              return callAnthropicText(key, (shortenModel && String(shortenModel).indexOf('claude') !== -1) ? shortenModel : 'claude-sonnet-5', prompt, maxTokens || 2048, 0.7);
-            }
-            throw shortGrokErr;
-          }
+          // Keep Shorten on Grok for Unhinged family — Claude fallback flattens the voice.
+          return await callGrokText(grokKey, shortenModel, prompt, maxTokens || 1200, 0.7);
         }
         return callAnthropicText(key, shortenModel, prompt, maxTokens || 2048, 0.7);
       }
