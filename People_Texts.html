@@ -529,11 +529,11 @@
   <button class="btn btn-primary" id="generateDateNightBtn" style="display:none;">Generate Countdown Plan 📅</button>
   <button class="btn btn-primary" id="generateMemeBtn" style="display:none;">Generate Song + Captions 🎵</button>
   <button class="btn btn-primary" id="renderPasteBtn" style="display:none;">Render Conversation 📱</button>
-  <div class="loading-div" id="loadingDiv"><span class="spinner"></span>Claude is writing the texts...</div>
-  <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the story and song...</div>
-  <div class="loading-div" id="reactLoadingDiv" style="display:none;"><span class="spinner"></span>Planning the video and writing the song...</div>
-  <div class="loading-div" id="dateNightLoadingDiv" style="display:none;"><span class="spinner"></span>Mapping your clips to the song...</div>
-  <div class="loading-div" id="memeLoadingDiv" style="display:none;"><span class="spinner"></span>Writing the song...</div>
+  <div class="loading-div" id="loadingDiv"><span class="spinner"></span><span id="loadingText">Claude is typing...</span></div>
+  <div class="loading-div" id="sayItLoadingDiv" style="display:none;"><span class="spinner"></span><span id="sayItLoadingText">Claude is writing the story and song...</span></div>
+  <div class="loading-div" id="reactLoadingDiv" style="display:none;"><span class="spinner"></span><span id="reactLoadingText">Claude is planning the video...</span></div>
+  <div class="loading-div" id="dateNightLoadingDiv" style="display:none;"><span class="spinner"></span><span id="dateNightLoadingText">Claude is mapping your clips...</span></div>
+  <div class="loading-div" id="memeLoadingDiv" style="display:none;"><span class="spinner"></span><span id="memeLoadingText">Claude is writing the song...</span></div>
   <div class="error-box" id="errorBox"></div>
 </div>
 
@@ -1751,7 +1751,19 @@
     return wrap;
   }
 
+  function activeProviderName() {
+    var provider = document.getElementById('providerSelect').value;
+    var vibe = document.getElementById('vibe').value;
+    return shouldUseGrok(provider, vibe) ? 'Grok' : 'Claude';
+  }
+
+  function setProviderLoadingText(textElId, action) {
+    var el = document.getElementById(textElId);
+    if (el) el.textContent = activeProviderName() + ' is ' + action + '...';
+  }
+
   function showLoading(show) {
+    if (show) setProviderLoadingText('loadingText', 'typing');
     document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
     document.getElementById('generateBtn').disabled = show;
   }
@@ -1909,11 +1921,11 @@
     if (!topic) { showError('Tell it what the song should be about first.'); return; }
     var vibe = document.getElementById('vibe').value;
     var model = document.getElementById('modelSelect').value;
-    document.getElementById('memeLoadingDiv').style.display = 'block';
-    document.getElementById('generateMemeBtn').disabled = true;
-
     var provider = document.getElementById('providerSelect').value;
     var useGrok = shouldUseGrok(provider, vibe);
+    setProviderLoadingText('memeLoadingText', 'writing the song');
+    document.getElementById('memeLoadingDiv').style.display = 'block';
+    document.getElementById('generateMemeBtn').disabled = true;
 
     var formatBrief = isJustSong
       ? 'FORMAT — "It\'s Just a Song" (Squidward meme, 3 slides):\n'
@@ -1991,11 +2003,11 @@
     var clipLength = document.getElementById('dateNightClipLength').value;
     var vibe = document.getElementById('vibe').value;
     var model = document.getElementById('modelSelect').value;
-    document.getElementById('dateNightLoadingDiv').style.display = 'block';
-    document.getElementById('generateDateNightBtn').disabled = true;
-
     var provider = document.getElementById('providerSelect').value;
     var useGrok = shouldUseGrok(provider, vibe);
+    setProviderLoadingText('dateNightLoadingText', 'mapping your clips');
+    document.getElementById('dateNightLoadingDiv').style.display = 'block';
+    document.getElementById('generateDateNightBtn').disabled = true;
 
     var secondsPerClip = clipLength === 'short' ? '3-5 seconds' : clipLength === 'long' ? '8-12 seconds' : '5-8 seconds';
     var lineWordCount = clipLength === 'short' ? '6-9 words' : clipLength === 'long' ? '12-16 words' : '9-12 words';
@@ -2058,11 +2070,11 @@
     var topic = document.getElementById('topic').value.trim();
     var model = document.getElementById('modelSelect').value;
     var direction = document.getElementById('reactDirection').value;
-    document.getElementById('reactLoadingDiv').style.display = 'block';
-    document.getElementById('generateReactBtn').disabled = true;
-
     var provider = document.getElementById('providerSelect').value;
     var useGrok = shouldUseGrok(provider, vibe);
+    setProviderLoadingText('reactLoadingText', 'planning the video');
+    document.getElementById('reactLoadingDiv').style.display = 'block';
+    document.getElementById('generateReactBtn').disabled = true;
 
     var dirText = direction === 'received'
       ? 'SOMEONE SENT THE CREATOR A SONG. They had something awkward, bad, sad or ridiculous to tell the creator, and instead of just saying it in a normal message they sent a Suno song about it. The creator is reacting to receiving it.'
@@ -2133,11 +2145,11 @@
     var vibe = document.getElementById('vibe').value;
     var topic = document.getElementById('topic').value.trim();
     var model = document.getElementById('modelSelect').value;
-    document.getElementById('sayItLoadingDiv').style.display = 'block';
-    document.getElementById('generateSayItBtn').disabled = true;
-
     var provider = document.getElementById('providerSelect').value;
     var useGrok = shouldUseGrok(provider, vibe);
+    setProviderLoadingText('sayItLoadingText', 'writing the story and song');
+    document.getElementById('sayItLoadingDiv').style.display = 'block';
+    document.getElementById('generateSayItBtn').disabled = true;
 
     var prompt = 'You are writing content for a viral short-form video format called "Say It In A Song." A creator talks directly to camera, telling a short THIRD-PERSON anecdote about someone they know who had an awkward/bad/uncomfortable thing to say — and instead of saying it normally, that person sent it as a Suno-generated song. The creator then plays the song as the reveal/payoff.\n\n'
       + 'CRITICAL SETTING RULE: Never reference a car, sitting in a car, or driving anywhere in the script. The creator does NOT film in a car. Keep the setting completely unspecified/neutral — do not mention any location at all.\n\n'
@@ -4240,7 +4252,7 @@
         return m.f === 'them' ? (m.speaker || theirName) : myName;
       }
 
-      document.getElementById('shortenLoadingText').textContent = 'Trimming for lyrics...';
+      document.getElementById('shortenLoadingText').textContent = activeProviderName() + ' is trimming for lyrics...';
       var rawShortenText = await runShortenModel(sp, 2048);
       var parsed = parseConversation(rawShortenText, myName, theirName, extraThem);
       if (parsed.length === 0) throw new Error('Could not shorten. Try again.');
@@ -4250,7 +4262,7 @@
 
       var firstPass = parsed.map(function(m) { return { f: m.f, t: m.t, speaker: m.speaker }; });
 
-      document.getElementById('shortenLoadingText').textContent = 'Fixing grammar and meaning...';
+      document.getElementById('shortenLoadingText').textContent = activeProviderName() + ' is fixing grammar and meaning...';
       var pairLines = currentMessages.map(function(m, i) {
         return (i + 1) + '.\nORIGINAL: ' + lineSpeaker(m) + ': ' + m.t
           + '\nSHORTENED: ' + lineSpeaker(parsed[i]) + ': ' + parsed[i].t;
