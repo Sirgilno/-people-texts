@@ -253,8 +253,8 @@
   <div style="margin-bottom:12px;">
     <label>AI Provider</label>
     <select id="providerSelect">
-      <option value="auto" selected>Auto — Claude (normal) / Grok (unhinged)</option>
-      <option value="anthropic">Anthropic Claude — force Claude for all vibes</option>
+      <option value="auto" selected>Auto — Claude (normal) / Grok (Unhinged always)</option>
+      <option value="anthropic">Anthropic Claude — normal vibes (Unhinged still Grok-only)</option>
       <option value="xai">xAI Grok — force Grok for all vibes</option>
     </select>
   </div>
@@ -433,9 +433,9 @@
         <option value="dramatic">Dramatic / Over the top</option>
         <option value="awkward">Awkward / Cringe</option>
         <option value="relatable">Relatable / Everyday</option>
-        <option value="unhinged">Unhinged 🔥 (zero filter)</option>
-        <option value="unhingedspicy">Unhinged Spicy 🌶️ (explicit / old Pro Max)</option>
-        <option value="unhingedmax">Unhinged Max 💀 (chaos amp — not sex)</option>
+        <option value="unhinged">Unhinged 🔥 (Grok only)</option>
+        <option value="unhingedspicy">Unhinged Spicy 🌶️ (Grok — explicit dirty talk)</option>
+        <option value="unhingedmax">Unhinged Max 💀 (Grok — chaos, no filters)</option>
         <option value="tinder">Tinder / Dating App Energy 😬</option>
       </select>
     </div>
@@ -975,8 +975,8 @@
 
   // ── VIBE DESCRIPTIONS ────────────────────────────────────────
   // Engagement vibes: job → voice → must-include → bans → share test.
-  // Unhinged family stays on Grok (Claude sands these down):
-  // Unhinged = zero-filter chaos; Spicy = old Pro Max explicit; Max = chaos amp (not sex).
+  // Unhinged / Spicy / Max = Grok ONLY. Claude never generates these vibes.
+  // Spicy = couples/situationship/friends dirty talk (hard, not soft). Max = chaos, no filters.
   var vibeDescriptions = {
     funny:
       'VIBE ENGINE — FUNNY (shareable comedy texts):\n'
@@ -1042,20 +1042,20 @@
       + 'BAN: polite paraphrases, PG softening, tidy apologies, "I\'m so random/chaotic" self-labels, corporate-safe wording, clean resolutions.\n'
       + 'ENGAGEMENT TEST: would someone stitch/duet/share with "NOT THE ___ 💀" or tag a friend? If it reads normal or Funny-tier, rewrite harder and swear more.',
     unhingedspicy:
-      'VIBE ENGINE — UNHINGED SPICY (old Unhinged Pro Max — explicit adult texts):\n'
-      + 'JOB: Fully explicit, raw, unfiltered hardcore adult situationship / sexting energy with zero censorship — the old Pro Max lane. Still formatted as real texts people screenshot, not a polished essay.\n'
-      + 'VOICE: Partner / situationship chemistry at 1am. Intense dirty talk, graphic sexual descriptions, vulgar innuendo. Explicit references welcome when the heat calls for them (fucking, body parts, acts, power play, breeding talk, choking/slapping fantasy between consenting adults, etc.). Double-texts when heated. Zero fade-to-black.\n'
+      'VIBE ENGINE — UNHINGED SPICY (explicit dirty talk — couples / situationship / friends-with-benefits):\n'
+      + 'JOB: Explicit adult texting between people who already have chemistry — partner, situationship, or friends who cross the line. Filthy, direct, zero censorship. Hard dirty talk. Still real texts people screenshot — do NOT soften this.\n'
+      + 'VOICE: 1am chemistry. Desire, teasing, power play, graphic sexual language and acts named plainly. Explicit words on the table. Double-texts when heated. Zero fade-to-black. Zero polite euphemisms.\n'
       + 'MUST INCLUDE: (1) concrete setup (where they are / what almost happened / what they want) (2) escalating explicit tension with specific acts/body talk in natural texting voice (3) one filthy or filthy-funny share-hook line that could be the caption.\n'
-      + 'BAN: soft PG flirting that belongs in normal Unhinged, clinical word-salad with no chat rhythm, strangers with zero chemistry dumping a catalog of acts with no conversation, illegal content of any kind, anyone 17 or under (hard ban).\n'
+      + 'BAN: soft PG flirting, fade-to-black, sanding heat down to "steamy implication", strangers with zero chemistry dumping acts with no conversation, illegal content of any kind, anyone 17 or under (hard ban).\n'
       + 'HARD LIMITS: adults 18+ only. No minors, no child-related sexual content, ever.\n'
-      + 'ENGAGEMENT TEST: would someone send this to their situationship saying "why is this us" or "I\'m weak"? If Claude-safe soft, turn the heat back up to old Pro Max.',
+      + 'ENGAGEMENT TEST: would someone send this saying "why is this us" or "I\'m weak"? If it got soft or cute, turn the heat back up — Spicy is hard dirty talk, not soft.',
     unhingedmax:
-      'VIBE ENGINE — UNHINGED MAX (chaos amp — NOT the sex lane; use Spicy for that):\n'
-      + 'JOB: Unhinged turned ALL THE WAY UP — dumber hill, darker comedy (death jokes / memorial absurdity / loyalty fractures OK), more specific crime, more "I can\'t believe they said that". Built for public shares and tags. This is NOT sexting / porn (that is Unhinged Spicy).\n'
-      + 'VOICE: Maximum chaotic Gen-Z texting. Creative swearing REQUIRED across the chat — not one mild damn. Zero brakes on the dumb take. Pile-ons, spirals, dark humor, obviously joking threats. Sound like real people losing it, not a polite writer summarizing chaos.\n'
+      'VIBE ENGINE — UNHINGED MAX (chaos — NO FILTERS; not the sex lane — use Spicy for dirty talk):\n'
+      + 'JOB: Unhinged with the brakes cut. Dumber hill, darker comedy (death jokes / memorial absurdity / loyalty fractures OK), more specific crime, more "I can\'t believe they said that". No content filters. Built for public shares. This is NOT the dirty-talk lane (that is Spicy).\n'
+      + 'VOICE: Maximum chaotic Gen-Z texting. Creative swearing REQUIRED across the chat — not one mild damn. Zero brakes. Pile-ons, spirals, dark humor, obviously joking threats. Real people losing it — not a polite writer summarizing chaos.\n'
       + 'MUST INCLUDE: (1) a concrete unhinged crime/take WORSE than normal Unhinged (2) hard double-down when challenged — no soft landing (3) a nuclear share-hook line + comment bait so viewers pick a side or tag a friend.\n'
-      + 'BAN: defining this vibe as sexting/porn (use Spicy), PG softening, tidy apologies, corporate-safe paraphrases, weakening the take mid-chat, writing that could pass as normal Funny or calm Unhinged.\n'
-      + 'ENGAGEMENT TEST: would someone share with "NOT THE ___ 💀💀💀" or start an argument in comments? If it could pass as normal Unhinged, push the crime, the swearing, and the double-down harder.',
+      + 'BAN: defining this vibe as sexting (use Spicy), ANY softening / PG rewrite, tidy apologies, corporate-safe paraphrases, writing that could pass as Funny or calm Unhinged.\n'
+      + 'ENGAGEMENT TEST: would someone share with "NOT THE ___ 💀💀💀" or start an argument in comments? If it could pass as normal Unhinged, push crime + swearing + double-down harder. No filters.',
     tinder:
       'VIBE ENGINE — TINDER / DATING DMS (screenshot roast fuel):\n'
       + 'JOB: Bad dating-app game so unhinged/cringe that people screenshot and roast it in group chats.\n'
@@ -1327,59 +1327,42 @@
     return vibe === 'unhinged' || vibe === 'unhingedspicy' || vibe === 'unhingedmax';
   }
 
+  // Unhinged family is ALWAYS Grok — even if Provider is set to Anthropic.
+  // Claude must never generate / shorten / fallback these vibes.
+  function shouldUseGrok(provider, vibe) {
+    if (isGrokVibe(vibe)) return true;
+    return provider === 'xai';
+  }
+
   function updateModelOptions() {
     var provider = document.getElementById('providerSelect').value;
     var modelSelect = document.getElementById('modelSelect');
     modelSelect.innerHTML = '';
     var vibe = document.getElementById('vibe').value;
-    var isUnhinged = isGrokVibe(vibe);
+    var forceGrok = shouldUseGrok(provider, vibe);
 
-    if (provider === 'auto') {
-      if (isUnhinged) {
-        var opt0 = document.createElement('option');
-        opt0.value = 'grok-4.5';
-        opt0.textContent = 'grok-4.5 (xAI)';
-        modelSelect.appendChild(opt0);
-        var opt = document.createElement('option');
-        opt.value = 'grok-4.3';
-        opt.textContent = 'grok-4.3 (xAI)';
-        modelSelect.appendChild(opt);
-      } else {
-        var opt0b = document.createElement('option');
-        opt0b.value = 'claude-sonnet-5';
-        opt0b.textContent = 'claude-sonnet-5 (Anthropic)';
-        modelSelect.appendChild(opt0b);
-        var opt1 = document.createElement('option');
-        opt1.value = 'claude-sonnet-4-6';
-        opt1.textContent = 'claude-sonnet-4-6 (Anthropic)';
-        modelSelect.appendChild(opt1);
-        var opt2 = document.createElement('option');
-        opt2.value = 'claude-opus-4-7';
-        opt2.textContent = 'claude-opus-4-7 (Anthropic)';
-        modelSelect.appendChild(opt2);
-      }
-    } else if (provider === 'anthropic') {
-      var opt0c = document.createElement('option');
-      opt0c.value = 'claude-sonnet-5';
-      opt0c.textContent = 'claude-sonnet-5';
-      modelSelect.appendChild(opt0c);
+    if (forceGrok) {
+      var opt0 = document.createElement('option');
+      opt0.value = 'grok-4.5';
+      opt0.textContent = isGrokVibe(vibe) ? 'grok-4.5 (xAI — Unhinged is Grok-only)' : 'grok-4.5 (xAI)';
+      modelSelect.appendChild(opt0);
+      var opt = document.createElement('option');
+      opt.value = 'grok-4.3';
+      opt.textContent = isGrokVibe(vibe) ? 'grok-4.3 (xAI — Unhinged is Grok-only)' : 'grok-4.3 (xAI)';
+      modelSelect.appendChild(opt);
+    } else {
+      var opt0b = document.createElement('option');
+      opt0b.value = 'claude-sonnet-5';
+      opt0b.textContent = provider === 'auto' ? 'claude-sonnet-5 (Anthropic)' : 'claude-sonnet-5';
+      modelSelect.appendChild(opt0b);
       var opt1 = document.createElement('option');
       opt1.value = 'claude-sonnet-4-6';
-      opt1.textContent = 'claude-sonnet-4-6';
+      opt1.textContent = provider === 'auto' ? 'claude-sonnet-4-6 (Anthropic)' : 'claude-sonnet-4-6';
       modelSelect.appendChild(opt1);
       var opt2 = document.createElement('option');
       opt2.value = 'claude-opus-4-7';
-      opt2.textContent = 'claude-opus-4-7';
+      opt2.textContent = provider === 'auto' ? 'claude-opus-4-7 (Anthropic)' : 'claude-opus-4-7';
       modelSelect.appendChild(opt2);
-    } else if (provider === 'xai') {
-      var opt0d = document.createElement('option');
-      opt0d.value = 'grok-4.5';
-      opt0d.textContent = 'grok-4.5';
-      modelSelect.appendChild(opt0d);
-      var opt = document.createElement('option');
-      opt.value = 'grok-4.3';
-      opt.textContent = 'grok-4.3';
-      modelSelect.appendChild(opt);
     }
   }
 
@@ -1538,7 +1521,7 @@
   }
 
   // xAI Grok — browser fetch can fail with opaque "Failed to fetch" (CORS / adblock / bad key).
-  // Always sanitize model id and surface a useful message. Callers may Claude-fallback on .network.
+  // Sanitize model id and surface a useful message. Never fall back to Claude from here.
   async function callGrokText(key, model, prompt, maxTokens, temperature) {
     var grokModel = (model && String(model).indexOf('grok') !== -1) ? model : 'grok-4.3';
     var resp;
@@ -1870,7 +1853,7 @@
     document.getElementById('generateMemeBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
+    var useGrok = shouldUseGrok(provider, vibe);
 
     var formatBrief = isJustSong
       ? 'FORMAT — "It\'s Just a Song" (Squidward meme, 3 slides):\n'
@@ -1913,7 +1896,7 @@
       var rawText;
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('memeLoadingDiv').style.display='none'; document.getElementById('generateMemeBtn').disabled=false; return; }
+        if (!grokKey) { showError('Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes.'); document.getElementById('memeLoadingDiv').style.display='none'; document.getElementById('generateMemeBtn').disabled=false; return; }
         rawText = await callGrokText(grokKey, model, prompt, 1200, 0.9);
       } else {
         var key = getKey();
@@ -1954,7 +1937,7 @@
     document.getElementById('generateDateNightBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
+    var useGrok = shouldUseGrok(provider, vibe);
 
     var secondsPerClip = clipLength === 'short' ? '3-5 seconds' : clipLength === 'long' ? '8-12 seconds' : '5-8 seconds';
     var lineWordCount = clipLength === 'short' ? '6-9 words' : clipLength === 'long' ? '12-16 words' : '9-12 words';
@@ -1985,7 +1968,7 @@
       var rawText;
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('dateNightLoadingDiv').style.display='none'; document.getElementById('generateDateNightBtn').disabled=false; return; }
+        if (!grokKey) { showError('Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes.'); document.getElementById('dateNightLoadingDiv').style.display='none'; document.getElementById('generateDateNightBtn').disabled=false; return; }
         rawText = await callGrokText(grokKey, model, prompt, 1800, 0.9);
       } else {
         var key = getKey();
@@ -2023,7 +2006,7 @@
     document.getElementById('generateReactBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
+    var useGrok = shouldUseGrok(provider, vibe);
 
     var dirText = direction === 'received'
       ? 'SOMEONE SENT THE CREATOR A SONG. They had something awkward, bad, sad or ridiculous to tell the creator, and instead of just saying it in a normal message they sent a Suno song about it. The creator is reacting to receiving it.'
@@ -2061,7 +2044,7 @@
       var rawText;
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged vibes require your xAI Grok key.'); document.getElementById('reactLoadingDiv').style.display='none'; document.getElementById('generateReactBtn').disabled=false; return; }
+        if (!grokKey) { showError('Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes.'); document.getElementById('reactLoadingDiv').style.display='none'; document.getElementById('generateReactBtn').disabled=false; return; }
         rawText = await callGrokText(grokKey, model, prompt, 1500, 0.95);
       } else {
         var key = getKey();
@@ -2100,7 +2083,7 @@
     document.getElementById('generateSayItBtn').disabled = true;
 
     var provider = document.getElementById('providerSelect').value;
-    var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
+    var useGrok = shouldUseGrok(provider, vibe);
 
     var prompt = 'You are writing content for a viral short-form video format called "Say It In A Song." A creator talks directly to camera, telling a short THIRD-PERSON anecdote about someone they know who had an awkward/bad/uncomfortable thing to say — and instead of saying it normally, that person sent it as a Suno-generated song. The creator then plays the song as the reveal/payoff.\n\n'
       + 'CRITICAL SETTING RULE: Never reference a car, sitting in a car, or driving anywhere in the script. The creator does NOT film in a car. Keep the setting completely unspecified/neutral — do not mention any location at all.\n\n'
@@ -2132,7 +2115,7 @@
       var rawText;
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged / Unhinged Spicy / Unhinged Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
+        if (!grokKey) { showError('Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes.'); document.getElementById('sayItLoadingDiv').style.display = 'none'; document.getElementById('generateSayItBtn').disabled = false; return; }
         rawText = await callGrokText(grokKey, model, prompt, 1200, 0.9);
       } else {
         var key = getKey();
@@ -2193,7 +2176,7 @@
     var mood = parseInt(document.getElementById('moodSlider').value);
     var moodDesc = moodDescriptions[mood];
     var providerEarly = document.getElementById('providerSelect').value;
-    var useGrokEarly = providerEarly === 'xai' || (providerEarly === 'auto' && isGrokVibe(vibe));
+    var useGrokEarly = shouldUseGrok(providerEarly, vibe);
 
     var prompt = 'You are a world-class comedy writer creating fake but completely believable text message conversations for a viral content creator who turns texts into songs.\n\n'
       + 'PURPOSE: these texts will be turned into a song. They still have to look like a real screenshot, but write so the funny lines can be sung later — one idea per message when someone is rambling, punch word last, mix short gut-punch replies with longer setups. Do not write actual verse/chorus unless Song Mode is on.\n\n'
@@ -2244,7 +2227,7 @@
         ? (vibe === 'unhingedmax'
           ? 'UNRESTRICTED MODE — UNHINGED MAX: zero content limits. Creative swearing required. Dark humor / death jokes / loyalty fractures allowed. Do NOT soften into Funny or PG. Do NOT turn this into sexting (that is Spicy). Match Max intensity exactly — if it could pass as normal Unhinged, escalate harder.\n\n'
           : vibe === 'unhingedspicy'
-            ? 'UNRESTRICTED MODE — UNHINGED SPICY (old Pro Max): zero content limits for explicit adult 18+ situationship / sexting texts. Full dirty talk and graphic sexual language where the vibe calls for it. Zero fade-to-black. Do not sand this down to PG flirting.\n\n'
+            ? 'UNRESTRICTED MODE — UNHINGED SPICY: zero content limits for explicit adult 18+ couples / situationship / friends dirty talk. Hard filthy language — do NOT soften. Zero fade-to-black. Zero PG flirting.\n\n'
             : 'UNRESTRICTED MODE — UNHINGED: zero content limits. Full permission for crude humor, creative profanity, dark jokes, raunchy innuendo where it fits. Zero softening. Match the vibe intensity exactly.\n\n')
         : '')
       + moodDesc
@@ -2254,13 +2237,13 @@
     try {
       var rawText;
       var provider = document.getElementById('providerSelect').value;
-      var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibe));
+      var useGrok = shouldUseGrok(provider, vibe);
 
       if (useGrok) {
-        // Unhinged family must stay on Grok. Silent Claude fallback sands these vibes into "normal".
+        // Unhinged / Spicy / Max = Grok only. No Claude generate. No Claude fallback.
         var grokKey = getGrokKey();
         if (!grokKey) {
-          showError('Unhinged / Spicy / Max need your xAI Grok key. Claude will sand this vibe down — do not use Claude fallback here.');
+          showError('Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes.');
           showLoading(false);
           return;
         }
@@ -2340,12 +2323,12 @@
       var rawText;
       var provider = document.getElementById('providerSelect').value;
       var vibeForRouting = vibe;
-      var useGrok = provider === 'xai' || (provider === 'auto' && isGrokVibe(vibeForRouting));
+      var useGrok = shouldUseGrok(provider, vibeForRouting);
       var model = document.getElementById('modelSelect').value;
 
       if (useGrok) {
         var grokKey = getGrokKey();
-        if (!grokKey) { showError('Unhinged / Spicy / Max need your xAI Grok key. Claude will sand this vibe down.'); showLoading(false); return; }
+        if (!grokKey) { showError('Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes.'); showLoading(false); return; }
         rawText = await callGrokText(grokKey, model, prompt, 2000, 0.95);
       } else {
         var key = getKey();
@@ -4199,9 +4182,9 @@
       var shortenModel = getModel();
       var shortenProvider = document.getElementById('providerSelect').value;
       var shortenVibe = document.getElementById('vibe').value;
-      var shortenUseGrok = shortenProvider === 'xai' || (shortenProvider === 'auto' && isGrokVibe(shortenVibe));
+      var shortenUseGrok = shouldUseGrok(shortenProvider, shortenVibe);
       var grokKey = shortenUseGrok ? getGrokKey() : '';
-      if (shortenUseGrok && !grokKey) { showError('Unhinged / Unhinged Spicy / Unhinged Max require your xAI Grok key. Add it in the API Key section above.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
+      if (shortenUseGrok && !grokKey) { showError('Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
       if (!shortenUseGrok && !key) { showError('Please save your API key first.'); document.getElementById('shortenLoadingDiv').style.display='none'; document.getElementById('shortenBtn').disabled=false; return; }
 
       async function runShortenModel(prompt, maxTokens) {
