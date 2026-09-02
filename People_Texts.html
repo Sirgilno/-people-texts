@@ -1545,11 +1545,22 @@
     return info.text;
   }
 
-  // xAI Grok — browser CORS is allowed (Access-Control-Allow-Origin: *).
-  // "Failed to fetch" is usually adblock, offline, or a bad/missing key — NEVER fall back to Claude.
+  // Grok goes through same-origin /api/grok (Vercel) so ad blockers / VPNs that
+  // block api.x.ai still let Unhinged work. Claude keeps talking to Anthropic
+  // directly — that domain usually is not blocked. NEVER fall back to Claude.
+  function grokEndpoint() {
+    try {
+      if (typeof location !== 'undefined' && /^https?:/.test(location.protocol)) {
+        return '/api/grok';
+      }
+    } catch (e) {}
+    return 'https://api.x.ai/v1/chat/completions';
+  }
+
   async function callGrokText(key, model, prompt, maxTokens, temperature) {
     if (!key || !String(key).trim()) throw new Error(grokOnlyError());
     var grokModel = resolveGrokModel(model);
+    var endpoint = grokEndpoint();
     var body = JSON.stringify({
       model: grokModel,
       messages: [{ role: 'user', content: prompt }],
@@ -1558,7 +1569,7 @@
     });
 
     async function once() {
-      var resp = await fetch('https://api.x.ai/v1/chat/completions', {
+      var resp = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
         body: body
@@ -1570,6 +1581,8 @@
           msg = 'xAI rejected your Grok key (' + resp.status + '). Re-save a valid key from console.x.ai.';
         } else if (resp.status === 404 || /model/i.test(msg)) {
           msg = 'Grok model "' + grokModel + '" failed: ' + msg + ' Try grok-4.5 or grok-4.3 in the Model dropdown.';
+        } else if (resp.status === 502) {
+          msg = 'Grok proxy could not reach xAI. Try Generate again in a moment.';
         }
         var err = new Error(msg);
         err.status = resp.status;
@@ -1597,7 +1610,7 @@
       } catch (retryErr) {
         if (!isFetchNetworkErr(retryErr)) throw retryErr;
         var wrapped = new Error(
-          'Could not reach xAI Grok (Failed to fetch). Unhinged stays on Grok — Claude will NOT take over. Check: Grok key saved, ad blockers off on this page, you are online, then Generate again.'
+          'Could not reach Grok (Failed to fetch). Unhinged stays on Grok — Claude will NOT take over. Hard-refresh, confirm your Grok key is saved, then Generate again.'
         );
         wrapped.network = true;
         wrapped.cause = retryErr;
