@@ -10,7 +10,7 @@ MOOD-FIRST (silent, every project)
 
 CRITICAL LANGUAGE
 English is the base of original sections (V2 / Chorus / V3 / Outro). Dialect words there are seasoning.
-Every Verse 2, Verse 3, and Outro MUST contain ≥1 full standalone line in the home language of the genre.
+Every Verse 2, Chorus, Verse 3, and Outro MUST contain ≥1 full standalone line in the home language of the genre.
 That home-language line MUST end-rhyme with the line before it or the line after it. End rhyme = last stressed vowel + all following sounds match when spoken. Adjacent is not a rhyme. Spelling is not a rhyme. Use any dictionary word (English or that language) that matches THIS line's last sound and fits the song. No template words.
 A dumped Hindi / Zulu / Spanish / Arabic / Pidgin sentence with no sonic partner is a fail even if the FINAL CHECK box is ticked.
 
@@ -71,6 +71,18 @@ Seasoning: aman, opa, yamas, ela, agapi, haydi, kefi, dert, hasret, habibi, yall
 Full line: Greek or Turkish. Tags: Αμάν αμάν | Κέφι και χορός | Ateş düştü gönlüme
 Example: Αμάν, πονάει η καρδιά μου για σένα, έχω ένα ντέρτι που δεν με αφήνει να κοιμηθώ.
 
+ARABIC TRAP / MAHRAGANAT / SHAABI / KHALEEJI
+Triggers: Arabic trap, mahraganat, electro shaabi, Cairo street energy, distorted 808s, synth mizmar, auto-tuned Arabic male vocal, 128-140 BPM. Or Khaleeji pop, oud, frame drum, Gulf groove, 90-110 BPM.
+Seasoning: yalla, habibi, wallahi, wallah, khalas, inshallah, mashallah, yaani, bas, keda, sho, yallah, abey.
+Full line: Arabic (Egyptian, Levantine, or Gulf — match the comments if they are Arabic). Tags: يلا بينا | والله العظيم | خلاص كده
+Example: والله الحركة دي بتخوف في الضلمة يا جدعان.
+
+RAÏ / MAGHREB
+Triggers: Raï, Algerian raï, synth accordion, darbuka, nostalgic North African groove, French and Arabic vocals, 100-120 BPM.
+Seasoning: ya rayi, sahbi, wesh, bled, ça va, habibi, wallah, mazal, baraka.
+Full line: Algerian Arabic or Maghrebi French-Arabic. Tags: Ya rayi | Wesh sahbi | Mazal
+Example: Ya rayi, khalli el-dar dayen, el-tefla totla3 fel-hit kima el-lezgha.
+
 FLAMENCO
 Triggers: Flamenco, Spanish guitar, handclaps, raw passionate male vocals, Andalusian scale, duende, cajon, 100-120 BPM.
 Seasoning: ole, duende, alma, corazon, ay, madre mia, pena, sangre, fuego, quejío, ole.
@@ -118,6 +130,12 @@ Triggers: Highlife, West African guitar, brass horn section, joyful Yoruba or Tw
 Seasoning: e go better, oya, jeje, medaase, wahala dey, chale, suru, aseda, odo, onyame.
 Full line: Yoruba or Twi flavored. Tags: Suru l'ere | Bokoor na eye | Sankofa
 Example: Ɔbra yi yɛ den, nanso abotare wɔ hɔ, Onyame bɛma yɛn ahooden ne nhyira.
+
+BONGO FLAVA
+Triggers: Bongo Flava, Tanzanian pop, smooth Swahili male vocal, mid-tempo Afro groove, bright guitar, 95-110 BPM.
+Seasoning: poa, safi, niaje, kaka, dada, mapenzi, haraka, mzuri, bana, sawa.
+Full line: Swahili. Tags: Poa sana | Niaje kaka | Haraka haraka
+Example: Binti anapanda ukuta kama mjusi, simu ikatwa ndio akaonyesha nguvu.
 
 FADO
 Triggers: Fado, Portuguese saudade, mournful nylon guitar, melancholic vocals, sparse arrangement, 60-80 BPM.
@@ -170,6 +188,38 @@ NEVER: FIFA, World Cup, World Cup 2026, player names, trophies, emblems, mascots
 TRAP / HIP-HOP / RAP VARIANTS
 Genre tag first. Hard original bars at the Kendrick / Eminem / Wayne / Ludacris / Nas craft ceiling. Punchlines last. Callbacks. Double entendres. Multis.
 Those names never appear in lyrics or Style of Music. No "in the style of".
+
+PHONK / DRIFT PHONK
+Triggers: Phonk, drift phonk, cowbell melody, distorted 808 bass, chopped vocal chops, dark Memphis atmosphere, 135-150 BPM.
+Seasoning: English with Memphis / internet-phonk cadence. Tags: Cowbell in the night | Drift the block
+HARD BARS if it leans rap. Home line: English with that cadence, unless comments are another language — then one rhyming line in THAT language.
+
+BAILE FUNK
+Triggers: Baile funk, Brazilian funk, tamborzão drums, montagem energy, São Paulo or Rio street bounce, 130-150 BPM.
+Seasoning: vai, no baile, grave, montagem, favela, no grau, então, vai embora.
+Full line: Brazilian Portuguese. Tags: Vai no baile | Grave pesado | Montagem
+Example: Ela sobe na parede no baile da sala, sem tela na mão e o terror na cara.
+
+JERSEY CLUB
+Triggers: Jersey club, bed-squeak percussion, chopped vocal chops, fast bounce drums, Newark club energy, 130-140 BPM.
+Seasoning: English club-chant cadence. Tags: Bounce it | Let it squeak
+Home line: English chant, or the comments' language if mixed.
+
+CINEMATIC HORROR / DARK SCORE
+Triggers: Dark cinematic, horror score, music box melody, low drone, risers, stingers, tense strings, 70-90 BPM score or 120-140 hybrid with trap drums.
+Seasoning: eerie English. If the comments are Arabic (or another language), the home-language line is in THAT language — this genre is atmosphere, not a license to translate Verse 1.
+Full line: match the comments' non-English language when present; otherwise eerie English. Tags: Don't cut the lights | She's already up there
+
+NU-METAL / ALT-ROCK / POP-PUNK
+Triggers: Nu-metal, downtuned guitar riffs, industrial hits, aggressive drums, rap-sung or raspy vocal, 120-140 BPM. Or pop-punk, bright distorted guitar, shout-along chorus, 160-180 BPM.
+Seasoning: English rock cadence. HARD BARS if rap-sung (same RAP OVERRIDE).
+Home line: English, or the comments' language if mixed. Tags: Don't cut the lights | Ceiling crawler
+
+SOCA / ZOUK / KOMPA
+Triggers: Soca, Carnival bounce, steel-pan accents, 110-135 BPM. Zouk: Antillean French Creole, smooth 90-110 BPM. Kompa: Haitian guitar, 90-110 BPM.
+Seasoning: gyal, fete, wine, jam, sa ou fè, doudou, ayisyen, konpa.
+Full line: Caribbean English, Antillean Creole, or Haitian Creole. Tags: Fete start | Sa ou fè | Konpa souke
+Example: Gyal climb the wall like Carnival reach the house, phone gone and she still mash up the place.
 
 90s EURODANCE / DARK SYNTHWAVE / OTHER
 If mood wants it: name specific drums, synth type, BPM, vocal texture, atmosphere. Same dialect/foreign-line standard if the genre has a home language; if not, English with era-correct phrasing.
