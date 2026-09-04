@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>People Texts Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,6 +63,7 @@
     width: 100%; max-width: calc(1344px / 3);
     border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222;
     box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative;
+    font-family: 'Roboto', 'Noto Sans', sans-serif;
   }
   #phoneFrame, #commentsFrame {
     display: flex; flex-direction: column;
@@ -70,53 +74,53 @@
   .phone > * { position: relative; z-index: 1; }
   /* Must beat `.phone > *` or the overlay stays in-flow with 0 height and the opacity slider is a no-op. */
   .phone > .phone-wallpaper { position: absolute; z-index: 0; }
-  .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+  .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
   .p-chat-header { padding: 8px 14px 10px; text-align: center; flex-shrink: 0; }
   .p-header-row { display: flex; align-items: center; gap: 8px; text-align: left; }
   .p-header-row.centered { flex-direction: column; gap: 4px; text-align: center; }
   .p-header-row.centered .p-avatar { margin: 0 auto; }
   .p-header-meta { flex: 1; min-width: 0; }
-  .p-header-sub { font-size: 11px; font-weight: 400; opacity: 0.72; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .p-header-sub { font-size: 12px; font-weight: 400; opacity: 0.72; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .p-header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
   .p-header-actions svg { display: block; }
-  .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .p-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 15px; font-weight: 700; flex-shrink: 0; overflow: hidden; }
   .p-header-row:not(.centered) .p-avatar { margin: 0; }
-  .p-chat-name { font-size: 13px; font-weight: 600; }
+  .p-chat-name { font-size: 16px; font-weight: 500; }
   .p-messages { padding: 12px 10px; min-height: 200px; flex: 1 1 auto; display: flex; flex-direction: column; gap: 0; }
   .p-bubble-row { display: flex; flex-direction: column; }
   .p-bubble-row.me { align-items: flex-end; }
   .p-bubble-row.them { align-items: flex-start; }
-  .p-bubble-time { font-size: 9px; opacity: 0.5; margin-top: 2px; padding: 0 4px; }
-  .p-bubble-time.inside { font-size: 9px; color: inherit; opacity: 0.6; padding: 0 2px 1px 8px; align-self: flex-end; flex-shrink:0; }
-  .p-bubble-time.outside { font-size: 9px; opacity: 0.6; margin-top: 2px; padding: 0 4px; display:block; }
-  .p-time-divider { font-size: 10px; text-align: center; margin: 10px 0 4px; opacity: 0.5; width:100%; }
-  .p-read-receipt { font-size: 9px; margin-top: 1px; padding: 0 4px; text-align: right; }
-  .p-time { font-size: 10px; text-align: center; margin: 6px 0; opacity: 0.5; }
+  .p-bubble-time { font-size: 11px; opacity: 0.5; margin-top: 2px; padding: 0 4px; }
+  .p-bubble-time.inside { font-size: 11px; color: inherit; opacity: 0.6; padding: 0 2px 1px 8px; align-self: flex-end; flex-shrink:0; }
+  .p-bubble-time.outside { font-size: 11px; opacity: 0.6; margin-top: 2px; padding: 0 4px; display:block; }
+  .p-time-divider { font-size: 12px; text-align: center; margin: 10px 0 4px; opacity: 0.5; width:100%; }
+  .p-read-receipt { font-size: 11px; margin-top: 1px; padding: 0 4px; text-align: right; }
+  .p-time { font-size: 12px; text-align: center; margin: 6px 0; opacity: 0.5; }
   .p-input-bar { padding: 8px 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .p-compose-lead, .p-compose-trail { display: none; align-items: center; gap: 8px; flex-shrink: 0; color: inherit; }
   .p-compose-lead.visible, .p-compose-trail.visible { display: flex; }
   .p-compose-icon { width: 20px; height: 20px; opacity: 0.85; }
-  .p-fake-input { flex: 1; border-radius: 18px; padding: 7px 14px; font-size: 12px; }
+  .p-fake-input { flex: 1; border-radius: 18px; padding: 7px 14px; font-size: 16px; }
   .p-send { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .p-send.mic { width: 40px; height: 40px; }
   .p-gm-read { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
-  .p-date-chip { align-self: center; font-size: 11px; padding: 4px 10px; border-radius: 8px; margin: 8px auto; opacity: 1; }
-  .p-reply-quote { font-size: 10px; padding: 4px 8px; border-left: 2px solid; border-radius: 4px; margin-bottom: 3px; max-width: 75%; opacity: 0.7; line-height: 1.3; }
+  .p-date-chip { align-self: center; font-size: 12px; padding: 4px 10px; border-radius: 8px; margin: 8px auto; opacity: 1; }
+  .p-reply-quote { font-size: 13px; padding: 4px 8px; border-left: 2px solid; border-radius: 4px; margin-bottom: 3px; max-width: 75%; opacity: 0.7; line-height: 1.3; }
   .p-wa-quote { display: flex; flex: 1 1 100%; width: 100%; border-radius: 8px; overflow: hidden; margin: 0 0 5px; min-width: 0; }
   .p-wa-quote-bar { width: 4px; flex-shrink: 0; }
   .p-wa-quote-body { flex: 1; min-width: 0; padding: 5px 8px 5px 7px; }
   .p-wa-quote-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .p-wa-quote-name { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
-  .p-wa-quote-num { font-size: 11px; color: #8696a0; flex-shrink: 0; }
-  .p-wa-quote-text { font-size: 12px; line-height: 1.3; opacity: 0.78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .p-wa-quote-name { font-size: 14px; font-weight: 600; line-height: 1.2; }
+  .p-wa-quote-num { font-size: 12px; color: #8696a0; flex-shrink: 0; }
+  .p-wa-quote-text { font-size: 13px; line-height: 1.3; opacity: 0.78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
   .p-quote-edit { cursor: text; }
   .p-wa-quote-text.bubble-editable:focus { white-space: normal; overflow: visible; text-overflow: clip; }
   .p-wa-group-av { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; margin: 0 0 1px; }
   .p-wa-group-av-spacer { visibility: hidden; background: transparent !important; }
   .p-wa-in-wrap { display: flex; flex-direction: row; align-items: flex-end; max-width: 92%; gap: 5px; min-width: 0; }
   .p-wa-group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex: 1 1 100%; width: 100%; margin-bottom: 2px; }
-  .p-wa-group-name { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
-  .p-wa-group-num { font-size: 11px; color: #8696a0; flex-shrink: 0; }
+  .p-wa-group-name { font-size: 14px; font-weight: 600; line-height: 1.2; }
+  .p-wa-group-num { font-size: 12px; color: #8696a0; flex-shrink: 0; }
   .p-typing { display: none; align-items: flex-start; margin: 2px 0; }
   .p-typing-bubble { background: #e5e5ea; border-radius: 18px 18px 18px 4px; padding: 10px 14px; display: flex; gap: 3px; align-items: center; }
   .p-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; animation: typingBounce 1.2s infinite; }
@@ -867,7 +871,21 @@
     var nameEl = document.getElementById(nameId);
     var avEl = document.getElementById(avatarId);
     if (nameEl) nameEl.textContent = title;
-    if (avEl) avEl.textContent = title.charAt(0).toUpperCase();
+    if (avEl) {
+      var initial = title.charAt(0).toUpperCase() || '?';
+      avEl.setAttribute('data-initial', initial);
+      avEl.textContent = '';
+      var usePortrait = !(theme && theme.headerPortrait === false) && !isGroupChatActive();
+      if (usePortrait) {
+        var img = document.createElement('img');
+        img.alt = '';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';
+        img.src = generateRealisticAvatarDataUri(title);
+        avEl.appendChild(img);
+      } else {
+        avEl.textContent = initial;
+      }
+    }
     var sub = subId ? document.getElementById(subId) : null;
     if (sub && isGroupChatActive()) {
       sub.textContent = groupHeaderSubtitle();
@@ -2703,12 +2721,15 @@
     }
     if (trail) {
       if (composer === 'whatsapp') {
-        trail.innerHTML = iconSvg('<path d="M21.4 11.6L12 2.2 2.6 11.6a2 2 0 0 0-.6 1.4V20a2 2 0 0 0 2 2h4v-6h8v6h4a2 2 0 0 0 2-2v-7a2 2 0 0 0-.6-1.4z"/>', 18, 18, composeColor) + iconSvg('<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>', 18, 18, composeColor);
+        trail.innerHTML = iconSvg('<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>', 20, 20, composeColor);
+        trail.setAttribute('data-wa-attach', 'paperclip');
         trail.classList.add('visible');
       } else if (composer === 'gmessages') {
+        trail.removeAttribute('data-wa-attach');
         trail.innerHTML = iconSvg('<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>', 20, 20, composeColor) + iconSvg('<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>', 18, 18, composeColor);
         trail.classList.add('visible');
       } else {
+        trail.removeAttribute('data-wa-attach');
         trail.innerHTML = '';
         trail.classList.remove('visible');
       }
@@ -2724,10 +2745,10 @@
 
     if (theme.floatInput) {
       ib.style.cssText = 'padding:6px 8px 10px;display:flex;align-items:center;gap:8px;background:transparent;';
-      fi.style.cssText = 'flex:1;border-radius:24px;padding:9px 12px;font-size:13px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';box-shadow:0 1px 6px rgba(0,0,0,0.28);';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:9px 12px;font-size:16px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';box-shadow:0 1px 6px rgba(0,0,0,0.28);';
     } else {
       ib.style.cssText = 'padding:8px 10px;display:flex;align-items:center;gap:8px;background:' + theme.bgInput + ';';
-      fi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:12px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
+      fi.style.cssText = 'flex:1;border-radius:24px;padding:8px 14px;font-size:16px;background:' + theme.bgFakeInput + ';border:none;color:' + theme.colorFakeInput + ';';
     }
     if (composer === 'whatsapp') {
       ib.style.background = 'transparent';
@@ -2737,7 +2758,7 @@
       var composeWrap = fi.parentElement;
       composeWrap.style.background = 'transparent';
       ib.style.cssText = 'padding:6px 8px 10px;display:flex;align-items:center;gap:6px;background:transparent;';
-      fi.style.cssText = 'flex:1;border-radius:0;padding:10px 4px;font-size:13px;background:transparent;border:none;color:' + theme.colorFakeInput + ';box-shadow:none;';
+      fi.style.cssText = 'flex:1;border-radius:0;padding:10px 4px;font-size:16px;background:transparent;border:none;color:' + theme.colorFakeInput + ';box-shadow:none;';
       if (!ib.querySelector('.p-wa-pill')) {
         var pill = document.createElement('div');
         pill.className = 'p-wa-pill';
@@ -2859,7 +2880,7 @@
         var sameAsNext = i < messages.length - 1 && messages[i+1].f === msg.f && (msg.f === 'me' || !isGroupChat || messages[i+1].speaker === msg.speaker);
         var radius = clusterRadius(theme, isMe, sameAsPrev, sameAsNext);
         var bubble = document.createElement('div');
-        var bubbleStyle = 'max-width:82%;color:' + bTheme.color + ';padding:7px 10px 6px 10px;border-radius:' + radius + ';font-size:13px;line-height:1.4;';
+        var bubbleStyle = 'max-width:82%;color:' + bTheme.color + ';padding:8px 12px 7px 12px;border-radius:' + radius + ';font-size:16px;line-height:1.35;';
         bubbleStyle += 'background:' + bTheme.bg + ';';
 
         // Occasionally render a voice-note look above the real message. This
@@ -3073,7 +3094,7 @@
       headerSubColor: '#8696a0',
       composer: 'whatsapp',
       composeIconColor: '#8696a0',
-      defaultWallpaper: 'doodle1',
+      defaultWallpaper: 'doodleWa',
       dateChip: true,
       dateChipBg: '#182229',
       bgSb: '#0b141a', colorSb: '#e9edef',
@@ -3332,7 +3353,11 @@
     envelope: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.3"><rect x="-11" y="-8" width="22" height="16" rx="1.5"/><path d="M-11,-8 L0,2 L11,-8"/></g>'; },
     note: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.4"><circle cx="-6" cy="9" r="4"/><line x1="-2" y1="9" x2="-2" y2="-10"/><path d="M-2,-10 L8,-7 L8,-1 L-2,-4"/></g>'; },
     plane: function(x, y, s, rot) { return '<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" d="M-11,3 L11,-9 L2,5 L4,11 L-1,6 L-6,8 Z" fill="none" stroke="STROKE" stroke-width="1.3" stroke-linejoin="round"/>'; },
-    cat: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.5" stroke-linejoin="round"><path d="M-9,10 C-9,2 -6,-6 0,-6 C6,-6 9,2 9,10 Z"/><path d="M-6,-5 L-8,-11 L-3,-7 Z"/><path d="M6,-5 L8,-11 L3,-7 Z"/></g>'; }
+    cat: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.5" stroke-linejoin="round"><path d="M-9,10 C-9,2 -6,-6 0,-6 C6,-6 9,2 9,10 Z"/><path d="M-6,-5 L-8,-11 L-3,-7 Z"/><path d="M6,-5 L8,-11 L3,-7 Z"/></g>'; },
+    bulb: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.4"><circle cx="0" cy="-2" r="6"/><path d="M-3,4 h6 v3 a3 3 0 0 1 -6 0 z"/><line x1="-2" y1="12" x2="2" y2="12"/></g>'; },
+    gear: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.3"><circle cx="0" cy="0" r="4"/><path d="M0,-9 L2,-4 L0,-4 L-2,-4 Z M0,9 L2,4 L0,4 L-2,4 Z M-9,0 L-4,2 L-4,0 L-4,-2 Z M9,0 L4,2 L4,0 L4,-2 Z M-6.4,-6.4 L-2.2,-3.2 L-2.8,-2.8 L-3.2,-2.2 Z M6.4,6.4 L2.2,3.2 L2.8,2.8 L3.2,2.2 Z M6.4,-6.4 L2.2,-3.2 L2.8,-2.8 L3.2,-2.2 Z M-6.4,6.4 L-2.2,3.2 L-2.8,2.8 L-3.2,2.2 Z"/></g>'; },
+    pizza: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.3" stroke-linejoin="round"><path d="M0,-11 L9,9 L-9,9 Z"/><circle cx="-2" cy="2" r="1.3"/><circle cx="3" cy="4" r="1.3"/><circle cx="1" cy="-2" r="1.2"/></g>'; },
+    cup: function(x, y, s, rot) { return '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" fill="none" stroke="STROKE" stroke-width="1.3"><path d="M-7,-5 h12 v8 a6 6 0 0 1 -12 0 z"/><path d="M5,-3 h3 a3 3 0 0 1 0 6 h-3"/><line x1="-5" y1="-8" x2="-3" y2="-5"/><line x1="-1" y1="-9" x2="0" y2="-5"/></g>'; }
   };
   function buildDoodleSVG(iconFns, tileSize, count, strokeColor, sparse) {
     var out = '';
@@ -3392,6 +3417,7 @@
       'solid4': { base: fallback, overlay: '#0f3460' },
       'solid5': { base: fallback, overlay: '#1e3a5f' },
       'doodle1': doodleTile(buildDoodleSVG([ICONS.heart], 140, 9, 'rgba(255,255,255,0.11)', false), 140, '#0b141a'),
+      'doodleWa': doodleTile(buildDoodleSVG([ICONS.heart, ICONS.star, ICONS.envelope, ICONS.note, ICONS.plane, ICONS.bulb, ICONS.gear, ICONS.pizza, ICONS.cup], 200, 16, 'rgba(255,255,255,0.12)', false), 200, '#0b141a'),
       'doodle2': doodleTile(buildDoodleSVG([ICONS.star, ICONS.envelope], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#14181f'),
       'doodle3': doodleTile(buildDoodleSVG([ICONS.note, ICONS.plane], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#171a24'),
       'doodle4': doodleTile(buildDoodleSVG([ICONS.cat], 220, 5, 'rgba(255,255,255,0.15)', true), 220, '#12141c'),
@@ -3424,6 +3450,7 @@
         { id: 'solid5', label: 'Steel' }
       ]},
       { label: 'Doodle Patterns', options: [
+        { id: 'doodleWa', label: 'WhatsApp Mix' },
         { id: 'doodle1', label: 'Hearts' },
         { id: 'doodle2', label: 'Stars & Envelopes' },
         { id: 'doodle3', label: 'Music & Paper Planes' },
@@ -3717,7 +3744,7 @@
     var isYT = plat === 'youtube';
 
     document.getElementById('commentsFrame').style.background = theme.bg;
-    document.getElementById('cStatusBar').style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bg + ';color:' + theme.headerText + ';';
+    document.getElementById('cStatusBar').style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;background:' + theme.bg + ';color:' + theme.headerText + ';';
     document.getElementById('cTime').textContent = new Date().getHours() + ':' + String(new Date().getMinutes()).padStart(2,'0');
 
     var header = document.getElementById('cHeader');
@@ -3951,7 +3978,7 @@
     var sendBtn = document.getElementById('pSendBtn');
     var sendPath = document.getElementById('pSendPath');
 
-    sb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
+    sb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
     applyChatChrome(theme, {
       header: 'pChatHeader', headerRow: 'pHeaderRow', sub: 'pHeaderSub', actions: 'pHeaderActions',
       inputBar: 'pInputBar', lead: 'pComposeLead', fakeInput: 'pFakeInput', trail: 'pComposeTrail',
@@ -4015,7 +4042,7 @@
     var aSend = document.getElementById('aSend');
     var aSendPath = document.getElementById('aSendPath');
 
-    aSb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
+    aSb.style.cssText = 'padding:8px 14px 4px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;background:' + theme.bgSb + ';color:' + theme.colorSb + ';';
     applyChatChrome(theme, {
       header: 'aCh', headerRow: 'aHeaderRow', sub: 'aHeaderSub', actions: 'aHeaderActions',
       inputBar: 'aIb', lead: 'aComposeLead', fakeInput: 'aFi', trail: 'aComposeTrail',
@@ -4612,6 +4639,8 @@
       frame.classList.add('capturing');
       var bg = window.getComputedStyle(frame).backgroundColor;
       if (!bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') bg = '#000000';
+      var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      fontsReady.then(function() {
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           var scale = PIXEL_SCREEN_W / Math.max(1, frame.offsetWidth);
@@ -4629,6 +4658,10 @@
             reject(err);
           });
         });
+      });
+      }).catch(function() {
+        frame.classList.remove('capturing');
+        reject(new Error('Font load failed'));
       });
     });
   }
@@ -5015,7 +5048,7 @@
         groupType: isGroup ? document.getElementById('groupType').value : 'dm',
         headerName: document.getElementById('pName').textContent,
         headerSub: document.getElementById('pHeaderSub').textContent,
-        headerInitial: document.getElementById('pAvatar').textContent
+        headerInitial: document.getElementById('pAvatar').getAttribute('data-initial') || document.getElementById('pAvatar').textContent
       };
     };
     if (new URLSearchParams(location.search).get('waquote')) {
@@ -5181,9 +5214,43 @@
         anyPravatar: srcs.some(function(s){ return s.indexOf('pravatar') !== -1; })
       };
     };
+    window.__ptgWhatsAppMatchFixture = function() {
+      document.getElementById('msgStyle').value = 'whatsapp';
+      document.getElementById('groupSize').value = '2';
+      document.getElementById('groupSize').dispatchEvent(new Event('change'));
+      window.__ptgLayoutFixture();
+      applyWallpaper();
+      var bubble = document.querySelector('#pMessages [data-msg-idx]');
+      var phone = document.getElementById('phoneFrame');
+      var av = document.getElementById('pAvatar');
+      var trail = document.getElementById('pComposeTrail');
+      var paper = document.getElementById('phoneWallpaper');
+      var font = phone ? getComputedStyle(phone).fontFamily : '';
+      return {
+        font: font,
+        roboto: /roboto/i.test(font),
+        bubblePx: bubble ? getComputedStyle(bubble).fontSize : '',
+        portrait: !!(av && av.querySelector('img') && (av.querySelector('img').getAttribute('src') || '').indexOf('data:image/svg+xml') === 0),
+        paperclip: !!(trail && trail.getAttribute('data-wa-attach') === 'paperclip'),
+        wallpaper: currentWallpaper === 'none' ? (platformThemes.whatsapp.defaultWallpaper) : currentWallpaper,
+        overlayHasImage: !!(paper && paper.style.background && paper.style.background !== 'none')
+      };
+    };
     window.__ptgProtectShortenedLine = protectShortenedLine;
     window.__ptgWordCount = wordCount;
     window.__ptgLooksTelegraph = looksTelegraph;
+    if (new URLSearchParams(location.search).get('wamatch') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgWhatsAppMatchFixture();
+        var ok = !!(r.roboto && r.bubblePx === '16px' && r.portrait && r.paperclip && r.wallpaper === 'doodleWa' && r.overlayHasImage);
+        var banner = document.createElement('div');
+        banner.id = 'waMatchBanner';
+        banner.textContent = (ok ? 'WAMATCH PASS' : 'WAMATCH FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'WAMATCH PASS' : 'WAMATCH FAIL';
+      }, 0);
+    }
     if (new URLSearchParams(location.search).get('pixel') === '1') {
       setTimeout(function() {
         window.__ptgLayoutFixture();
