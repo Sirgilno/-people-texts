@@ -67,7 +67,7 @@ Thumbnail:
 WHAT CHANGED VS THE OLD MEGA-PROMPT
 ═══════════════════════════════════════
 KEPT (this is the formula that got you liked / hired):
-- Verse 1 = comments transcribed, not invented
+- Verse 1 = comments transcribed, not invented, original language kept (do not translate Arabic/etc.)
 - Two full Suno options, Style outside the code block, lyrics-only paste
 - Gilno's Stem in Intro + Outro
 - Mood-first genre + dialect + one full home-language line
@@ -89,3 +89,4 @@ UPDATED:
 - Brand-safe default; spicy only if the comments themselves are adult 18+
 - Image context can flavor Verse 2 without describing "a screenshot"
 - Dialect banks condensed (same genres, usable vocab — the old dump was too long to load)
+- Verse 1 never translates comments: Arabic stays Arabic, mixed threads stay mixed. English-as-base is V2/Chorus/V3/Outro only.
