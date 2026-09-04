@@ -68,7 +68,8 @@
   .phone.capturing { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; width: calc(1344px / 3) !important; max-width: calc(1344px / 3) !important; min-height: calc(2992px / 3); }
   .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .phone > * { position: relative; z-index: 1; }
-  .phone > .phone-wallpaper { z-index: 0; }
+  /* Must beat `.phone > *` or the overlay stays in-flow with 0 height and the opacity slider is a no-op. */
+  .phone > .phone-wallpaper { position: absolute; z-index: 0; }
   .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
   .p-chat-header { padding: 8px 14px 10px; text-align: center; flex-shrink: 0; }
   .p-header-row { display: flex; align-items: center; gap: 8px; text-align: left; }
@@ -5102,11 +5103,16 @@
       var at0 = { op: paper.style.opacity };
       document.getElementById('wallpaperOpacity').value = '40';
       applyWallpaper();
+      var cs = getComputedStyle(paper);
+      var paperRect = paper.getBoundingClientRect();
+      var frameRect = document.getElementById('phoneFrame').getBoundingClientRect();
       return {
         at100: at100.op,
         at0: at0.op,
         at40: paper.style.opacity,
-        overlayHasImage: !!(at100.bg && at100.bg !== 'none')
+        overlayHasImage: !!(at100.bg && at100.bg !== 'none'),
+        position: cs.position,
+        coversFrame: paperRect.height >= frameRect.height - 2 && paperRect.width >= frameRect.width - 2
       };
     };
     window.__ptgDiscordXssFixture = function() {
@@ -5227,6 +5233,7 @@
         var pasteBgLight = getComputedStyle(document.getElementById('pasteInput')).backgroundColor;
         document.documentElement.removeAttribute('data-theme');
         var ok = opacity.at100 === '1' && opacity.at0 === '0' && opacity.at40 === '0.4' && opacity.overlayHasImage
+          && opacity.position === 'absolute' && opacity.coversFrame
           && xss.imgCount === 0 && xss.hasRawTag && !xss.leaked
           && imq.quote === 'hello first'
           && empty.after === '' && empty.quoteT === ''
