@@ -436,6 +436,7 @@
         <option value="unhinged">Unhinged 🔥 (Grok only)</option>
         <option value="unhingedspicy">Unhinged Spicy 🌶️ (Grok — explicit dirty talk)</option>
         <option value="unhingedmax">Unhinged Max 💀 (Grok — chaos, no filters)</option>
+        <option value="darkhumour">Dark Humour 🖤 (Grok — grim / death-joke comedy)</option>
         <option value="tinder">Tinder / Dating App Energy 😬</option>
       </select>
     </div>
@@ -975,8 +976,9 @@
 
   // ── VIBE DESCRIPTIONS ────────────────────────────────────────
   // Engagement vibes: job → voice → must-include → bans → share test.
-  // Unhinged / Spicy / Max = Grok ONLY. Claude never generates these vibes.
+  // Unhinged / Spicy / Max / Dark Humour = Grok ONLY. Claude never generates these vibes.
   // Spicy = couples/situationship/friends dirty talk (hard, not soft). Max = chaos, no filters.
+  // Dark Humour = grim comedy (death jokes, memorial absurdity). Separate from Max.
   var vibeDescriptions = {
     funny:
       'VIBE ENGINE — FUNNY (shareable comedy texts):\n'
@@ -1056,6 +1058,14 @@
       + 'MUST INCLUDE: (1) a concrete unhinged crime/take WORSE than normal Unhinged (2) hard double-down when challenged — no soft landing (3) a nuclear share-hook line + comment bait so viewers pick a side or tag a friend.\n'
       + 'BAN: defining this vibe as sexting (use Spicy), ANY softening / PG rewrite, tidy apologies, corporate-safe paraphrases, writing that could pass as Funny or calm Unhinged.\n'
       + 'ENGAGEMENT TEST: would someone share with "NOT THE ___ 💀💀💀" or start an argument in comments? If it could pass as normal Unhinged, push crime + swearing + double-down harder. No filters.',
+    darkhumour:
+      'VIBE ENGINE — DARK HUMOUR (grim comedy — not Max chaos, not Spicy dirty talk):\n'
+      + 'JOB: The joke itself is dark. Death jokes, funeral/memorial absurdity, "too soon" timing, grim observational comedy, loyalty fractures that make people laugh then go "I should not be laughing". Screenshot fuel because it is messed up AND funny. This is NOT Unhinged Max (chaos amp) and NOT Spicy (sex).\n'
+      + 'VOICE: Deadpan. Wrong-funeral energy. Friends who would get kicked out of the wake. Short punches. Someone says the unspeakable like it is small talk. Swearing is fine when it serves the joke — the punch is the darkness, not the volume.\n'
+      + 'MUST INCLUDE: (1) a specific dark premise (death, funeral, hospital, will, "if I die", memorial group chat, grim what-if) (2) at least one person doubling down instead of "too soon / I\'m sorry" (3) one share-hook line that is dark-funny — the caption people send with "I\'m going to hell".\n'
+      + 'BAN: sanding into Funny or Relatable, turning it into Max pile-on chaos with no dark joke, turning it into Spicy/sexting, tidy moral-of-the-story apologies, refusing the bit because it is "too dark".\n'
+      + 'HARD LIMITS: adults 18+ only. No minors in any harmful or sexual framing. Ever. No real-world instructions for harm. The darkness is comedy, not a how-to.\n'
+      + 'ENGAGEMENT TEST: would someone share it with "I should not have laughed 💀"? If it could pass as regular Unhinged or Max without a dark punchline, rewrite until the joke is actually grim.',
     tinder:
       'VIBE ENGINE — TINDER / DATING DMS (screenshot roast fuel):\n'
       + 'JOB: Bad dating-app game so unhinged/cringe that people screenshot and roast it in group chats.\n'
@@ -1324,7 +1334,7 @@
   });
 
   function isGrokVibe(vibe) {
-    return vibe === 'unhinged' || vibe === 'unhingedspicy' || vibe === 'unhingedmax';
+    return vibe === 'unhinged' || vibe === 'unhingedspicy' || vibe === 'unhingedmax' || vibe === 'darkhumour';
   }
 
   // Unhinged family is ALWAYS Grok — even if Provider is set to Anthropic.
@@ -1351,7 +1361,7 @@
         var gOpt = document.createElement('option');
         gOpt.value = grokModels[gi][0];
         gOpt.textContent = isGrokVibe(vibe)
-          ? grokModels[gi][1].replace('(xAI)', '(xAI — Unhinged is Grok-only)')
+          ? grokModels[gi][1].replace('(xAI)', '(xAI — this vibe is Grok-only)')
           : grokModels[gi][1];
         modelSelect.appendChild(gOpt);
       }
@@ -1412,7 +1422,7 @@
   }
 
   function grokOnlyError() {
-    return 'Unhinged / Spicy / Max are Grok-only. Save your xAI Grok key — Claude never runs these vibes (no fallback).';
+    return 'Unhinged / Spicy / Max / Dark Humour are Grok-only. Save your xAI Grok key — Claude never runs these vibes (no fallback).';
   }
 
   function extractAnthropicText(data) {
@@ -2307,7 +2317,9 @@
           ? 'UNRESTRICTED MODE — UNHINGED MAX: zero content limits. Creative swearing required. Dark humor / death jokes / loyalty fractures allowed. Do NOT soften into Funny or PG. Do NOT turn this into sexting (that is Spicy). Match Max intensity exactly — if it could pass as normal Unhinged, escalate harder.\n\n'
           : vibe === 'unhingedspicy'
             ? 'UNRESTRICTED MODE — UNHINGED SPICY: zero content limits for explicit adult 18+ couples / situationship / friends dirty talk. Hard filthy language — do NOT soften. Zero fade-to-black. Zero PG flirting.\n\n'
-            : 'UNRESTRICTED MODE — UNHINGED: zero content limits. Full permission for crude humor, creative profanity, dark jokes, raunchy innuendo where it fits. Zero softening. Match the vibe intensity exactly.\n\n')
+            : vibe === 'darkhumour'
+              ? 'UNRESTRICTED MODE — DARK HUMOUR: the comedy is grim. Death jokes, funeral/memorial absurdity, too-soon timing. Do NOT soften into Funny. Do NOT turn this into Max chaos-with-no-joke. Do NOT turn this into Spicy/sexting. Adults 18+ only. No minors. No harm how-tos. If there is no dark punchline, rewrite.\n\n'
+              : 'UNRESTRICTED MODE — UNHINGED: zero content limits. Full permission for crude humor, creative profanity, dark jokes, raunchy innuendo where it fits. Zero softening. Match the vibe intensity exactly.\n\n')
         : '')
       + moodDesc
       + (activeDramaPack ? '\n\n' + activeDramaPack : '')
@@ -2384,7 +2396,9 @@
       + moodDesc + '\n\n'
       + 'COMMENT LENGTH — STRICT: Real Instagram/TikTok comments are short. At least 80% of comments must be ONE short sentence or fragment, under 17 words — many should be even shorter (3-8 words). Maximum 1-2 comments in the entire batch may run to 2-3 sentences for variety, and even those should stay under 40 words total. Never write a comment longer than a short paragraph — no comment should read like a monologue or story.\n\n'
       + 'Generate exactly ' + count + ' distinct fake ' + platformLabel + ' usernames each with ONE comment, matching the mixed patterns above based on what the hook is asking for.\n\n'
-      + 'Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful comedy, not actual bullying.\n\n'
+      + (vibe === 'darkhumour'
+        ? 'HARD LIMITS: adults 18+ only. No minors. No real-world harm instructions. Dark jokes about death/funerals/grim timing are the point — do not sand them into wholesome comedy. Still no hate that uses race/religion as the punchline.\n\n'
+        : 'Never racist, never targeting protected characteristics, never sexual, never genuinely cruel about real physical/mental health struggles — keep it playful comedy, not actual bullying.\n\n')
       + 'Mark exactly ONE of the comments (the funniest/best one) by starting that line with [PINNED] before the username — this represents the top comment the algorithm surfaced. Mark exactly ONE different comment (can overlap logic-wise but must be a different line) by starting it with [LIKED] before the username — this represents a comment the creator personally liked. Every other line has no marker.\n\n'
       + 'NESTED REPLIES: for exactly 2 of the comments in the batch (pick ones where a reply thread would feel natural — a joke someone builds on, a disagreement, a "wait what" reaction), write 2-3 short reply lines directly under that comment. Each reply line must start with ">" followed by a fake username, then the reply text — e.g. ">replyuser22: wait fr??". Replies should read like a real back-and-forth (agreeing, arguing, adding a joke, asking a follow-up) — not just more top-level comments. Every other comment in the batch has no replies attached. On exactly ONE nested reply (the creator responding in-thread), prefix with [CREATOR] after the >: e.g. "> [CREATOR] ghosttowndj_: wait I meant it tho". Use a realistic handle, never the literal word CREATOR.\n\n'
       + 'Usernames must look real: lowercase, mix of words/numbers/underscores/dots, no spaces (e.g. ghosttowndj_, ifeefafaux, lilpinkcupid, victor.j1_, tonnyjayworld).\n\n'
