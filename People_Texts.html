@@ -192,17 +192,38 @@
     .app-shell.has-preview { max-width: 1180px; display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
     .app-shell.has-preview > #previewSection {
       grid-column: 2; grid-row: 1 / span 99; position: sticky; top: 20px; align-self: start; margin-top: 0;
-      max-height: calc(100vh - 40px); min-height: 0; overflow: hidden;
+      max-height: calc(100vh - 40px); min-height: 0;
+      overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable;
       display: flex; flex-direction: column;
     }
     .app-shell.has-preview > *:not(#previewSection) { grid-column: 1; min-width: 0; }
-    .app-shell.has-preview .preview-toolbar { flex: 0 1 auto; min-height: 0; max-height: 46vh; overflow-y: auto; }
-    .app-shell.has-preview .phone-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; margin-bottom: 12px; }
+    /* Phone mockup grows with every bubble — scroll the preview column, never clip the screenshot. */
+    .app-shell.has-preview .preview-toolbar { flex: 0 0 auto; min-height: 0; max-height: none; overflow: visible; }
+    .app-shell.has-preview .phone-wrap { flex: 0 0 auto; min-height: 0; overflow: visible; margin-bottom: 12px; }
     .app-shell.has-preview .preview-more { flex: 0 0 auto; }
   }
 
   /* ── Searchable preset picker ── */
   #sunoPreset { display: none !important; }
+  .preset-card { margin-bottom: 16px; }
+  .preset-card-toggle {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    cursor: pointer; list-style: none; user-select: none;
+    padding: 2px 0 10px; color: inherit;
+  }
+  .preset-card-toggle::-webkit-details-marker, .preset-card-toggle::marker { display: none; content: ''; }
+  .preset-card-title { margin-bottom: 0; display: flex; align-items: center; gap: 8px; }
+  .preset-june { font-size: 10px; background: transparent; border: 1px solid #3d2f52; color: #b794f6; padding: 2px 7px; border-radius: 6px; font-weight: 500; letter-spacing: 0.05em; }
+  .preset-card-meta {
+    flex: 1; min-width: 0; font-size: 11px; color: var(--text-muted); font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .preset-card-chevron {
+    width: 7px; height: 7px; margin-left: auto; flex-shrink: 0;
+    border-right: 2px solid var(--text-faint); border-bottom: 2px solid var(--text-faint);
+    transform: rotate(-45deg); transition: transform 0.15s ease;
+  }
+  .preset-card[open] .preset-card-chevron { transform: rotate(45deg); }
   .preset-search { margin-bottom: 8px; }
   .preset-picker { display: flex; flex-direction: column; gap: 3px; max-height: 320px; overflow-y: auto; border: 1px solid var(--border-soft); border-radius: 12px; padding: 6px; background: var(--surface-2); }
   .preset-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); padding: 9px 8px 4px; position: sticky; top: 0; background: var(--surface-2); z-index: 1; }
@@ -453,7 +474,13 @@
     <div class="mood-label" id="moodLabel">😤 Heated — tension builds, things get spicy</div>
   </div>
 
-  <div class="section-title" style="display:flex;align-items:center;gap:8px;">Suno Campaign Presets <span style="font-size:10px;background:transparent;border:1px solid #3d2f52;color:#b794f6;padding:2px 7px;border-radius:6px;font-weight:500;letter-spacing:0.05em;">JUNE</span></div>
+  <details class="preset-card" id="presetCard">
+  <summary class="preset-card-toggle" id="presetCardToggle">
+    <span class="section-title preset-card-title">Suno Campaign Presets <span class="preset-june">JUNE</span></span>
+    <span class="preset-card-meta" id="presetCardMeta"></span>
+    <span class="preset-card-chevron" aria-hidden="true"></span>
+  </summary>
+  <div class="preset-card-body">
   <div style="margin-bottom:8px;">
     <select id="sunoPreset" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;">
       <option value="">— Pick a campaign format to auto-fill —</option>
@@ -497,6 +524,8 @@
   <div id="presetPicker" class="preset-picker"></div>
   <div id="sunoPresetDesc" style="display:none;background:var(--surface-2);border:1px solid var(--accent-border);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
   <button class="btn" id="applyPresetBtn" style="display:none;background:#b794f6;color:#0a0a0a;margin-bottom:16px;">Apply Preset ✨</button>
+  </div>
+  </details>
 
   <div class="section-title">Chat Wallpaper</div>
   <div style="margin-bottom:12px;">
@@ -4527,6 +4556,130 @@
         document.title = ok ? 'LAYOUT PASS' : 'LAYOUT FAIL';
       }, 0);
     }
+    window.__ptgPhoneScrollFixture = function() {
+      currentMessages = [
+        { f: 'them', t: 'uncle dave i need to tell u something but u cant tell mom', speaker: 'Nina' },
+        { f: 'them', t: 'so u know jordan', speaker: 'Nina' },
+        { f: 'me', t: 'WAS knowing jordan', speaker: 'Me' },
+        { f: 'me', t: 'past tense as of 4:37pm today', speaker: 'Me' },
+        { f: 'them', t: 'what happened', speaker: 'Nina' },
+        { f: 'them', t: 'he liked his ex\'s photo from 2019 so i threw his xbox off the balcony and now maintenance wants $340 for the pool umbrella it landed on and i have $12 and a CRUSHED SOUL', speaker: 'Nina' },
+        { f: 'me', t: 'nina. the xbox. the POOL. you are 19.', speaker: 'Me' },
+        { f: 'them', t: 'and homeless-adjacent unless you venmo me before mom sees the group chat', speaker: 'Nina' },
+        { f: 'me', t: 'i am not laundering your balcony crime through cash app', speaker: 'Me' },
+        { f: 'them', t: 'ok but can you at least tell maintenance it was a raccoon', speaker: 'Nina' },
+        { f: 'me', t: 'NO', speaker: 'Me' },
+        { f: 'them', t: 'the raccoon\'s name is jordan too if that helps the story', speaker: 'Nina' }
+      ];
+      document.getElementById('theirName').value = 'Nina';
+      document.getElementById('myName').value = 'uncle dave';
+      renderPhone();
+      setPreviewVisible(true);
+      void document.body.offsetHeight;
+      var previewEl = document.getElementById('previewSection');
+      var phone = document.getElementById('phoneFrame');
+      var inputBar = document.getElementById('pInputBar');
+      var header = document.getElementById('pChatHeader');
+      var wrap = previewEl.querySelector('.phone-wrap');
+      var animate = document.getElementById('animateBtn');
+      var save = document.getElementById('saveConvoBtn');
+      var copy = document.getElementById('copyBtn');
+      function visibleIn(el, box, pad) {
+        pad = pad == null ? 3 : pad;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        return er.width > 0 && er.height > 0 && er.top >= br.top - pad && er.bottom <= br.bottom + pad;
+      }
+      var pcs = window.getComputedStyle(previewEl);
+      var wcs = wrap ? window.getComputedStyle(wrap) : null;
+      previewEl.scrollTop = 0;
+      void document.body.offsetHeight;
+      var topOk = visibleIn(header, previewEl, 8);
+      previewEl.scrollTop = previewEl.scrollHeight;
+      void document.body.offsetHeight;
+      var bottom = {
+        inputBar: visibleIn(inputBar, previewEl, 8),
+        animate: visibleIn(animate, previewEl, 8),
+        save: visibleIn(save, previewEl, 8),
+        copy: visibleIn(copy, previewEl, 8)
+      };
+      var overflowY = pcs.overflowY;
+      var wrapOverflow = wcs ? wcs.overflowY : '';
+      var canScroll = previewEl.scrollHeight > previewEl.clientHeight + 2;
+      var phoneFitsScroll = previewEl.scrollHeight + 2 >= phone.offsetHeight;
+      var clipped = overflowY === 'hidden';
+      var wrapClips = wrapOverflow === 'hidden' || wrapOverflow === 'auto' || wrapOverflow === 'scroll';
+      return {
+        overflowY: overflowY,
+        wrapOverflow: wrapOverflow,
+        canScroll: canScroll,
+        clipped: clipped,
+        wrapClips: wrapClips,
+        phoneFitsScroll: phoneFitsScroll,
+        topOk: topOk,
+        bottom: bottom,
+        phoneH: Math.round(phone.offsetHeight),
+        previewClientH: previewEl.clientHeight,
+        previewScrollH: previewEl.scrollHeight,
+        hasPreview: document.getElementById('appShell').classList.contains('has-preview')
+      };
+    };
+    window.__ptgPresetCollapseFixture = function() {
+      var card = document.getElementById('presetCard');
+      var picker = document.getElementById('presetPicker');
+      var search = document.getElementById('presetSearch');
+      if (!card) return { hasCard: false };
+      var wasOpen = card.open;
+      card.open = false;
+      void document.body.offsetHeight;
+      var closed = {
+        open: card.open,
+        pickerH: picker.getBoundingClientRect().height,
+        searchH: search.getBoundingClientRect().height,
+        pickerHidden: picker.getBoundingClientRect().height < 1
+      };
+      card.open = true;
+      void document.body.offsetHeight;
+      var opened = {
+        open: card.open,
+        pickerH: Math.round(picker.getBoundingClientRect().height),
+        searchH: Math.round(search.getBoundingClientRect().height)
+      };
+      card.open = wasOpen;
+      return { hasCard: true, closed: closed, opened: opened, tag: card.tagName };
+    };
+    if (new URLSearchParams(location.search).get('phonescroll') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgPhoneScrollFixture();
+        var b = r.bottom;
+        var ok = !!(r.hasPreview && !r.clipped && !r.wrapClips && r.canScroll && r.phoneFitsScroll && r.topOk && b.inputBar && b.animate && b.save && b.copy);
+        var banner = document.createElement('div');
+        banner.id = 'phoneScrollBanner';
+        banner.textContent = (ok ? 'PHONE SCROLL PASS' : 'PHONE SCROLL FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'PHONE SCROLL PASS' : 'PHONE SCROLL FAIL';
+      }, 0);
+    }
+    if (new URLSearchParams(location.search).get('presets') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgPresetCollapseFixture();
+        var ok = !!(r.hasCard && r.closed.pickerHidden && r.opened.pickerH > 40 && r.opened.searchH > 20);
+        var banner = document.createElement('div');
+        banner.id = 'presetCollapseBanner';
+        banner.textContent = (ok ? 'PRESETS PASS' : 'PRESETS FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'PRESETS PASS' : 'PRESETS FAIL';
+      }, 0);
+    }
+    if (new URLSearchParams(location.search).get('demo') === '1') {
+      setTimeout(function() {
+        window.__ptgPhoneScrollFixture();
+        var previewEl = document.getElementById('previewSection');
+        if (previewEl) previewEl.scrollTop = 0;
+      }, 0);
+    }
     window.__ptgExtractAnthropicText = extractAnthropicText;
     window.__ptgAnthropicEmptyMessage = anthropicEmptyMessage;
     window.__ptgApplyPreset = applyPresetFields;
@@ -4733,6 +4886,17 @@
   if (preview) { new MutationObserver(syncPreview).observe(preview, { attributes: true, attributeFilter: ['style','class'] }); }
   syncPreview();
 
+  // Collapse / expand Suno Campaign Presets (remembered)
+  var presetCard = document.getElementById('presetCard');
+  if (presetCard) {
+    var presetsOpen = null;
+    try { presetsOpen = localStorage.getItem('ptg_presets_open'); } catch(e){}
+    presetCard.open = presetsOpen === '1';
+    presetCard.addEventListener('toggle', function(){
+      try { localStorage.setItem('ptg_presets_open', presetCard.open ? '1' : '0'); } catch(e){}
+    });
+  }
+
   // Searchable preset picker with favorites + recents (drives the existing hidden <select>)
   var sel = document.getElementById('sunoPreset');
   var applyBtn = document.getElementById('applyPresetBtn');
@@ -4796,6 +4960,14 @@
       order.forEach(function(gname){ picker.appendChild(groupEl(gname)); groups[gname].forEach(function(p){ picker.appendChild(makeItem(p)); }); });
     }
     if (search) search.addEventListener('input', function(){ render(this.value); });
+    function syncPresetMeta(){
+      var meta = document.getElementById('presetCardMeta');
+      if (!meta) return;
+      var opt = sel.options[sel.selectedIndex];
+      meta.textContent = (sel.value && opt) ? opt.textContent : '';
+    }
+    sel.addEventListener('change', syncPresetMeta);
+    syncPresetMeta();
     render('');
   }
 })();
