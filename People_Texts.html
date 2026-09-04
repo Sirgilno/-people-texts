@@ -5268,6 +5268,15 @@
       var parsed = parseConversation(raw, 'Me', 'Best Friend');
       var joined = parsed.map(function(m) { return m.t; }).join('\n');
       var restored = protectShortenedLine("that's good right, progress?", 'thats good right progress');
+      document.getElementById('theirName').value = 'Best Friend';
+      document.getElementById('myName').value = 'Me';
+      document.getElementById('msgStyle').value = 'whatsapp';
+      currentMessages = parsed;
+      renderPhone();
+      setPreviewVisible(true);
+      var bubbles = Array.prototype.map.call(document.querySelectorAll('#pMessages [data-msg-idx]'), function(el) {
+        return el.textContent;
+      });
       return {
         count: parsed.length,
         joined: joined,
@@ -5278,7 +5287,8 @@
         hasQuotes: joined.indexOf('"') !== -1,
         promptHasRules: TEXTING_PUNCTUATION_RULES.indexOf('KEEP IT') !== -1 && TEXTING_PUNCTUATION_RULES.indexOf('Apostrophes') !== -1,
         restored: restored,
-        restoreKeptMarks: restored.indexOf('?') !== -1 && /['\u2019]/.test(restored)
+        restoreKeptMarks: restored.indexOf('?') !== -1 && /['\u2019]/.test(restored),
+        bubbles: bubbles
       };
     };
     window.__ptgProtectShortenedLine = protectShortenedLine;
