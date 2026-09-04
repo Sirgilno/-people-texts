@@ -4863,6 +4863,7 @@
         afterText: quote ? quote.textContent : ''
       };
     };
+    window.__ptgWaQuoteFixture = function(kind) {
       document.getElementById('msgStyle').value = 'whatsapp';
       document.getElementById('contentType').value = 'paste';
       document.getElementById('contentType').dispatchEvent(new Event('change'));
