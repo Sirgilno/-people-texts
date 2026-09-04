@@ -31,8 +31,9 @@
   .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-faint); margin-bottom: 16px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
   label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500; }
-  input[type="text"], input[type="password"], select { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 14px; color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
-  input[type="text"]:focus, input[type="password"]:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
+  input[type="text"], input[type="password"], select, textarea { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 14px; color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+  input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
+  textarea { font-family: inherit; line-height: 1.6; resize: vertical; }
   select option { background: var(--input-bg); color: var(--text); }
   .mode-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
   .mode-tab { padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; transition: all 0.15s; }
@@ -54,11 +55,23 @@
   .preview-toolbar { margin-bottom: 12px; }
   .preview-toolbar .action-btns { margin-bottom: 8px; }
   .phone-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
-  .phone { width: 100%; max-width: 448px; border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
+  /* Pixel 9 Pro XL screen is 1344×2992. CSS mockup is 1/3 so scale-3 export hits native pixels. */
+  .phone {
+    width: 100%; max-width: calc(1344px / 3);
+    border-radius: 36px; overflow: hidden; border: 8px solid #222; background: #222;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative;
+  }
+  #phoneFrame, #commentsFrame {
+    display: flex; flex-direction: column;
+    min-height: calc(2992px / 3);
+  }
+  .phone.capturing { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; width: calc(1344px / 3) !important; max-width: calc(1344px / 3) !important; min-height: calc(2992px / 3); }
   .phone-wallpaper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
   .phone > * { position: relative; z-index: 1; }
-  .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
-  .p-chat-header { padding: 8px 14px 10px; text-align: center; }
+  /* Must beat `.phone > *` or the overlay stays in-flow with 0 height and the opacity slider is a no-op. */
+  .phone > .phone-wallpaper { position: absolute; z-index: 0; }
+  .p-status-bar { padding: 8px 14px 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+  .p-chat-header { padding: 8px 14px 10px; text-align: center; flex-shrink: 0; }
   .p-header-row { display: flex; align-items: center; gap: 8px; text-align: left; }
   .p-header-row.centered { flex-direction: column; gap: 4px; text-align: center; }
   .p-header-row.centered .p-avatar { margin: 0 auto; }
@@ -69,7 +82,7 @@
   .p-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
   .p-header-row:not(.centered) .p-avatar { margin: 0; }
   .p-chat-name { font-size: 13px; font-weight: 600; }
-  .p-messages { padding: 12px 10px; min-height: 200px; display: flex; flex-direction: column; gap: 0; }
+  .p-messages { padding: 12px 10px; min-height: 200px; flex: 1 1 auto; display: flex; flex-direction: column; gap: 0; }
   .p-bubble-row { display: flex; flex-direction: column; }
   .p-bubble-row.me { align-items: flex-end; }
   .p-bubble-row.them { align-items: flex-start; }
@@ -79,7 +92,7 @@
   .p-time-divider { font-size: 10px; text-align: center; margin: 10px 0 4px; opacity: 0.5; width:100%; }
   .p-read-receipt { font-size: 9px; margin-top: 1px; padding: 0 4px; text-align: right; }
   .p-time { font-size: 10px; text-align: center; margin: 6px 0; opacity: 0.5; }
-  .p-input-bar { padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+  .p-input-bar { padding: 8px 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .p-compose-lead, .p-compose-trail { display: none; align-items: center; gap: 8px; flex-shrink: 0; color: inherit; }
   .p-compose-lead.visible, .p-compose-trail.visible { display: flex; }
   .p-compose-icon { width: 20px; height: 20px; opacity: 0.85; }
@@ -96,6 +109,8 @@
   .p-wa-quote-name { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
   .p-wa-quote-num { font-size: 11px; color: #8696a0; flex-shrink: 0; }
   .p-wa-quote-text { font-size: 12px; line-height: 1.3; opacity: 0.78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .p-quote-edit { cursor: text; }
+  .p-wa-quote-text.bubble-editable:focus { white-space: normal; overflow: visible; text-overflow: clip; }
   .p-wa-group-av { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; margin: 0 0 1px; }
   .p-wa-group-av-spacer { visibility: hidden; background: transparent !important; }
   .p-wa-in-wrap { display: flex; flex-direction: row; align-items: flex-end; max-width: 92%; gap: 5px; min-width: 0; }
@@ -192,17 +207,39 @@
     .app-shell.has-preview { max-width: 1180px; display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
     .app-shell.has-preview > #previewSection {
       grid-column: 2; grid-row: 1 / span 99; position: sticky; top: 20px; align-self: start; margin-top: 0;
-      max-height: calc(100vh - 40px); min-height: 0; overflow: hidden;
+      max-height: calc(100vh - 40px); min-height: 0;
+      overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable;
       display: flex; flex-direction: column;
     }
     .app-shell.has-preview > *:not(#previewSection) { grid-column: 1; min-width: 0; }
-    .app-shell.has-preview .preview-toolbar { flex: 0 1 auto; min-height: 0; max-height: 46vh; overflow-y: auto; }
-    .app-shell.has-preview .phone-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; margin-bottom: 12px; }
+    /* Phone mockup grows with every bubble — scroll the preview column, never clip the screenshot. */
+    .app-shell.has-preview .preview-toolbar { flex: 0 0 auto; min-height: 0; max-height: none; overflow: visible; }
+    .app-shell.has-preview .phone-wrap { flex: 0 0 auto; min-height: 0; overflow: visible; margin-bottom: 12px; }
     .app-shell.has-preview .preview-more { flex: 0 0 auto; }
   }
 
   /* ── Searchable preset picker ── */
   #sunoPreset { display: none !important; }
+  .preset-card { margin-bottom: 16px; }
+  .preset-card-toggle {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    cursor: pointer; list-style: none; user-select: none;
+    padding: 2px 0 10px; color: inherit;
+  }
+  .preset-card-toggle::-webkit-details-marker, .preset-card-toggle::marker { display: none; content: ''; }
+  .preset-card-title { margin-bottom: 0; display: flex; align-items: center; gap: 8px; }
+  .preset-june { font-size: 10px; background: transparent; border: 1px solid #3d2f52; color: #b794f6; padding: 2px 7px; border-radius: 6px; font-weight: 500; letter-spacing: 0.05em; }
+  .preset-card-meta {
+    flex: 1; min-width: 0; font-size: 11px; color: var(--text-muted); font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .preset-card-chevron {
+    width: 7px; height: 7px; margin-left: auto; flex-shrink: 0;
+    border-right: 2px solid var(--text-faint); border-bottom: 2px solid var(--text-faint);
+    transform: rotate(-45deg); transition: transform 0.15s ease;
+  }
+  .preset-card[open] .preset-card-chevron { transform: rotate(45deg); }
+  .preset-card:not([open]) > .preset-card-body { display: none !important; }
   .preset-search { margin-bottom: 8px; }
   .preset-picker { display: flex; flex-direction: column; gap: 3px; max-height: 320px; overflow-y: auto; border: 1px solid var(--border-soft); border-radius: 12px; padding: 6px; background: var(--surface-2); }
   .preset-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); padding: 9px 8px 4px; position: sticky; top: 0; background: var(--surface-2); z-index: 1; }
@@ -239,7 +276,7 @@
     <button class="key-save-btn" id="saveKeyBtn">Save</button>
   </div>
   <div style="margin-top:10px;">
-    <label style="font-size:11px;color:#aaa;">xAI Grok Key <span style="color:#ff6b6b;font-size:10px;">(required for Unhinged / Spicy / Max)</span></label>
+    <label style="font-size:11px;color:#aaa;">xAI Grok Key <span style="color:#ff6b6b;font-size:10px;">(required for Unhinged / Spicy / Max / Dark Humour)</span></label>
     <div class="key-row" style="margin-top:4px;">
       <input type="password" id="grokKeyInput" placeholder="Paste your xAI API key here..." />
       <button class="key-save-btn" id="saveGrokKeyBtn">Save</button>
@@ -306,7 +343,7 @@
   </div>
   <div id="pasteSection" style="margin-bottom:12px;display:none;">
     <label>Paste your conversation — one message per line</label>
-    <textarea id="pasteInput" rows="10" placeholder="Me: yo did you see what she posted&#10;Them: no what happened&#10;Them: wait send it&#10;Me: check her story&#10;Me: the third one&#10;Them: NO WAY" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;font-family:inherit;line-height:1.6;resize:vertical;"></textarea>
+    <textarea id="pasteInput" rows="10" placeholder="Me: yo did you see what she posted&#10;Them: no what happened&#10;Them: wait send it&#10;Me: check her story&#10;Me: the third one&#10;Them: NO WAY"></textarea>
     <div class="row" style="margin-top:10px;">
       <div>
         <label>Your messages start with</label>
@@ -343,7 +380,7 @@
     </div>
     <div id="dateNightWrap" style="margin-top:12px;display:none;">
       <label>Your real clip list — one per line, include actual times where you have them</label>
-      <textarea id="dateNightClips" rows="9" placeholder="7:40am - waking up in bed&#10;9:10am - eating breakfast&#10;11:15am - going to town&#10;12:30pm - entering golden oaklets&#10;1:05pm - looking at baby wipes I bought&#10;4:00pm - arrived at mall (bought a mattress on the way)&#10;5:20pm - eating at rocomamas&#10;6:35pm - buying beer at shoprite, it's friday&#10;8:15pm - ending the day at home, drinks and a movie" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;font-family:inherit;line-height:1.6;resize:vertical;margin-bottom:10px;"></textarea>
+      <textarea id="dateNightClips" rows="9" placeholder="7:40am - waking up in bed&#10;9:10am - eating breakfast&#10;11:15am - going to town&#10;12:30pm - entering golden oaklets&#10;1:05pm - looking at baby wipes I bought&#10;4:00pm - arrived at mall (bought a mattress on the way)&#10;5:20pm - eating at rocomamas&#10;6:35pm - buying beer at shoprite, it's friday&#10;8:15pm - ending the day at home, drinks and a movie" style="margin-bottom:10px;"></textarea>
       <label>Roughly how long is each clip? (this decides how much lyric fits per clip)</label>
       <select id="dateNightClipLength" style="margin-bottom:10px;">
         <option value="short">Short — 3-5 seconds each</option>
@@ -397,9 +434,9 @@
   <div id="avatarStyleSection" style="margin-bottom:12px;display:none;">
     <label>Avatar Style</label>
     <select id="avatarStyle">
-      <option value="mixed" selected>Mixed (mostly real photos, some cartoon, few blank)</option>
+      <option value="mixed" selected>Mixed (mostly portraits, some cartoon, few blank)</option>
       <option value="procedural">All Generated Avatars (cartoon)</option>
-      <option value="realistic">All Realistic Photos</option>
+      <option value="realistic">All Realistic Portraits</option>
     </select>
   </div>
   <div class="row">
@@ -453,9 +490,15 @@
     <div class="mood-label" id="moodLabel">😤 Heated — tension builds, things get spicy</div>
   </div>
 
-  <div class="section-title" style="display:flex;align-items:center;gap:8px;">Suno Campaign Presets <span style="font-size:10px;background:transparent;border:1px solid #3d2f52;color:#b794f6;padding:2px 7px;border-radius:6px;font-weight:500;letter-spacing:0.05em;">JUNE</span></div>
+  <details class="preset-card" id="presetCard">
+  <summary class="preset-card-toggle" id="presetCardToggle">
+    <span class="section-title preset-card-title">Suno Campaign Presets <span class="preset-june">JUNE</span></span>
+    <span class="preset-card-meta" id="presetCardMeta"></span>
+    <span class="preset-card-chevron" aria-hidden="true"></span>
+  </summary>
+  <div class="preset-card-body" id="presetCardBody">
   <div style="margin-bottom:8px;">
-    <select id="sunoPreset" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;">
+    <select id="sunoPreset">
       <option value="">— Pick a campaign format to auto-fill —</option>
       <optgroup label="💬 Text → Song Formats">
         <option value="comments">Format 5 — Viral Comments to Song</option>
@@ -497,6 +540,8 @@
   <div id="presetPicker" class="preset-picker"></div>
   <div id="sunoPresetDesc" style="display:none;background:var(--surface-2);border:1px solid var(--accent-border);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
   <button class="btn" id="applyPresetBtn" style="display:none;background:#b794f6;color:#0a0a0a;margin-bottom:16px;">Apply Preset ✨</button>
+  </div>
+  </details>
 
   <div class="section-title">Chat Wallpaper</div>
   <div style="margin-bottom:12px;">
@@ -720,7 +765,7 @@
     <div class="action-btns">
       <button class="action-btn full" id="saveConvoBtn">💾 Save This Conversation</button>
     </div>
-    <p class="edit-hint" id="editHint">✏️ Tap any message or comment to edit it directly</p>
+    <p class="edit-hint" id="editHint">✏️ Tap any message, quote, or comment to edit it directly</p>
     <div class="action-btns" id="copyBtnRow">
       <button class="action-btn full" id="copyBtn">Copy text for Gem 📋</button>
     </div>
@@ -1789,13 +1834,71 @@
     return '+260 ' + body.slice(0, 3) + ' ' + body.slice(3);
   }
 
+  function quotePreviewText(quotedMsg, replyMsg, limit) {
+    // Honor an explicit edit, including an empty string (user cleared the quote).
+    if (replyMsg && replyMsg.quoteT != null) return String(replyMsg.quoteT);
+    var t = (quotedMsg && quotedMsg.t) ? quotedMsg.t : '';
+    if (t.length > limit) return t.substring(0, limit) + '\u2026';
+    return t;
+  }
+
+  function collectReplyIndices(messages, isLiteral) {
+    var set;
+    if (window.__ptgForcedReplyIndices) {
+      set = new Set(window.__ptgForcedReplyIndices);
+    } else if (isLiteral) {
+      set = new Set();
+    } else {
+      set = pickReplyIndices(messages);
+    }
+    if (messages) {
+      for (var qi = 0; qi < messages.length; qi++) {
+        if (messages[qi] && (messages[qi].quoteT != null || messages[qi].quoted)) set.add(qi);
+      }
+      set.forEach(function(idx) {
+        if (messages[idx]) messages[idx].quoted = true;
+      });
+    }
+    return set;
+  }
+
+  function markQuoteEditable(el, replyIdx) {
+    el.classList.add('p-quote-edit');
+    el.dataset.quoteIdx = String(replyIdx);
+    return el;
+  }
+
+  function bindQuoteEditors(root) {
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('.p-quote-edit'), function(el) {
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.contentEditable = 'true';
+        this.classList.add('bubble-editable');
+        this.focus();
+        var hint = document.getElementById('editHint');
+        if (hint) hint.style.display = 'block';
+      });
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+      });
+      el.addEventListener('blur', function() {
+        var idx = parseInt(this.dataset.quoteIdx, 10);
+        if (!isNaN(idx) && currentMessages[idx]) {
+          currentMessages[idx].quoteT = this.textContent.trim();
+        }
+        this.contentEditable = 'false';
+      });
+    });
+  }
+
   function buildWhatsAppQuote(quotedMsg, isMe, ctx) {
     var quotedMe = quotedMsg.f === 'me';
     var otherName = quotedMsg.speaker || ctx.theirName;
     var showPublicIds = !!(ctx.isGroupChat && ctx.isPublicGroup);
     var color = quotedMe ? '#00a884' : (ctx.isGroupChat ? ctx.colorForSender(otherName) : (ctx.theme.quoteNameThem || '#c084fc'));
     var label = quotedMe ? 'You' : ((showPublicIds ? '~ ' : '') + otherName);
-    var preview = quotedMsg.t.length > 56 ? quotedMsg.t.substring(0, 56) + '\u2026' : quotedMsg.t;
+    var preview = quotePreviewText(quotedMsg, ctx.messages[ctx.i], 56);
     var wrap = document.createElement('div');
     wrap.className = 'p-wa-quote';
     wrap.style.background = isMe ? '#014d40' : '#1a252c';
@@ -1820,6 +1923,7 @@
     var text = document.createElement('div');
     text.className = 'p-wa-quote-text';
     text.textContent = preview;
+    markQuoteEditable(text, ctx.i);
     body.appendChild(head);
     body.appendChild(text);
     wrap.appendChild(bar);
@@ -1853,6 +1957,29 @@
   }
   function hideError() {
     document.getElementById('errorBox').style.display = 'none';
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(String(text == null ? '' : text));
+    }
+    return Promise.reject(new Error('clipboard unavailable'));
+  }
+
+  function bindCopyButton(btnId, boxId, idleLabel) {
+    var btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      var el = document.getElementById(boxId);
+      var label = idleLabel;
+      copyText(el ? el.textContent : '').then(function() {
+        btn.textContent = '✓ Copied!';
+        setTimeout(function(){ btn.textContent = label; }, 1500);
+      }).catch(function() {
+        btn.textContent = 'Copy failed';
+        setTimeout(function(){ btn.textContent = label; }, 1800);
+      });
+    });
   }
 
   function normalizeSpeaker(name) {
@@ -2663,18 +2790,29 @@
       if (theme.isDiscord) {
         var dm = document.createElement('div');
         dm.style.cssText = 'display:flex;flex-direction:column;padding:2px 8px;';
-        dm.innerHTML = '<span style="font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;">' + (isMe ? myName : theirName) + ' <span style="font-size:9px;font-weight:400;color:' + theme.timeBubble + ';">' + ts + '</span></span><span style="font-size:12px;color:' + bTheme.color + ';line-height:1.4;">' + msg.t + '</span>';
+        var dmHead = document.createElement('span');
+        dmHead.style.cssText = 'font-size:10px;font-weight:700;color:' + (isMe ? '#00b0f4' : '#7289da') + ';margin-bottom:1px;';
+        dmHead.appendChild(document.createTextNode(isMe ? myName : (msg.speaker || theirName)));
+        dmHead.appendChild(document.createTextNode(' '));
+        var dmTime = document.createElement('span');
+        dmTime.style.cssText = 'font-size:9px;font-weight:400;color:' + theme.timeBubble + ';';
+        dmTime.textContent = ts;
+        dmHead.appendChild(dmTime);
+        var dmBody = document.createElement('span');
+        dmBody.style.cssText = 'font-size:12px;color:' + bTheme.color + ';line-height:1.4;';
+        dmBody.textContent = msg.t == null ? '' : String(msg.t);
+        dm.appendChild(dmHead);
+        dm.appendChild(dmBody);
         row.appendChild(dm);
       } else {
         var qStyle = theme.quoteStyle || 'nested';
         var quoteEl = null;
-        var quotedMsg = (isWhatsApp && replyIndices && replyIndices.has(i) && qStyle !== 'none')
+        var quotedMsg = (replyIndices && replyIndices.has(i) && qStyle !== 'none')
           ? findQuotedMessage(messages, i) : null;
         if (quotedMsg && isWhatsApp) {
           quoteEl = buildWhatsAppQuote(quotedMsg, isMe, ctx);
-        } else if (replyIndices && replyIndices.has(i) && i > 0 && qStyle !== 'none') {
-          var prevMsg = messages[i-1];
-          var preview = prevMsg.t.length > 40 ? prevMsg.t.substring(0,40) + '...' : prevMsg.t;
+        } else if (quotedMsg && qStyle !== 'none') {
+          var preview = quotePreviewText(quotedMsg, msg, 40);
 
           if (qStyle === 'spine') {
             var spineWrap = document.createElement('div');
@@ -2685,7 +2823,8 @@
             miniAvatar.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (isMe ? theme.avatarBg : theme.bubbleThem.bg) + ';flex-shrink:0;';
             var spineText = document.createElement('span');
             spineText.style.cssText = 'overflow:hidden;text-overflow:ellipsis;';
-            spineText.textContent = (isMe ? theirName : myName) + '  ' + (prevMsg.t.length > 32 ? prevMsg.t.substring(0,32) + '...' : prevMsg.t);
+            spineText.textContent = (quotedMsg.f === 'me' ? myName : (quotedMsg.speaker || theirName)) + '  ' + quotePreviewText(quotedMsg, msg, 32);
+            markQuoteEditable(spineText, i);
             spineWrap.appendChild(spineLine);
             spineWrap.appendChild(miniAvatar);
             spineWrap.appendChild(spineText);
@@ -2695,12 +2834,14 @@
             quoteEl.className = 'p-reply-quote';
             quoteEl.style.cssText = 'border-left:none;font-size:10.5px;padding:6px 10px;border-radius:14px;margin-bottom:4px;opacity:0.9;line-height:1.35;background:' + (isMe ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.09)') + ';color:' + bTheme.color + ';';
             quoteEl.textContent = preview;
+            markQuoteEditable(quoteEl, i);
           } else {
             quoteEl = document.createElement('div');
             quoteEl.className = 'p-reply-quote';
             var qBar = isMe ? (theme.quoteBarMe || theme.bubbleMe.bg) : (theme.quoteBarThem || theme.bubbleThem.bg);
             quoteEl.style.cssText = 'font-size:10px;padding:4px 8px;border-left:3px solid ' + qBar + ';border-radius:6px;margin-bottom:4px;opacity:0.85;line-height:1.3;background:' + (isMe ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.06)') + ';color:' + bTheme.color + ';';
             quoteEl.textContent = preview;
+            markQuoteEditable(quoteEl, i);
           }
         } else if (!isWhatsApp && !ctx.literal && theme.hasStories && !sameAsPrev && Math.random() < 0.08) {
           var storyReply = document.createElement('div');
@@ -3177,11 +3318,13 @@
   // no shading, low opacity (8-15%), densely interlocked tiling for the
   // "classic" style, or sparse/rotated for the "scattered" style.
   function doodleTile(iconPaths, tileSize, baseColor) {
+    return { base: baseColor, overlay: doodleOverlay(iconPaths, tileSize) };
+  }
+  function doodleOverlay(iconPaths, tileSize) {
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + tileSize + '" height="' + tileSize + '" viewBox="0 0 ' + tileSize + ' ' + tileSize + '">'
       + iconPaths
       + '</svg>';
-    var dataUri = 'data:image/svg+xml,' + encodeURIComponent(svg);
-    return baseColor + ' url("' + dataUri + '") repeat';
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '") repeat';
   }
   var ICONS = {
     heart: function(x, y, s, rot) { return '<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ') scale(' + s + ')" d="M0,6 C0,3 -3,0 -6,0 C-9,0 -11,2 -11,5 C-11,9 -6,13 0,18 C6,13 11,9 11,5 C11,2 9,0 6,0 C3,0 0,3 0,6 Z" fill="none" stroke="STROKE" stroke-width="1.5"/>'; },
@@ -3207,47 +3350,57 @@
   }
 
   function applyWallpaper() {
-    var opacity = parseInt(document.getElementById('wallpaperOpacity').value) / 100;
+    var opacityRaw = parseInt(document.getElementById('wallpaperOpacity').value, 10);
+    var opacity = isNaN(opacityRaw) ? 1 : Math.max(0, Math.min(100, opacityRaw)) / 100;
     var phone = document.getElementById('phoneFrame');
     var animatePhone = document.getElementById('animatePhone');
+    var paper = document.getElementById('phoneWallpaper');
+    var animatePaper = document.getElementById('animateWallpaper');
     var styleKey = document.getElementById('msgStyle').value;
     var platTheme = platformThemes[styleKey] || {};
     var wallpaperId = currentWallpaper === 'none' ? (platTheme.defaultWallpaper || 'none') : currentWallpaper;
+    var fallback = platTheme.bgMessages || '#222';
+
+    function paintPhone(el, paperEl, base, overlay) {
+      if (!el) return;
+      el.style.background = base;
+      if (!paperEl) return;
+      if (!overlay) {
+        paperEl.style.background = 'none';
+        paperEl.style.opacity = '0';
+        return;
+      }
+      paperEl.style.background = overlay;
+      paperEl.style.opacity = String(opacity);
+    }
+
     if (wallpaperId === 'none') {
-      var plain = platTheme.bgMessages || '#222';
-      phone.style.background = plain;
-      if (animatePhone) animatePhone.style.background = plain;
+      paintPhone(phone, paper, fallback, '');
+      paintPhone(animatePhone, animatePaper, fallback, '');
       return;
     }
-    var colors = {
-      'none': '#222',
-      'gradient1': 'linear-gradient(135deg, #1a1a2e, #16213e)',
-      'gradient2': 'linear-gradient(135deg, #0f3460, #533483)',
-      'gradient3': 'linear-gradient(135deg, #2d132c, #801336)',
-      'gradient4': 'linear-gradient(135deg, #1e3a5f, #2e5a7e)',
-      'gradient5': 'linear-gradient(135deg, #3d1a1a, #6b2d2d)',
-      'solidWhite': '#ffffff',
-      'solid1': '#1a1a1a',
-      'solid2': '#16213e',
-      'solid3': '#2d132c',
-      'solid4': '#0f3460',
-      'solid5': '#1e3a5f',
-      // Classic Monoline style — dense, interlocked, low opacity (~10-12%),
-      // matches the exact spec found in research for WhatsApp-style doodles.
+    var specs = {
+      'gradient1': { base: fallback, overlay: 'linear-gradient(135deg, #1a1a2e, #16213e)' },
+      'gradient2': { base: fallback, overlay: 'linear-gradient(135deg, #0f3460, #533483)' },
+      'gradient3': { base: fallback, overlay: 'linear-gradient(135deg, #2d132c, #801336)' },
+      'gradient4': { base: fallback, overlay: 'linear-gradient(135deg, #1e3a5f, #2e5a7e)' },
+      'gradient5': { base: fallback, overlay: 'linear-gradient(135deg, #3d1a1a, #6b2d2d)' },
+      'solidWhite': { base: fallback, overlay: '#ffffff' },
+      'solid1': { base: fallback, overlay: '#1a1a1a' },
+      'solid2': { base: fallback, overlay: '#16213e' },
+      'solid3': { base: fallback, overlay: '#2d132c' },
+      'solid4': { base: fallback, overlay: '#0f3460' },
+      'solid5': { base: fallback, overlay: '#1e3a5f' },
       'doodle1': doodleTile(buildDoodleSVG([ICONS.heart], 140, 9, 'rgba(255,255,255,0.11)', false), 140, '#0b141a'),
       'doodle2': doodleTile(buildDoodleSVG([ICONS.star, ICONS.envelope], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#14181f'),
       'doodle3': doodleTile(buildDoodleSVG([ICONS.note, ICONS.plane], 150, 9, 'rgba(255,255,255,0.10)', false), 150, '#171a24'),
-      // Vector Overlay style — sparse, rotated, larger tile, matches
-      // Telegram's "themed" pattern approach found in the research.
       'doodle4': doodleTile(buildDoodleSVG([ICONS.cat], 220, 5, 'rgba(255,255,255,0.15)', true), 220, '#12141c'),
-      // Abstract Geometric style — under 10% opacity, tiny mathematical
-      // micro-pattern, exactly matching the research's spec for this style.
-      'geo1': '#14181f url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="1.4" fill="rgba(255,255,255,0.09)"/></svg>') + '") repeat',
-      'geo2': '#161616 url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><path d="M0,13 L6.5,6.5 L13,13 L19.5,6.5 L26,13" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/></svg>') + '") repeat'
+      'geo1': { base: '#14181f', overlay: 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="1.4" fill="rgba(255,255,255,0.09)"/></svg>') + '") repeat' },
+      'geo2': { base: '#161616', overlay: 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><path d="M0,13 L6.5,6.5 L13,13 L19.5,6.5 L26,13" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/></svg>') + '") repeat' }
     };
-    var bg = colors[wallpaperId] || platTheme.bgMessages || '#222';
-    phone.style.background = bg;
-    if (animatePhone) animatePhone.style.background = bg;
+    var spec = specs[wallpaperId] || { base: fallback, overlay: '' };
+    paintPhone(phone, paper, spec.base, spec.overlay);
+    paintPhone(animatePhone, animatePaper, spec.base, spec.overlay);
   }
 
   function createWallpaperOptions() {
@@ -3298,7 +3451,7 @@
       applyWallpaper();
     });
     document.getElementById('wallpaperOpacity').addEventListener('input', function() {
-      if (currentMessages.length > 0) applyWallpaper();
+      applyWallpaper();
     });
   }
 
@@ -3399,6 +3552,27 @@
     return 'data:image/svg+xml;base64,' + btoa(svg);
   }
 
+  // Photo-like portrait as a data URI so html2canvas never hits a CORS host.
+  function generateRealisticAvatarDataUri(seedStr) {
+    var seed = hashSeed(seedStr);
+    var skins = ['#f3d1b0', '#e8b98a', '#c68642', '#8d5524', '#ffdbac', '#d4a574', '#5c3317'];
+    var hairs = ['#1a120c', '#3b2416', '#6b4423', '#2c2c2c', '#4a3728', '#111111'];
+    var shirts = ['#2b2d42', '#3d5a80', '#8d99ae', '#6a4c93', '#1d3557', '#4a5568'];
+    var skin = skins[seed % skins.length];
+    var hair = hairs[(seed >> 3) % hairs.length];
+    var shirt = shirts[(seed >> 6) % shirts.length];
+    var hairH = 18 + (seed % 8);
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">'
+      + '<rect width="64" height="64" fill="' + shirt + '"/>'
+      + '<ellipse cx="32" cy="62" rx="24" ry="16" fill="' + shirt + '"/>'
+      + '<circle cx="32" cy="30" r="16" fill="' + skin + '"/>'
+      + '<ellipse cx="32" cy="' + (18 + (seed % 4)) + '" rx="17" ry="' + hairH / 2 + '" fill="' + hair + '"/>'
+      + '<ellipse cx="22" cy="32" rx="2.2" ry="2.6" fill="rgba(80,50,30,0.45)"/>'
+      + '<ellipse cx="42" cy="32" rx="2.2" ry="2.6" fill="rgba(80,50,30,0.45)"/>'
+      + '</svg>';
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+  }
+
   function parseComments(text) {
     var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
     var out = [];
@@ -3470,9 +3644,8 @@
       else list[idx].avatarKind = 'cartoon';
     });
 
-    // Assign guaranteed-unique photo seeds so no two commenters in the same
-    // batch ever get the same profile picture. pravatar.cc serves images
-    // 1-70, so we shuffle that full pool and deal from it without repeats.
+    // Assign guaranteed-unique seeds so no two commenters in the same
+    // batch share a portrait. Used by the local SVG generator (no network).
     var pool = [];
     for (var p = 1; p <= 70; p++) pool.push(p);
     for (var q = pool.length - 1; q > 0; q--) {
@@ -3517,12 +3690,11 @@
     var fallbackText = document.createTextNode(c.user.charAt(0).toUpperCase());
     avatar.appendChild(fallbackText);
     avatarImg.onload = function() { fallbackText.remove(); };
+    avatarImg.onerror = function() { this.remove(); };
     if (effectiveKind === 'realistic') {
-      avatarImg.src = 'https://i.pravatar.cc/64?img=' + c.avatarSeed;
-      avatarImg.onerror = function() { this.onerror = null; this.src = generateProceduralAvatarDataUri(c.user); };
+      avatarImg.src = generateRealisticAvatarDataUri(c.user + ':' + (c.avatarSeed || '0'));
     } else {
       avatarImg.src = generateProceduralAvatarDataUri(c.user);
-      avatarImg.onerror = function() { this.remove(); };
     }
     avatar.appendChild(avatarImg);
     return avatar;
@@ -3803,7 +3975,7 @@
     // render it EXACTLY as pasted — no invented reply-quotes, voice notes or
     // story replies. Those exist to add variety to AI-generated threads only.
     var isLiteral = document.getElementById('contentType').value === 'paste';
-    var replyIndices = window.__ptgForcedReplyIndices || (isLiteral ? new Set() : pickReplyIndices(currentMessages));
+    var replyIndices = collectReplyIndices(currentMessages, isLiteral);
     buildPhoneMessages(ma, theme, currentMessages, timestamps, true, replyIndices, isLiteral);
     applyWallpaper();
 
@@ -3823,6 +3995,7 @@
         this.contentEditable = 'false';
       });
     });
+    bindQuoteEditors(ma);
   }
 
   function renderAnimatePhone() {
@@ -3874,7 +4047,7 @@
     if (!currentMessages.length) return;
     animTimestamps = generateTimestamps(currentMessages.length);
     var animIsLiteral = document.getElementById('contentType').value === 'paste';
-    animReplyIndices = window.__ptgForcedReplyIndices || (animIsLiteral ? new Set() : pickReplyIndices(currentMessages));
+    animReplyIndices = collectReplyIndices(currentMessages, animIsLiteral);
     renderAnimatePhone();
     document.getElementById('animateOverlay').style.display = 'flex';
     document.getElementById('startAnimBtn').textContent = '▶ Play';
@@ -4016,12 +4189,27 @@
       savedConversations.unshift(item);
     }
     if (savedConversations.length > 5) savedConversations = savedConversations.slice(0, 5);
+    persistSavedConversations();
     renderSavedList();
     var badge = document.getElementById('shortenBadge');
     badge.textContent = isComments ? '✓ Comment batch saved!' : '✓ Conversation saved!';
     badge.style.display = 'block';
     setTimeout(function(){ badge.style.display = 'none'; badge.textContent = '✓ Shortened for song lyrics'; }, 2000);
   });
+
+  function persistSavedConversations() {
+    try { safeSet('ptg_saved_convos', JSON.stringify(savedConversations.slice(0, 5))); } catch (e) {}
+  }
+
+  function loadSavedConversations() {
+    try {
+      var raw = safeGet('ptg_saved_convos');
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.slice(0, 5);
+    } catch (e) { return []; }
+  }
 
   function renderSavedList() {
     var card = document.getElementById('savedConvosCard');
@@ -4035,8 +4223,20 @@
       var idx = savedConversations.indexOf(item);
       var el = document.createElement('div');
       el.className = 'saved-item';
-      el.innerHTML = '<span class="saved-item-preview">' + item.preview + '</span><span class="saved-item-label">' + item.label + '</span><span class="saved-del" data-idx="' + idx + '">✕</span>';
-      el.querySelector('.saved-item-preview').addEventListener('click', function() {
+      var previewEl = document.createElement('span');
+      previewEl.className = 'saved-item-preview';
+      previewEl.textContent = item.preview || '';
+      var labelEl = document.createElement('span');
+      labelEl.className = 'saved-item-label';
+      labelEl.textContent = item.label || '';
+      var del = document.createElement('span');
+      del.className = 'saved-del';
+      del.setAttribute('data-idx', String(idx));
+      del.textContent = '✕';
+      el.appendChild(previewEl);
+      el.appendChild(labelEl);
+      el.appendChild(del);
+      previewEl.addEventListener('click', function() {
         if (item.type === 'comments') {
           currentComments = JSON.parse(JSON.stringify(item.comments));
           commentsHeaderCount = 0;
@@ -4048,9 +4248,10 @@
         setPreviewVisible(true);
         window.scrollTo({top:0,behavior:'smooth'});
       });
-      el.querySelector('.saved-del').addEventListener('click', function(e) {
+      del.addEventListener('click', function(e) {
         e.stopPropagation();
-        savedConversations.splice(parseInt(this.dataset.idx), 1);
+        savedConversations.splice(parseInt(this.getAttribute('data-idx'), 10), 1);
+        persistSavedConversations();
         renderSavedList();
       });
       list.appendChild(el);
@@ -4131,8 +4332,8 @@
     document.getElementById('topicLabel').textContent = isComments ? 'Hook / On-screen caption — paste it exactly' : (isSongFormats ? 'Situation / Topic (optional)' : 'Topic / Context (optional)');
     document.getElementById('topic').placeholder = isComments ? 'e.g. "hype up my fence like it\'s a girls comment section"' : (isSongFormats ? 'e.g. got wrongly accused of stealing at work' : 'e.g. forgot my birthday, saw me at the club...');
     document.getElementById('topic').parentElement.style.display = isPaste ? 'none' : 'block';
-    document.getElementById('phoneFrame').style.display = (isComments || isSongFormats) ? 'none' : 'block';
-    document.getElementById('commentsFrame').style.display = isComments ? 'block' : 'none';
+    document.getElementById('phoneFrame').style.display = (isComments || isSongFormats) ? 'none' : 'flex';
+    document.getElementById('commentsFrame').style.display = isComments ? 'flex' : 'none';
     var showShorten = !(isComments || isSongFormats);
     document.getElementById('shortenRow').style.display = showShorten ? '' : 'none';
     document.getElementById('shortenHint').style.display = showShorten ? 'block' : 'none';
@@ -4190,24 +4391,14 @@
    ['copyMemeLyricsBtn','memeLyricsBox','📋 Copy Lyrics'],
    ['copyMemeClimaxBtn','memeClimaxBox','📋 Copy Climax Line'],
    ['copyMemeSocialBtn','memeSocialBox','📋 Copy Captions']].forEach(function(pair) {
-    document.getElementById(pair[0]).addEventListener('click', function() {
-      navigator.clipboard.writeText(document.getElementById(pair[1]).textContent);
-      this.textContent = '✓ Copied!';
-      var btn = this, label = pair[2];
-      setTimeout(function(){ btn.textContent = label; }, 1500);
-    });
+    bindCopyButton(pair[0], pair[1], pair[2]);
   });
   [['copyDnHookBtn','dnHookBox','📋 Copy Hook'],
    ['copyDnBreakdownBtn','dnBreakdownBox','📋 Copy Breakdown'],
    ['copyDnStyleBtn','dnStyleBox','📋 Copy Style Prompt'],
    ['copyDnLyricsBtn','dnLyricsBox','📋 Copy Lyrics'],
    ['copyDnCaptionBtn','dnCaptionBox','📋 Copy Caption']].forEach(function(pair) {
-    document.getElementById(pair[0]).addEventListener('click', function() {
-      navigator.clipboard.writeText(document.getElementById(pair[1]).textContent);
-      this.textContent = '✓ Copied!';
-      var btn = this, label = pair[2];
-      setTimeout(function(){ btn.textContent = label; }, 1500);
-    });
+    bindCopyButton(pair[0], pair[1], pair[2]);
   });
   [['copyReactScenarioBtn','reactScenarioBox','📋 Copy Scenario'],
    ['copyReactHookBtn','reactHookBox','📋 Copy On-Screen Caption'],
@@ -4216,12 +4407,7 @@
    ['copyReactLyricsBtn','reactLyricsBox','📋 Copy Lyrics'],
    ['copyReactShotsBtn','reactShotsBox','📋 Copy Shot Layout'],
    ['copyReactCaptionsBtn','reactCaptionsBox','📋 Copy Captions']].forEach(function(pair) {
-    document.getElementById(pair[0]).addEventListener('click', function() {
-      navigator.clipboard.writeText(document.getElementById(pair[1]).textContent);
-      this.textContent = '✓ Copied!';
-      var btn = this, label = pair[2];
-      setTimeout(function(){ btn.textContent = label; }, 1500);
-    });
+    bindCopyButton(pair[0], pair[1], pair[2]);
   });
   document.getElementById('renderPasteBtn').addEventListener('click', doRenderPaste);
   document.getElementById('swapSidesBtn').addEventListener('click', function() {
@@ -4232,36 +4418,13 @@
     this.textContent = '✓ Swapped';
     setTimeout(function(btn){ btn.textContent = '⇄ Swap Sides'; }, 1200, this);
   });
-  document.getElementById('copySayItScriptBtn').addEventListener('click', function() {
-    navigator.clipboard.writeText(document.getElementById('sayItScriptBox').textContent);
-    this.textContent = '✓ Copied!';
-    setTimeout(function(btn){ btn.textContent = '📋 Copy Narration Script'; }, 1500, this);
-  });
-  document.getElementById('copySayItSongPromptBtn').addEventListener('click', function() {
-    navigator.clipboard.writeText(document.getElementById('sayItSongPromptBox').textContent);
-    this.textContent = '✓ Copied!';
-    setTimeout(function(btn){ btn.textContent = '📋 Copy Song Description'; }, 1500, this);
-  });
-  document.getElementById('copySayItLyricsBtn').addEventListener('click', function() {
-    navigator.clipboard.writeText(document.getElementById('sayItLyricsBox').textContent);
-    this.textContent = '✓ Copied!';
-    setTimeout(function(btn){ btn.textContent = '📋 Copy Backup Lyrics'; }, 1500, this);
-  });
-  document.getElementById('copySayItOnScreenBtn').addEventListener('click', function() {
-    navigator.clipboard.writeText(document.getElementById('sayItOnScreenBox').textContent);
-    this.textContent = '✓ Copied!';
-    setTimeout(function(btn){ btn.textContent = '📋 Copy On-Screen Caption'; }, 1500, this);
-  });
-  document.getElementById('copySayItSocialBtn').addEventListener('click', function() {
-    navigator.clipboard.writeText(document.getElementById('sayItSocialBox').textContent);
-    this.textContent = '✓ Copied!';
-    setTimeout(function(btn){ btn.textContent = '📋 Copy Social Caption'; }, 1500, this);
-  });
-  document.getElementById('copySayItYtBtn').addEventListener('click', function() {
-    navigator.clipboard.writeText(document.getElementById('sayItYtBox').textContent);
-    this.textContent = '✓ Copied!';
-    setTimeout(function(btn){ btn.textContent = '📋 Copy YouTube Caption'; }, 1500, this);
-  });
+  bindCopyButton('copySayItScriptBtn','sayItScriptBox','📋 Copy Narration Script');
+  bindCopyButton('copySayItSongPromptBtn','sayItSongPromptBox','📋 Copy Song Description');
+  bindCopyButton('copySayItLyricsBtn','sayItLyricsBox','📋 Copy Backup Lyrics');
+  bindCopyButton('copySayItOnScreenBtn','sayItOnScreenBox','📋 Copy On-Screen Caption');
+  bindCopyButton('copySayItSocialBtn','sayItSocialBox','📋 Copy Social Caption');
+  bindCopyButton('copySayItYtBtn','sayItYtBox','📋 Copy YouTube Caption');
+  savedConversations = loadSavedConversations();
   // Run once immediately on page load — without this, any section whose
   // correct default state differs from its hardcoded HTML (like
   // groupSizeSection defaulting to display:none in the markup even though
@@ -4425,13 +4588,58 @@
     }
   });
 
+  var PIXEL_SCREEN_W = 1344;
+  var PIXEL_SCREEN_H = 2992;
+
+  function fitCanvasToPixelScreen(canvas, bg) {
+    var out = document.createElement('canvas');
+    out.width = PIXEL_SCREEN_W;
+    var scale = PIXEL_SCREEN_W / Math.max(1, canvas.width);
+    var drawH = Math.round(canvas.height * scale);
+    out.height = Math.max(PIXEL_SCREEN_H, drawH);
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = bg || '#000000';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(canvas, 0, 0, PIXEL_SCREEN_W, drawH);
+    return out;
+  }
+
+  function capturePhonePng(frame) {
+    return new Promise(function(resolve, reject) {
+      if (!frame) { reject(new Error('No frame')); return; }
+      frame.classList.add('capturing');
+      var bg = window.getComputedStyle(frame).backgroundColor;
+      if (!bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') bg = '#000000';
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          var scale = PIXEL_SCREEN_W / Math.max(1, frame.offsetWidth);
+          html2canvas(frame, {
+            scale: scale,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: bg,
+            logging: false
+          }).then(function(canvas) {
+            frame.classList.remove('capturing');
+            resolve(fitCanvasToPixelScreen(canvas, bg));
+          }).catch(function(err) {
+            frame.classList.remove('capturing');
+            reject(err);
+          });
+        });
+      });
+    });
+  }
+
   document.getElementById('downloadBtn').addEventListener('click', function() {
     var isComments = document.getElementById('contentType').value === 'comments';
     var frame = document.getElementById(isComments ? 'commentsFrame' : 'phoneFrame');
     var btn = document.getElementById('downloadBtn');
     btn.textContent = 'Generating...';
     btn.disabled = true;
-    html2canvas(frame, { scale:3, useCORS:true, allowTaint:true, backgroundColor:'#222', logging:false }).then(function(canvas) {
+    capturePhonePng(frame).then(function(canvas) {
       var dataUrl = canvas.toDataURL('image/png');
       try {
         var a = document.createElement('a');
@@ -4441,13 +4649,6 @@
         a.click();
         document.body.removeChild(a);
       } catch(e) {}
-      setTimeout(function() {
-        var win = window.open();
-        if (win) {
-          win.document.write('<img src="' + dataUrl + '" style="max-width:100%;display:block;margin:auto;" /><br><p style="text-align:center;font-family:sans-serif;color:#666;">Right-click the image and select Save Image As to save it</p>');
-          win.document.title = 'People Texts Screenshot';
-        }
-      }, 300);
       btn.textContent = 'Download PNG 📸';
       btn.disabled = false;
     }).catch(function(err) {
@@ -4469,9 +4670,16 @@
       text = currentMessages.map(function(m){ return (m.f==='them' ? (m.speaker || theirName) : myName) + ': ' + m.t; }).join('\n');
     }
     var box = document.getElementById('gemTextBox'); box.textContent = text; box.style.display = 'block';
-    navigator.clipboard.writeText(text).then(function() {
-      var t = document.getElementById('copiedToast'); t.style.display = 'block';
+    copyText(text).then(function() {
+      var t = document.getElementById('copiedToast');
+      t.textContent = '✓ Copied to clipboard!';
+      t.style.display = 'block';
       setTimeout(function(){ t.style.display='none'; }, 2500);
+    }).catch(function() {
+      var t = document.getElementById('copiedToast');
+      t.textContent = 'Copy failed — select the text above';
+      t.style.display = 'block';
+      setTimeout(function(){ t.style.display='none'; t.textContent = '✓ Copied to clipboard!'; }, 2500);
     });
   });
 
@@ -4527,6 +4735,146 @@
         document.title = ok ? 'LAYOUT PASS' : 'LAYOUT FAIL';
       }, 0);
     }
+    window.__ptgPhoneScrollFixture = function() {
+      currentMessages = [
+        { f: 'them', t: 'uncle dave i need to tell u something but u cant tell mom', speaker: 'Nina' },
+        { f: 'them', t: 'so u know jordan', speaker: 'Nina' },
+        { f: 'me', t: 'WAS knowing jordan', speaker: 'Me' },
+        { f: 'me', t: 'past tense as of 4:37pm today', speaker: 'Me' },
+        { f: 'them', t: 'what happened', speaker: 'Nina' },
+        { f: 'them', t: 'he liked his ex\'s photo from 2019 so i threw his xbox off the balcony and now maintenance wants $340 for the pool umbrella it landed on and i have $12 and a CRUSHED SOUL', speaker: 'Nina' },
+        { f: 'me', t: 'nina. the xbox. the POOL. you are 19.', speaker: 'Me' },
+        { f: 'them', t: 'and homeless-adjacent unless you venmo me before mom sees the group chat', speaker: 'Nina' },
+        { f: 'me', t: 'i am not laundering your balcony crime through cash app', speaker: 'Me' },
+        { f: 'them', t: 'ok but can you at least tell maintenance it was a raccoon', speaker: 'Nina' },
+        { f: 'me', t: 'NO', speaker: 'Me' },
+        { f: 'them', t: 'the raccoon\'s name is jordan too if that helps the story', speaker: 'Nina' }
+      ];
+      document.getElementById('theirName').value = 'Nina';
+      document.getElementById('myName').value = 'uncle dave';
+      renderPhone();
+      setPreviewVisible(true);
+      void document.body.offsetHeight;
+      var previewEl = document.getElementById('previewSection');
+      var phone = document.getElementById('phoneFrame');
+      var inputBar = document.getElementById('pInputBar');
+      var header = document.getElementById('pChatHeader');
+      var wrap = previewEl.querySelector('.phone-wrap');
+      var animate = document.getElementById('animateBtn');
+      var save = document.getElementById('saveConvoBtn');
+      var copy = document.getElementById('copyBtn');
+      function visibleIn(el, box, pad) {
+        pad = pad == null ? 3 : pad;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        return er.width > 0 && er.height > 0 && er.top >= br.top - pad && er.bottom <= br.bottom + pad;
+      }
+      var pcs = window.getComputedStyle(previewEl);
+      var wcs = wrap ? window.getComputedStyle(wrap) : null;
+      previewEl.scrollTop = 0;
+      void document.body.offsetHeight;
+      var topOk = visibleIn(header, previewEl, 8);
+      previewEl.scrollTop = previewEl.scrollHeight;
+      void document.body.offsetHeight;
+      var bottom = {
+        inputBar: visibleIn(inputBar, previewEl, 8),
+        animate: visibleIn(animate, previewEl, 8),
+        save: visibleIn(save, previewEl, 8),
+        copy: visibleIn(copy, previewEl, 8)
+      };
+      var overflowY = pcs.overflowY;
+      var wrapOverflow = wcs ? wcs.overflowY : '';
+      var canScroll = previewEl.scrollHeight > previewEl.clientHeight + 2;
+      var phoneFitsScroll = previewEl.scrollHeight + 2 >= phone.offsetHeight;
+      var clipped = overflowY === 'hidden';
+      var wrapClips = wrapOverflow === 'hidden' || wrapOverflow === 'auto' || wrapOverflow === 'scroll';
+      return {
+        overflowY: overflowY,
+        wrapOverflow: wrapOverflow,
+        canScroll: canScroll,
+        clipped: clipped,
+        wrapClips: wrapClips,
+        phoneFitsScroll: phoneFitsScroll,
+        topOk: topOk,
+        bottom: bottom,
+        phoneH: Math.round(phone.offsetHeight),
+        previewClientH: previewEl.clientHeight,
+        previewScrollH: previewEl.scrollHeight,
+        hasPreview: document.getElementById('appShell').classList.contains('has-preview')
+      };
+    };
+    window.__ptgPresetCollapseFixture = function() {
+      var card = document.getElementById('presetCard');
+      var picker = document.getElementById('presetPicker');
+      var search = document.getElementById('presetSearch');
+      if (!card) return { hasCard: false };
+      var body = document.getElementById('presetCardBody');
+      if (!body) body = card.querySelector('.preset-card-body');
+      var wasOpen = card.open;
+      card.open = false;
+      card.removeAttribute('open');
+      void document.body.offsetHeight;
+      var closedRect = picker.getBoundingClientRect();
+      var closed = {
+        open: card.open,
+        pickerH: Math.round(closedRect.height),
+        searchH: Math.round(search.getBoundingClientRect().height),
+        cardH: Math.round(card.getBoundingClientRect().height),
+        bodyDisplay: body ? window.getComputedStyle(body).display : null,
+        pickerHidden: closedRect.height < 1
+      };
+      card.open = true;
+      card.setAttribute('open', '');
+      void document.body.offsetHeight;
+      void card.offsetHeight;
+      if (body) void body.offsetHeight;
+      void picker.offsetHeight;
+      var opened = {
+        open: card.open,
+        pickerH: Math.round(picker.getBoundingClientRect().height),
+        searchH: Math.round(search.getBoundingClientRect().height),
+        cardH: Math.round(card.getBoundingClientRect().height),
+        bodyDisplay: body ? window.getComputedStyle(body).display : null,
+        pickerKids: picker.children.length
+      };
+      card.open = wasOpen;
+      if (!wasOpen) card.removeAttribute('open');
+      return { hasCard: true, closed: closed, opened: opened, tag: card.tagName };
+    };
+    if (new URLSearchParams(location.search).get('phonescroll') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgPhoneScrollFixture();
+        var b = r.bottom;
+        var ok = !!(r.hasPreview && !r.clipped && !r.wrapClips && r.canScroll && r.phoneFitsScroll && r.topOk && b.inputBar && b.animate && b.save && b.copy);
+        var banner = document.createElement('div');
+        banner.id = 'phoneScrollBanner';
+        banner.textContent = (ok ? 'PHONE SCROLL PASS' : 'PHONE SCROLL FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'PHONE SCROLL PASS' : 'PHONE SCROLL FAIL';
+      }, 0);
+    }
+    if (new URLSearchParams(location.search).get('presets') === '1') {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          var r = window.__ptgPresetCollapseFixture();
+          var ok = !!(r.hasCard && r.closed.pickerHidden && r.opened.pickerH > 40 && r.opened.searchH > 20);
+          var banner = document.createElement('div');
+          banner.id = 'presetCollapseBanner';
+          banner.textContent = (ok ? 'PRESETS PASS' : 'PRESETS FAIL') + ' ' + JSON.stringify(r);
+          banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+          document.body.appendChild(banner);
+          document.title = ok ? 'PRESETS PASS' : 'PRESETS FAIL';
+        });
+      });
+    }
+    if (new URLSearchParams(location.search).get('demo') === '1') {
+      setTimeout(function() {
+        window.__ptgPhoneScrollFixture();
+        var previewEl = document.getElementById('previewSection');
+        if (previewEl) previewEl.scrollTop = 0;
+      }, 0);
+    }
     window.__ptgExtractAnthropicText = extractAnthropicText;
     window.__ptgAnthropicEmptyMessage = anthropicEmptyMessage;
     window.__ptgApplyPreset = applyPresetFields;
@@ -4562,6 +4910,44 @@
         document.title = ok ? 'SIDES PASS' : 'SIDES FAIL';
       }, 0);
     }
+    window.__ptgPixelScreen = { w: PIXEL_SCREEN_W, h: PIXEL_SCREEN_H };
+    window.__ptgCapturePhonePng = capturePhonePng;
+    window.__ptgPixelFrameMetrics = function() {
+      var phone = document.getElementById('phoneFrame');
+      var cssW = phone.offsetWidth;
+      var cssH = phone.offsetHeight;
+      return {
+        cssW: cssW,
+        cssH: cssH,
+        minH: 2992 / 3,
+        maxW: 1344 / 3,
+        exportW: PIXEL_SCREEN_W,
+        exportH: Math.max(PIXEL_SCREEN_H, Math.round(cssH * PIXEL_SCREEN_W / Math.max(1, cssW))),
+        hasPreview: document.getElementById('appShell').classList.contains('has-preview')
+      };
+    };
+    window.__ptgQuoteEditFixture = function() {
+      var r = window.__ptgWaQuoteFixture('dm');
+      var quote = document.querySelector('#pMessages .p-wa-quote-text');
+      var origQuote = quote ? quote.textContent : '';
+      var origMsg = currentMessages[0] && currentMessages[0].t;
+      if (quote) {
+        quote.click();
+        quote.textContent = 'edited quote line';
+        quote.dispatchEvent(new Event('blur'));
+      }
+      var replyIdx = quote ? parseInt(quote.dataset.quoteIdx, 10) : NaN;
+      return {
+        quoteCount: r.quoteCount,
+        hasQuoteEl: !!quote,
+        quoteClass: quote ? quote.className : '',
+        quoteIdx: replyIdx,
+        origQuote: origQuote,
+        savedQuoteT: isNaN(replyIdx) ? null : (currentMessages[replyIdx] && currentMessages[replyIdx].quoteT),
+        sourceUnchanged: currentMessages[0] && currentMessages[0].t === origMsg,
+        afterText: quote ? quote.textContent : ''
+      };
+    };
     window.__ptgWaQuoteFixture = function(kind) {
       document.getElementById('msgStyle').value = 'whatsapp';
       document.getElementById('contentType').value = 'paste';
@@ -4696,15 +5082,174 @@
       var sel = document.getElementById('wallpaperSelect');
       if (sel) sel.value = id;
       applyWallpaper();
+      var paper = document.getElementById('phoneWallpaper');
       return {
         selected: sel ? sel.value : null,
         labels: Array.prototype.map.call(sel ? sel.options : [], function(o){ return o.textContent; }),
-        phoneBg: document.getElementById('phoneFrame').style.background
+        phoneBg: document.getElementById('phoneFrame').style.background,
+        overlayOp: paper ? paper.style.opacity : ''
+      };
+    };
+    window.__ptgWallpaperOpacityFixture = function() {
+      window.__ptgLayoutFixture();
+      document.getElementById('wallpaperSelect').value = 'doodle1';
+      document.getElementById('wallpaperSelect').dispatchEvent(new Event('change'));
+      var paper = document.getElementById('phoneWallpaper');
+      document.getElementById('wallpaperOpacity').value = '100';
+      applyWallpaper();
+      var at100 = { op: paper.style.opacity, bg: getComputedStyle(paper).backgroundImage };
+      document.getElementById('wallpaperOpacity').value = '0';
+      applyWallpaper();
+      var at0 = { op: paper.style.opacity };
+      document.getElementById('wallpaperOpacity').value = '40';
+      applyWallpaper();
+      var cs = getComputedStyle(paper);
+      var paperRect = paper.getBoundingClientRect();
+      var frame = document.getElementById('phoneFrame');
+      return {
+        at100: at100.op,
+        at0: at0.op,
+        at40: paper.style.opacity,
+        overlayHasImage: !!(at100.bg && at100.bg !== 'none'),
+        position: cs.position,
+        coversFrame: paperRect.height >= frame.clientHeight - 2 && paperRect.width >= frame.clientWidth - 2
+      };
+    };
+    window.__ptgDiscordXssFixture = function() {
+      document.getElementById('msgStyle').value = 'discord';
+      document.getElementById('contentType').value = 'paste';
+      document.getElementById('contentType').dispatchEvent(new Event('change'));
+      currentMessages = [
+        { f: 'them', t: '<img src=x onerror="window.__ptgXss=1">xss', speaker: 'Nina' },
+        { f: 'me', t: 'hello', speaker: 'Gil' }
+      ];
+      renderPhone();
+      setPreviewVisible(true);
+      return {
+        imgCount: document.querySelectorAll('#pMessages img').length,
+        hasRawTag: document.getElementById('pMessages').textContent.indexOf('<img') !== -1,
+        leaked: !!window.__ptgXss
+      };
+    };
+    window.__ptgIMessageQuoteFixture = function() {
+      document.getElementById('msgStyle').value = 'messenger';
+      document.getElementById('contentType').value = 'messages';
+      document.getElementById('contentType').dispatchEvent(new Event('change'));
+      currentMessages = [
+        { f: 'them', t: 'hello first', speaker: 'Nina' },
+        { f: 'me', t: 'wait', speaker: 'Gil' },
+        { f: 'me', t: 'the quote should be hello first not wait', speaker: 'Gil' }
+      ];
+      window.__ptgForcedReplyIndices = new Set([2]);
+      renderPhone();
+      window.__ptgForcedReplyIndices = null;
+      var q = document.querySelector('#pMessages .p-reply-quote');
+      setPreviewVisible(true);
+      return { quote: q ? q.textContent : null };
+    };
+    window.__ptgEmptyQuoteFixture = function() {
+      window.__ptgWaQuoteFixture('dm');
+      var quote = document.querySelector('#pMessages .p-wa-quote-text');
+      if (quote) {
+        quote.click();
+        quote.textContent = '';
+        quote.dispatchEvent(new Event('blur'));
+      }
+      renderPhone();
+      var after = document.querySelector('#pMessages .p-wa-quote-text');
+      return { after: after ? after.textContent : null, quoteT: currentMessages[1] && currentMessages[1].quoteT };
+    };
+    window.__ptgSavedPersistFixture = function() {
+      currentMessages = [{ f: 'them', t: 'persist me please', speaker: 'Nina' }];
+      savedConversations = [];
+      document.getElementById('contentType').value = 'messages';
+      document.getElementById('contentType').dispatchEvent(new Event('change'));
+      setPreviewVisible(true);
+      document.getElementById('saveConvoBtn').click();
+      var stored = safeGet('ptg_saved_convos');
+      var parsed = stored ? JSON.parse(stored) : [];
+      return { count: parsed.length, preview: parsed[0] && parsed[0].preview, listText: document.getElementById('savedList').textContent };
+    };
+    window.__ptgAvatarSrcFixture = function() {
+      window.__ptgCommentsTest('[PINNED] roastking_: fence\nlilpinkcupid: hi');
+      document.getElementById('avatarStyle').value = 'realistic';
+      document.getElementById('avatarStyle').dispatchEvent(new Event('change'));
+      var srcs = Array.prototype.map.call(document.querySelectorAll('#commentsList img'), function(img){ return img.getAttribute('src') || ''; });
+      return {
+        count: srcs.length,
+        allData: srcs.every(function(s){ return s.indexOf('data:image/svg+xml') === 0; }),
+        anyPravatar: srcs.some(function(s){ return s.indexOf('pravatar') !== -1; })
       };
     };
     window.__ptgProtectShortenedLine = protectShortenedLine;
     window.__ptgWordCount = wordCount;
     window.__ptgLooksTelegraph = looksTelegraph;
+    if (new URLSearchParams(location.search).get('pixel') === '1') {
+      setTimeout(function() {
+        window.__ptgLayoutFixture();
+        var m = window.__ptgPixelFrameMetrics();
+        var ok = !!(m.hasPreview && m.cssH + 1 >= m.minH && m.cssW <= m.maxW + 2 && m.exportW === 1344 && m.exportH >= 2992);
+        var banner = document.createElement('div');
+        banner.id = 'pixelBanner';
+        banner.textContent = (ok ? 'PIXEL PASS' : 'PIXEL FAIL') + ' ' + JSON.stringify(m);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'PIXEL PASS' : 'PIXEL FAIL';
+      }, 0);
+    }
+    if (new URLSearchParams(location.search).get('quoteedit') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgQuoteEditFixture();
+        var ok = !!(r.hasQuoteEl && r.quoteClass.indexOf('p-quote-edit') >= 0 && r.savedQuoteT === 'edited quote line' && r.sourceUnchanged && r.afterText === 'edited quote line');
+        var banner = document.createElement('div');
+        banner.id = 'quoteEditBanner';
+        banner.textContent = (ok ? 'QUOTE EDIT PASS' : 'QUOTE EDIT FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'QUOTE EDIT PASS' : 'QUOTE EDIT FAIL';
+      }, 0);
+    }
+    if (new URLSearchParams(location.search).get('auditfixes') === '1') {
+      setTimeout(function() {
+        var opacity = window.__ptgWallpaperOpacityFixture();
+        var xss = window.__ptgDiscordXssFixture();
+        var imq = window.__ptgIMessageQuoteFixture();
+        var empty = window.__ptgEmptyQuoteFixture();
+        var saved = window.__ptgSavedPersistFixture();
+        var av = window.__ptgAvatarSrcFixture();
+        var grokHint = (document.querySelector('label') && document.body.innerText.indexOf('Dark Humour') !== -1);
+        var edited = window.__ptgQuoteEditFixture();
+        document.getElementById('msgStyle').value = 'messenger';
+        document.getElementById('msgStyle').dispatchEvent(new Event('change'));
+        document.getElementById('msgStyle').value = 'whatsapp';
+        document.getElementById('msgStyle').dispatchEvent(new Event('change'));
+        var qKeep = document.querySelector('#pMessages .p-wa-quote-text');
+        var quoteKeep = {
+          saved: edited.savedQuoteT,
+          after: qKeep ? qKeep.textContent : null,
+          count: document.querySelectorAll('#pMessages .p-wa-quote').length
+        };
+        document.documentElement.setAttribute('data-theme', 'light');
+        var pasteBgLight = getComputedStyle(document.getElementById('pasteInput')).backgroundColor;
+        document.documentElement.removeAttribute('data-theme');
+        var ok = opacity.at100 === '1' && opacity.at0 === '0' && opacity.at40 === '0.4' && opacity.overlayHasImage
+          && opacity.position === 'absolute' && opacity.coversFrame
+          && xss.imgCount === 0 && xss.hasRawTag && !xss.leaked
+          && imq.quote === 'hello first'
+          && empty.after === '' && empty.quoteT === ''
+          && saved.count >= 1 && saved.preview && saved.preview.indexOf('persist me') === 0
+          && av.count >= 1 && av.allData && !av.anyPravatar
+          && grokHint
+          && quoteKeep.count >= 1 && quoteKeep.after === 'edited quote line'
+          && /rgb\(\s*255,\s*255,\s*255\s*\)/.test(pasteBgLight);
+        var banner = document.createElement('div');
+        banner.id = 'auditFixesBanner';
+        banner.textContent = (ok ? 'AUDIT FIXES PASS' : 'AUDIT FIXES FAIL') + ' ' + JSON.stringify({ opacity: opacity, xss: xss, imq: imq, empty: empty, saved: saved, av: av, quoteKeep: quoteKeep, pasteBgLight: pasteBgLight });
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'AUDIT FIXES PASS' : 'AUDIT FIXES FAIL';
+      }, 0);
+    }
   }
 })();
 </script>
@@ -4732,6 +5277,17 @@
   function syncPreview(){ if(!shell||!preview) return; var vis = window.getComputedStyle(preview).display !== 'none'; shell.classList.toggle('has-preview', vis); }
   if (preview) { new MutationObserver(syncPreview).observe(preview, { attributes: true, attributeFilter: ['style','class'] }); }
   syncPreview();
+
+  // Collapse / expand Suno Campaign Presets (remembered)
+  var presetCard = document.getElementById('presetCard');
+  if (presetCard) {
+    var presetsOpen = null;
+    try { presetsOpen = localStorage.getItem('ptg_presets_open'); } catch(e){}
+    presetCard.open = presetsOpen === '1';
+    presetCard.addEventListener('toggle', function(){
+      try { localStorage.setItem('ptg_presets_open', presetCard.open ? '1' : '0'); } catch(e){}
+    });
+  }
 
   // Searchable preset picker with favorites + recents (drives the existing hidden <select>)
   var sel = document.getElementById('sunoPreset');
@@ -4796,6 +5352,14 @@
       order.forEach(function(gname){ picker.appendChild(groupEl(gname)); groups[gname].forEach(function(p){ picker.appendChild(makeItem(p)); }); });
     }
     if (search) search.addEventListener('input', function(){ render(this.value); });
+    function syncPresetMeta(){
+      var meta = document.getElementById('presetCardMeta');
+      if (!meta) return;
+      var opt = sel.options[sel.selectedIndex];
+      meta.textContent = (sel.value && opt) ? opt.textContent : '';
+    }
+    sel.addEventListener('change', syncPresetMeta);
+    syncPresetMeta();
     render('');
   }
 })();
