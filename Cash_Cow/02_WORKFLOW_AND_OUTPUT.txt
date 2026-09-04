@@ -6,10 +6,7 @@ VERSE / SECTION JOBS
 ═══════════════════════════════════════
 VERSE 1
 - Transcribe comments exactly (cleaned). One per line. Full stop at end of each line.
-- This is the "receipt." Listeners must recognize the original comments — including the original LANGUAGE.
-- Keep each comment in the language it was written. Do not translate Arabic (or any other language) into English.
-- If the last comments in the screenshot are Arabic, Verse 1 ends in Arabic. Mixed thread = mixed Verse 1.
-- English-as-base applies to V2 / Chorus / V3 / Outro only.
+- This is the "receipt." Listeners must recognize the original comments.
 
 VERSE 2 — THE PAYOFF
 - 8 original lines. Funny / wow / bewildered.
@@ -117,7 +114,6 @@ FINAL CHECK (print as checklist after assets + notes)
 ### FINAL CHECK
 - All comments used in Verse 1: Yes
 - No invented Verse 1 lines: Yes
-- Verse 1 original language preserved (Arabic/etc. not translated to English): Yes
 - Title/Chorus locked to the #1 comment: Yes
 - Style of Music outside code block: Yes
 - Code blocks lyrics-only: Yes
@@ -144,7 +140,7 @@ OUTPUT SKELETON
 Gilno's Stem!
 
 [Verse 1]
-[all comments, cleaned, original language, one per line]
+[all comments, cleaned, one per line]
 
 [Verse 2]
 [8 original payoff lines]

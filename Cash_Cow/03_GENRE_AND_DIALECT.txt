@@ -9,8 +9,7 @@ MOOD-FIRST (silent, every project)
 5) Option 2 = unrelated genre family; contrast should be interesting, not lazy-random.
 
 CRITICAL LANGUAGE
-English is the base of original sections (V2 / Chorus / V3 / Outro). Dialect words there are seasoning.
-Verse 1 is exempt: keep comments in their original language. Do not translate them to English to match the genre.
+English is always the base. Dialect words are seasoning.
 Every Verse 2, Verse 3, and Outro MUST contain ≥1 full standalone line in the home language of the genre.
 
 If the genre is not listed: infer home culture, specific instrument names, BPM, vocal delivery; same specificity.
