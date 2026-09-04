@@ -2,18 +2,11 @@ CASH COW — GENRE / DIALECT / SUNO TRIGGER MAP
 Source of truth for Style of Music and lyric dialect. Genre tag ALWAYS first.
 
 MOOD-FIRST (silent, every project)
-1) Name the mood in one sentence (wholesome family comedy / betrayal / gym fail / toddler chaos / slow-burn romance / tender-sad / soft pop / horror-comedy / etc.).
+1) Name the mood in one sentence (wholesome family comedy / betrayal / gym fail / toddler chaos / slow-burn romance / etc.).
 2) Scan this FULL map — do not default to the same 2–3 genres.
 3) Justify internally by emotional DNA, not just trigger words.
 4) Track genres already used in this chat. Repeat only if the mood genuinely repeats. If you reuse because it is truly the best fit, say so in one aside to the user.
 5) Option 2 = unrelated genre family; contrast should be interesting, not lazy-random.
-
-MOOD LOCK — genre must match the clip, not a comfort pick
-- SOFT / TENDER / SAD / ROMANTIC / WHOLESOME / LULLABY: Soft Pop, Indie Pop, R&B, Soul, Gospel, Bossa, French Chanson, Fado, Country ballad. UK Drill, Amapiano, Gqom, Grime, Phonk, Nu-metal = FAIL.
-- DARK / STREET / AGGRESSIVE / BATTLE: UK Drill, Chicago/NY Drill, Grime, Trap, Hip-Hop OK.
-- TOWNSHIP / PARTY / DANCE-FLOOR: Amapiano, Afro House, Gqom, Afrobeats, Baile Funk, Jersey Club, Soca OK. Not for a crying toddler or a breakup unless the comments are already that energy.
-- HORROR-COMEDY / LIGHTS-OFF: Cinematic Horror, Dark Trap, Nu-metal. Not default UK Drill.
-If you catch yourself reaching for UK Drill or Amapiano on a soft clip, stop and pick Soft Pop / Soul / R&B.
 
 CRITICAL LANGUAGE
 English is the base of original sections (V2 / Chorus / V3 / Outro). Dialect words there are seasoning.
@@ -182,13 +175,6 @@ GOSPEL POP
 Triggers: Gospel pop, uplifting choir, organ, warm Southern American devotional vocals, powerful belt, 80-100 BPM.
 Seasoning: hallelujah, glory, amen, praise, testify, blessed, saved, lifted, waymaker, breakthrough, walk by faith.
 Example: I felt the breakthrough coming when I began to praise, my shackles fell to pieces under His gaze.
-
-SOFT POP / INDIE POP / DREAM POP
-Triggers: Soft pop, indie pop, dream pop, warm intimate male or female vocal, clean guitar, gentle synth pads, stacked harmonies, 80-100 BPM. Not drill. Not amapiano. Not trap.
-Seasoning: English, tender, specific. Tags: Stay with me | Don't walk away | Come back home
-Full line: English unless comments are another language — then one rhyming line in THAT language.
-Example: You packed a bag like it was nothing, baby on the balcony still calling your name.
-USE THIS when the clip is tender, sad, romantic, wholesome-family, or "I needed soft pop." Drill/Amapiano here is a fail.
 
 SOUL / R&B
 Triggers: Soul, R&B, warm American vocal, emotive and deeply expressive, smooth production, groove-based rhythm, 75-95 BPM.

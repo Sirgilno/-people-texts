@@ -148,7 +148,6 @@ FINAL CHECK (print as checklist after assets + notes)
 - One full home-language line in V2, Chorus, V3, Outro each option: Yes
 - Each home-language line end-rhymes with the line before or after (last sounds match out loud): Yes
 - Rap/drill/trap/grime options: real punchlines/wordplay, not slang wallpaper: Yes
-- Genre matches the clip mood (soft clip is not UK Drill/Amapiano): Yes
 - Option 2 different genre family: Yes
 - No artist names in lyrics or Style of Music / no "AI music": Yes
 - Campaign hashtags correct (or spicy mode noted): Yes
