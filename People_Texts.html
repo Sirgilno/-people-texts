@@ -224,6 +224,7 @@
     transform: rotate(-45deg); transition: transform 0.15s ease;
   }
   .preset-card[open] .preset-card-chevron { transform: rotate(45deg); }
+  .preset-card:not([open]) > .preset-card-body { display: none !important; }
   .preset-search { margin-bottom: 8px; }
   .preset-picker { display: flex; flex-direction: column; gap: 3px; max-height: 320px; overflow-y: auto; border: 1px solid var(--border-soft); border-radius: 12px; padding: 6px; background: var(--surface-2); }
   .preset-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); padding: 9px 8px 4px; position: sticky; top: 0; background: var(--surface-2); z-index: 1; }
@@ -480,7 +481,7 @@
     <span class="preset-card-meta" id="presetCardMeta"></span>
     <span class="preset-card-chevron" aria-hidden="true"></span>
   </summary>
-  <div class="preset-card-body">
+  <div class="preset-card-body" id="presetCardBody">
   <div style="margin-bottom:8px;">
     <select id="sunoPreset" style="width:100%;background:#131313;border:1px solid #232323;border-radius:8px;padding:11px 12px;font-size:13px;color:#e8e8e8;outline:none;">
       <option value="">— Pick a campaign format to auto-fill —</option>
@@ -4629,23 +4630,33 @@
       var picker = document.getElementById('presetPicker');
       var search = document.getElementById('presetSearch');
       if (!card) return { hasCard: false };
+      var body = document.getElementById('presetCardBody');
+      if (!body) body = card.querySelector('.preset-card-body');
       var wasOpen = card.open;
       card.open = false;
+      card.removeAttribute('open');
       void document.body.offsetHeight;
+      var closedRect = picker.getBoundingClientRect();
       var closed = {
         open: card.open,
-        pickerH: picker.getBoundingClientRect().height,
-        searchH: search.getBoundingClientRect().height,
-        pickerHidden: picker.getBoundingClientRect().height < 1
+        pickerH: Math.round(closedRect.height),
+        searchH: Math.round(search.getBoundingClientRect().height),
+        cardH: Math.round(card.getBoundingClientRect().height),
+        bodyDisplay: body ? window.getComputedStyle(body).display : null,
+        pickerHidden: closedRect.height < 1
       };
       card.open = true;
+      card.setAttribute('open', '');
       void document.body.offsetHeight;
       var opened = {
         open: card.open,
         pickerH: Math.round(picker.getBoundingClientRect().height),
-        searchH: Math.round(search.getBoundingClientRect().height)
+        searchH: Math.round(search.getBoundingClientRect().height),
+        cardH: Math.round(card.getBoundingClientRect().height),
+        bodyDisplay: body ? window.getComputedStyle(body).display : null
       };
       card.open = wasOpen;
+      if (!wasOpen) card.removeAttribute('open');
       return { hasCard: true, closed: closed, opened: opened, tag: card.tagName };
     };
     if (new URLSearchParams(location.search).get('phonescroll') === '1') {
