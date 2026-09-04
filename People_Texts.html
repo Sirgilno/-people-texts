@@ -5105,14 +5105,14 @@
       applyWallpaper();
       var cs = getComputedStyle(paper);
       var paperRect = paper.getBoundingClientRect();
-      var frameRect = document.getElementById('phoneFrame').getBoundingClientRect();
+      var frame = document.getElementById('phoneFrame');
       return {
         at100: at100.op,
         at0: at0.op,
         at40: paper.style.opacity,
         overlayHasImage: !!(at100.bg && at100.bg !== 'none'),
         position: cs.position,
-        coversFrame: paperRect.height >= frameRect.height - 2 && paperRect.width >= frameRect.width - 2
+        coversFrame: paperRect.height >= frame.clientHeight - 2 && paperRect.width >= frame.clientWidth - 2
       };
     };
     window.__ptgDiscordXssFixture = function() {
