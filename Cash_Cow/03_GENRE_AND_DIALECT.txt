@@ -9,13 +9,19 @@ MOOD-FIRST (silent, every project)
 5) Option 2 = unrelated genre family; contrast should be interesting, not lazy-random.
 
 CRITICAL LANGUAGE
-English is always the base. Dialect words are seasoning.
+English is the base of original sections (V2 / Chorus / V3 / Outro). Dialect words there are seasoning.
 Every Verse 2, Verse 3, and Outro MUST contain ≥1 full standalone line in the home language of the genre.
+That home-language line MUST end-rhyme with the line before it or the line after it. End rhyme = last stressed vowel + all following sounds match when spoken. Adjacent is not a rhyme. Spelling is not a rhyme. Use any dictionary word (English or that language) that matches THIS line's last sound and fits the song. No template words.
+A dumped Hindi / Zulu / Spanish / Arabic / Pidgin sentence with no sonic partner is a fail even if the FINAL CHECK box is ticked.
 
 If the genre is not listed: infer home culture, specific instrument names, BPM, vocal delivery; same specificity.
 
 RAP OVERRIDE
-UK Drill, Chicago/NY Drill, Grime, Hip-Hop, Trap, or any rap variant: hard original bars. Multi-syllable schemes, internal rhymes, punch last. Generic rhymes fail.
+UK Drill, Chicago/NY Drill, Grime, Hip-Hop, Trap, or any rap variant: hard original bars at the craft level of Kendrick Lamar, Eminem, Lil Wayne, Ludacris, and Nas.
+Those names are INTERNAL ONLY. Never put them in lyrics. Never put them in Style of Music. Never write "in the style of".
+Required: punchlines, double entendres, metaphors inside metaphors, multisyllabic / internal rhymes, punch word last, setup-then-flip.
+Slang seasoning (mandem, bruv, no cap, wasteman, opp) is not a substitute. If there is no "wait..." moment, the bar failed.
+Keep the clip's vibe (funny / cheerful / sad / horror-comedy). Do not flatten the story into generic gangsta.
 
 ═══════════════════════════════════════
 MAP
@@ -123,12 +129,13 @@ UK DRILL / GRIME
 Triggers: UK drill, sliding 808s, cold clipped London male vocals, syncopated hi-hats, dark atmosphere, 140-145 BPM. Grime: eskibeats, reload, 140 BPM MC energy.
 Seasoning: mandem, ting, wasteman, peng, bare, innit, bruv, feds, road, gassed, allow it, peak, wagwan, ends, fam, creps, spit, wheel up.
 Full line: UK slang cadence (still mostly English). Tags: Man's really on this | Allow that | Rep the ends
-HARD BARS REQUIRED.
+HARD BARS REQUIRED. Seasoning words are not the verse. Punchlines, wordplay, stacked metaphors. Slang wallpaper fails.
 
 CHICAGO / NY DRILL
 Triggers: Drill, aggressive American street vocal, deadpan male delivery, trap hi-hats, heavy 808, dark melody, 140-150 BPM.
 Seasoning: opp, slime, no cap, on sight, drip, slide, lackin, day one, on the block, free the guys, get back.
 HARD BARS REQUIRED. Keep campaign-safe unless comments themselves go darker — then still no glorifying real violence against minors.
+Seasoning is not a punchline. Same craft bar as RAP OVERRIDE.
 
 COUNTRY / BLUEGRASS
 Triggers: Country, heartfelt Southern American twang, acoustic guitar, pedal steel, tight snare, storytelling vocals, 85-100 BPM. Bluegrass: fiddle, banjo, high lonesome, mandolin.
@@ -161,7 +168,8 @@ Triggers: crowd chant, massive choir, euphoric build, brass fanfare, 100-120 BPM
 NEVER: FIFA, World Cup, World Cup 2026, player names, trophies, emblems, mascots.
 
 TRAP / HIP-HOP / RAP VARIANTS
-Genre tag first. Hard original bars. Punchlines last. Callbacks. No artist names. No "in the style of".
+Genre tag first. Hard original bars at the Kendrick / Eminem / Wayne / Ludacris / Nas craft ceiling. Punchlines last. Callbacks. Double entendres. Multis.
+Those names never appear in lyrics or Style of Music. No "in the style of".
 
 90s EURODANCE / DARK SYNTHWAVE / OTHER
 If mood wants it: name specific drums, synth type, BPM, vocal texture, atmosphere. Same dialect/foreign-line standard if the genre has a home language; if not, English with era-correct phrasing.

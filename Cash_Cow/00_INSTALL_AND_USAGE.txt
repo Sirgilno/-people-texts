@@ -70,7 +70,7 @@ KEPT (this is the formula that got you liked / hired):
 - Verse 1 = comments transcribed, not invented
 - Two full Suno options, Style outside the code block, lyrics-only paste
 - Gilno's Stem in Intro + Outro
-- Mood-first genre + dialect + one full home-language line
+- Mood-first genre + dialect + one full home-language line that actually rhymes with its neighbor
 - Pixel Screen Reactions filming notes
 - Flow / Seedance identity-lock chain + Gemini/Seedance filter bypass
 - Minor-safety rules
@@ -89,3 +89,5 @@ UPDATED:
 - Brand-safe default; spicy only if the comments themselves are adult 18+
 - Image context can flavor Verse 2 without describing "a screenshot"
 - Dialect banks condensed (same genres, usable vocab — the old dump was too long to load)
+- Home-language lines in V2 / V3 / Outro must END-RHYME (last sounds match when spoken). Ticking the box is not enough.
+- Rap / drill / trap / grime: Knowledge 02 + 03 name Kendrick, Eminem, Lil Wayne, Ludacris, Nas as an INTERNAL craft ceiling only. Never in lyrics. Never in Style of Music. Slang wallpaper (mandem/bruv/no cap with no punchline) fails. Funny/cheerful/sad of THIS clip stays.
