@@ -4825,12 +4825,16 @@
       card.open = true;
       card.setAttribute('open', '');
       void document.body.offsetHeight;
+      void card.offsetHeight;
+      if (body) void body.offsetHeight;
+      void picker.offsetHeight;
       var opened = {
         open: card.open,
         pickerH: Math.round(picker.getBoundingClientRect().height),
         searchH: Math.round(search.getBoundingClientRect().height),
         cardH: Math.round(card.getBoundingClientRect().height),
-        bodyDisplay: body ? window.getComputedStyle(body).display : null
+        bodyDisplay: body ? window.getComputedStyle(body).display : null,
+        pickerKids: picker.children.length
       };
       card.open = wasOpen;
       if (!wasOpen) card.removeAttribute('open');
@@ -4850,16 +4854,18 @@
       }, 0);
     }
     if (new URLSearchParams(location.search).get('presets') === '1') {
-      setTimeout(function() {
-        var r = window.__ptgPresetCollapseFixture();
-        var ok = !!(r.hasCard && r.closed.pickerHidden && r.opened.pickerH > 40 && r.opened.searchH > 20);
-        var banner = document.createElement('div');
-        banner.id = 'presetCollapseBanner';
-        banner.textContent = (ok ? 'PRESETS PASS' : 'PRESETS FAIL') + ' ' + JSON.stringify(r);
-        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
-        document.body.appendChild(banner);
-        document.title = ok ? 'PRESETS PASS' : 'PRESETS FAIL';
-      }, 0);
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          var r = window.__ptgPresetCollapseFixture();
+          var ok = !!(r.hasCard && r.closed.pickerHidden && r.opened.pickerH > 40 && r.opened.searchH > 20);
+          var banner = document.createElement('div');
+          banner.id = 'presetCollapseBanner';
+          banner.textContent = (ok ? 'PRESETS PASS' : 'PRESETS FAIL') + ' ' + JSON.stringify(r);
+          banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+          document.body.appendChild(banner);
+          document.title = ok ? 'PRESETS PASS' : 'PRESETS FAIL';
+        });
+      });
     }
     if (new URLSearchParams(location.search).get('demo') === '1') {
       setTimeout(function() {
@@ -5132,6 +5138,7 @@
       renderPhone();
       window.__ptgForcedReplyIndices = null;
       var q = document.querySelector('#pMessages .p-reply-quote');
+      setPreviewVisible(true);
       return { quote: q ? q.textContent : null };
     };
     window.__ptgEmptyQuoteFixture = function() {
@@ -5205,16 +5212,32 @@
         var saved = window.__ptgSavedPersistFixture();
         var av = window.__ptgAvatarSrcFixture();
         var grokHint = (document.querySelector('label') && document.body.innerText.indexOf('Dark Humour') !== -1);
+        var edited = window.__ptgQuoteEditFixture();
+        document.getElementById('msgStyle').value = 'messenger';
+        document.getElementById('msgStyle').dispatchEvent(new Event('change'));
+        document.getElementById('msgStyle').value = 'whatsapp';
+        document.getElementById('msgStyle').dispatchEvent(new Event('change'));
+        var qKeep = document.querySelector('#pMessages .p-wa-quote-text');
+        var quoteKeep = {
+          saved: edited.savedQuoteT,
+          after: qKeep ? qKeep.textContent : null,
+          count: document.querySelectorAll('#pMessages .p-wa-quote').length
+        };
+        document.documentElement.setAttribute('data-theme', 'light');
+        var pasteBgLight = getComputedStyle(document.getElementById('pasteInput')).backgroundColor;
+        document.documentElement.removeAttribute('data-theme');
         var ok = opacity.at100 === '1' && opacity.at0 === '0' && opacity.at40 === '0.4' && opacity.overlayHasImage
           && xss.imgCount === 0 && xss.hasRawTag && !xss.leaked
           && imq.quote === 'hello first'
           && empty.after === '' && empty.quoteT === ''
           && saved.count >= 1 && saved.preview && saved.preview.indexOf('persist me') === 0
           && av.count >= 1 && av.allData && !av.anyPravatar
-          && grokHint;
+          && grokHint
+          && quoteKeep.count >= 1 && quoteKeep.after === 'edited quote line'
+          && /rgb\(\s*255,\s*255,\s*255\s*\)/.test(pasteBgLight);
         var banner = document.createElement('div');
         banner.id = 'auditFixesBanner';
-        banner.textContent = (ok ? 'AUDIT FIXES PASS' : 'AUDIT FIXES FAIL') + ' ' + JSON.stringify({ opacity: opacity, xss: xss, imq: imq, empty: empty, saved: saved, av: av });
+        banner.textContent = (ok ? 'AUDIT FIXES PASS' : 'AUDIT FIXES FAIL') + ' ' + JSON.stringify({ opacity: opacity, xss: xss, imq: imq, empty: empty, saved: saved, av: av, quoteKeep: quoteKeep, pasteBgLight: pasteBgLight });
         banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
         document.body.appendChild(banner);
         document.title = ok ? 'AUDIT FIXES PASS' : 'AUDIT FIXES FAIL';
