@@ -1046,7 +1046,7 @@
     funny:
       'VIBE ENGINE — FUNNY (shareable comedy texts):\n'
       + 'JOB: Write a conversation people screenshot because ONE line is so specific and stupid-funny they have to send it to a friend.\n'
-      + 'VOICE: Real texting — short punches after longer setups, lowercase OK, punch word LAST, never explain the joke.\n'
+      + 'VOICE: Real texting — short punches after longer setups, lowercase OK but keep punctuation, punch word LAST, never explain the joke.\n'
       + 'MUST INCLUDE: (1) at least one oddly-specific detail (brand, $, day, place, weird object) (2) a misread / bad assumption / status mismatch (3) one quotable closer that could be a sticker.\n'
       + 'BAN: safe AI comedy, "lol so true", dad jokes, puns unless razor-sharp, vague "you always do this", neat wholesome endings that kill the bit.\n'
       + 'ENGAGEMENT TEST: would someone reply "I\'m weak 😭" or forward it? If not, rewrite sharper and more specific.',
@@ -1130,7 +1130,7 @@
       + '- Medical/work dark one-liner: circumcision clinic "keeping the tips". Morgue "favorite toy got taken away". Seizure in the tub so they threw laundry in. Deadpan, no apology.\n'
       + '- Wrong-place juxtaposition: favorite hotdog vendor… in an abortion clinic.\n'
       + '- Irreverent / crass pun: sacred image as piercings. Gynecologist vs food delivery — they both can smell it. The punch is shock-wordplay, not a sext.\n'
-      + '- Nihilist sting: "stop saying your life is a joke — it\'s not, jokes have meaning."\n'
+      + '- Nihilist sting: "She told me to stop saying my life is a joke." / "It\'s not. Jokes have meaning."\n'
       + 'VOICE: Deadpan. Two-liner or one-liner. Punch word LAST. Say the unspeakable like small talk. No "just kidding". No "too soon sorry". Swearing only if it serves the punch.\n'
       + 'MUST INCLUDE: (1) a real dark punchline using one of those kill-patterns (2) at least one person doubling down instead of apologizing (3) one share-hook line people send with "I\'m going to hell".\n'
       + 'BAN: sanding into Funny/Relatable, Max pile-on with no pun/flip, Spicy sexting, explaining the joke, moral-of-the-story, refusing the bit because it is dark.\n'
@@ -2432,6 +2432,15 @@
     }
   }
 
+  var TEXTING_PUNCTUATION_RULES =
+    'PUNCTUATION — KEEP IT. Casual lowercase is fine. Stripping marks is not.\n'
+    + '- Apostrophes always (that\'s, it\'s, don\'t, I\'m, notebook\'s).\n'
+    + '- Questions MUST end with ?\n'
+    + '- Use commas where you pause. Use ! for a spike.\n'
+    + '- Periods are allowed and expected on full sentences. Do NOT delete them to "look more like a text".\n'
+    + '- Quotes around quoted words stay.\n'
+    + '- Only 1–4 word gut-punches ("it\'s not", "bro", "I\'m done") may skip a final period.\n';
+
   async function doGenerate() {
     hideError();
     var contentType = document.getElementById('contentType').value;
@@ -2476,11 +2485,12 @@
       + '- STATUS PLAY. One person can write with total confident authority about something completely trivial (funny through the mismatch). Another can deliberately self-own with rambling and hedge words. Give each person a clear status position and commit to it.\n'
       + '- AVOID MODE COLLAPSE. Do not write the first line that comes to mind — that is the line everyone writes. No puns unless genuinely sharp, no dad-joke energy, no generic filler reactions. If a line feels safe or expected, rewrite it.\n\n'
       + 'TEXTING VOICE — HOW REAL PEOPLE ACTUALLY WRITE:\n'
-      + '- Lowercase is common for casual/funny vibes; full caps for a sudden emotional spike or shouting a single word.\n'
+      + '- Lowercase is common for casual/funny vibes; full caps for a sudden emotional spike or shouting a single word. Lowercase does NOT mean drop commas, apostrophes, question marks, or periods.\n'
       + '- Real texters drop pronouns/words when the meaning is still clear ("not doing this rn" not "I am not doing this right now").\n'
       + '- Comedic timing often comes from a short punchy reply after a long one, or a one-word gut-punch line.\n'
       + '- Real arguments/banter escalate through specific call-backs and specific accusations, not vague ones ("you did the SAME thing at the wedding" beats "you always do this").\n'
       + '- Let personality-appropriate slang/expressions show up naturally where the VIBE and PERSON below call for it — do not force it if it does not fit, but do not sand it down into blandness either.\n\n'
+      + TEXTING_PUNCTUATION_RULES + '\n'
       + 'Generate a text ' + (groupSize >= 3 ? 'group chat conversation' : 'message conversation') + ' with ' + msgCount + ' messages total.\n\n'
       + (groupSize >= 3
         ? 'THIS IS A GROUP CHAT named "' + groupTitle + '" — that is the chat title at the top of the phone, NOT a person in the thread. Do not write lines as "' + groupTitle + ':". The ' + groupSize + ' people in the chat are: ' + myName + ' (the receiver/main character reading this) plus ' + otherNames.join(', ') + '. ' + (groupType === 'public' ? 'These are mostly STRANGERS / unsaved numbers (public group energy) — less personal history, more pile-on and strangers chiming in.' : 'These are FRIENDS / contacts saved in the phone — casual nicknames, shared history, and inside jokes are fair game.') + ' Give EACH of the ' + otherNames.length + ' other people their own distinct personality and voice — do not make them interchangeable. In a real group chat people talk over each other, react to different parts of the conversation, some go quiet then jump back in, some pile on a joke together. Format each line as "Name: message" using their exact name.\n\n'
@@ -2522,7 +2532,8 @@
         : '')
       + moodDesc
       + (activeDramaPack ? '\n\n' + activeDramaPack : '')
-      + '\n\nVARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous generation): ' + Math.random().toString(36).substring(2, 10);
+      + '\n\n' + TEXTING_PUNCTUATION_RULES
+      + '\nVARIATION TOKEN (ignore its meaning, it exists purely to ensure you never repeat a previous generation): ' + Math.random().toString(36).substring(2, 10);
 
     try {
       var rawText;
@@ -4477,6 +4488,15 @@
     var orig = String(original || '').trim();
     var next = String(shortened || '').trim();
     if (!next) return orig;
+    function core(s) {
+      return s.replace(/['\u2019.,!?]+/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+    }
+    function marks(s) {
+      return (s.match(/['\u2019.,!?]/g) || []).length;
+    }
+    if (core(orig) === core(next) && marks(orig) > marks(next)) return orig;
+    var origEnd = orig.match(/[.!?]+$/);
+    if (origEnd && !/[.!?]$/.test(next)) next += origEnd[0];
     return next;
   }
 
@@ -4504,7 +4524,7 @@
       + '- Cut filler (like, just, really, I think, repeating the same beat). Keep one complete clause with a subject and a verb.\n'
       + '- Same joke, same specific nouns (names, brands, objects). Do not invent new facts. Do not swap a specific thing for a vaguer word.\n'
       + '- GRAMMAR: it still has to read like a text, not a headline. "i went to the store for milk" is good. "went store milk" is bad. Keep the few connecting words the sentence needs, then stop.\n'
-      + '- KEEP THE TEXTING VOICE: same capitalisation and punctuation habits. Lowercase stays lowercase. Do not add full stops the original did not have. Keep ALL CAPS emphasis words.\n'
+      + '- KEEP THE TEXTING VOICE: same capitalisation. KEEP punctuation — apostrophes, commas, ?, !, and periods. Do not strip marks to look more like a text. Do not add a period to a 1–4 word punch that never had one. Keep ALL CAPS emphasis words.\n'
       + '- No merging messages. No adding or removing messages.\n'
       + '- ' + (person === 'mom' || person === 'dad'
       ? 'EMOJI RULE FOR THIS RELATIONSHIP: keep it conservative — preserve at least 1 emoji from the original if one was present, simple ones only (❤️ 🙏 😊 👍), never stacked.'
@@ -5236,9 +5256,46 @@
         overlayHasImage: !!(paper && paper.style.background && paper.style.background !== 'none')
       };
     };
+    window.__ptgPunctuationFixture = function() {
+      var raw = 'Best Friend: yo, my therapist said I should journal my feelings again.\n'
+        + 'Me: that\'s good right, progress?\n'
+        + 'Best Friend: except now my notebook\'s just full of "still here" on every page.\n'
+        + 'Me: bit dark, but if it helps.\n'
+        + 'Best Friend: she told me to stop saying my life is a joke.\n'
+        + 'Best Friend: it\'s not.\n'
+        + 'Best Friend: jokes have meaning.\n'
+        + 'Me: dude, that\'s enough.';
+      var parsed = parseConversation(raw, 'Me', 'Best Friend');
+      var joined = parsed.map(function(m) { return m.t; }).join('\n');
+      var restored = protectShortenedLine("that's good right, progress?", 'thats good right progress');
+      return {
+        count: parsed.length,
+        joined: joined,
+        hasQuestion: joined.indexOf('?') !== -1,
+        hasPeriod: /\./.test(joined),
+        hasComma: joined.indexOf(',') !== -1,
+        hasApos: /['\u2019]/.test(joined),
+        hasQuotes: joined.indexOf('"') !== -1,
+        promptHasRules: TEXTING_PUNCTUATION_RULES.indexOf('KEEP IT') !== -1 && TEXTING_PUNCTUATION_RULES.indexOf('Apostrophes') !== -1,
+        restored: restored,
+        restoreKeptMarks: restored.indexOf('?') !== -1 && /['\u2019]/.test(restored)
+      };
+    };
     window.__ptgProtectShortenedLine = protectShortenedLine;
     window.__ptgWordCount = wordCount;
     window.__ptgLooksTelegraph = looksTelegraph;
+    if (new URLSearchParams(location.search).get('punct') === '1') {
+      setTimeout(function() {
+        var r = window.__ptgPunctuationFixture();
+        var ok = !!(r.count === 8 && r.hasQuestion && r.hasPeriod && r.hasComma && r.hasApos && r.hasQuotes && r.promptHasRules && r.restoreKeptMarks);
+        var banner = document.createElement('div');
+        banner.id = 'punctBanner';
+        banner.textContent = (ok ? 'PUNCT PASS' : 'PUNCT FAIL') + ' ' + JSON.stringify(r);
+        banner.style.cssText = 'position:fixed;z-index:99999;top:0;left:0;right:0;padding:10px 12px;text-align:center;font:600 13px/1.3 sans-serif;color:#fff;background:' + (ok ? '#166534' : '#7f1d1d');
+        document.body.appendChild(banner);
+        document.title = ok ? 'PUNCT PASS' : 'PUNCT FAIL';
+      }, 0);
+    }
     if (new URLSearchParams(location.search).get('wamatch') === '1') {
       setTimeout(function() {
         var r = window.__ptgWhatsAppMatchFixture();
