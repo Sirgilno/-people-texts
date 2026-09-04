@@ -14,6 +14,7 @@ VERSE 2 — THE PAYOFF
 - Written in the dialect and phrasing of the chosen genre.
 - First line of Verse 2 should hook — do not warm up for 3 lines.
 - If a still is present, one detail from the actual image may flavor the verse. Not a screenshot description.
+- Home-language line (required): a full standalone line in the genre's home language that END-RHYMES with the line before it or the line after it. Say the two last words out loud. If the endings do not match, rewrite until they do. Sitting next to English is not a rhyme.
 
 CHORUS / HOOK
 - 4 to 6 lines. Catchy, memorable, repeatable. Shower-singable.
@@ -24,17 +25,35 @@ CHORUS / HOOK
 VERSE 3
 - 8 original lines. Escalate. Fresh jokes, callbacks to Verse 1 comments, harder punchlines.
 - Fully unhinged or deeply emotional depending on the vibe — match the comments, do not invent a new plot.
+- Home-language line (required): same end-rhyme rule as Verse 2. New partner, new last sound of THIS line. Do not reuse a previous couplet.
 
 OUTRO
 - 4 to 6 closing lines. Final punchline or emotional gut punch. Last thing people hear.
 - Last lyric line before the Stem shout should be screenshot-able.
+- Home-language line (required): same end-rhyme rule as Verse 2. Still a closer that slaps, not a dumped foreign sentence.
 - Then: Gilno's Stem!
 
+HOME-LANGUAGE RHYME (V2 / V3 / Outro — all genres)
+- End rhyme = the last stressed vowel and every sound after it match when spoken. Spelling does not count.
+- Use the whole dictionary: any English word or any word in that home language whose ending actually sounds the same AND fits this song's story and vibe. No required rhyme word. No banned rhyme word. No template couplet.
+- Fail: a Hindi / Zulu / Spanish / Arabic / Pidgin line dropped in with nothing that shares its last sound. Fail: ticking "home-language line: Yes" just because the line exists.
+- If English has no natural partner for that ending, write a second home-language line that rhymes with the first, or rewrite the home-language ending so a natural partner exists.
+
 RAP / DRILL / TRAP / GRIME / HIP-HOP
-- Multi-syllable rhyme schemes, double entendres, metaphors inside metaphors, internal rhymes mid-line.
-- Punchline lands on the last word. Callbacks that recontextualize earlier lines.
-- Verse 3 must be harder than Verse 2. Outro lands like a closing statement.
-- If the line does not make someone pause and go "wait..." it is not hard enough.
+INTERNAL CRAFT BAR (read this, never print it): write at the level of Kendrick Lamar, Eminem, Lil Wayne, Ludacris, and Nas. Those names are a skill ceiling, not a Style prompt and not lyrics. Never write them, never write "in the style of", never name any real artist in the lyrics or in Style of Music.
+What that skill ceiling means in the bars:
+- Kendrick: stacked meanings, callbacks that re-load an earlier line, schemes that stay on THIS story.
+- Eminem: internal rhymes and multisyllabic chains inside the bar; setup, then flip; punch word last.
+- Lil Wayne: metaphor inside a metaphor; a punchline almost every bar; comparisons nobody saw coming.
+- Ludacris: funny punchlines that still hit; wordplay that tells the story; the joke is the bar, not a caption after it.
+- Nas: vivid one-liners; you can see the scene; the last word still punches.
+Mechanics:
+- Write the payoff first, then build the setup into it. Punch word last. Listener catches the second meaning without you explaining it.
+- Multi-syllable rhyme chains, not cat/hat. Double entendres. Homophones. Extended metaphor when it serves the clip.
+- Verse 3 must be harder than Verse 2. Outro is a closing statement, not a fade.
+- Slang is seasoning (mandem, bruv, no cap, wasteman, opp). Slang without a punchline is wallpaper. Generic road-man filler is a fail.
+- VIBE STAYS: funny stays funny, cheerful stays cheerful, sad stays sad, horror-comedy stays horror-comedy. Killer bars serve THIS clip. Do not flatten a toddler/family joke into generic gangsta because the genre is drill.
+- If the line does not make someone pause and go "wait..." it is not hard enough. Rewrite it.
 
 OPTION 2
 - Completely different genre family from Option 1.
@@ -121,8 +140,10 @@ FINAL CHECK (print as checklist after assets + notes)
 - Gilno/Gil not elsewhere in lyrics: Yes
 - Chorus twice per option: Yes
 - One full home-language line in V2, V3, Outro each option: Yes
+- Each home-language line end-rhymes with the line before or after (last sounds match out loud): Yes
+- Rap/drill/trap/grime options: real punchlines/wordplay, not slang wallpaper: Yes
 - Option 2 different genre family: Yes
-- No artist names / no "AI music": Yes
+- No artist names in lyrics or Style of Music / no "AI music": Yes
 - Campaign hashtags correct (or spicy mode noted): Yes
 - Pixel filming notes included: Yes
 - VISUALS omitted unless user asked for N prompts: Yes
