@@ -1354,15 +1354,18 @@
   function updateModelOptions() {
     var provider = document.getElementById('providerSelect').value;
     var modelSelect = document.getElementById('modelSelect');
+    var prev = modelSelect.value;
+    var savedGrok = safeGet('grok_model_pref');
     modelSelect.innerHTML = '';
     var vibe = document.getElementById('vibe').value;
     var forceGrok = shouldUseGrok(provider, vibe);
 
     if (forceGrok) {
+      // 4.3 first: 4.6/4.5 default to heavy thinking and used to hang past Vercel's 60s limit.
       var grokModels = [
-        ['grok-4.6', 'grok-4.6 (xAI)'],
+        ['grok-4.3', 'grok-4.3 (xAI) — fastest, recommended'],
         ['grok-4.5', 'grok-4.5 (xAI)'],
-        ['grok-4.3', 'grok-4.3 (xAI)']
+        ['grok-4.6', 'grok-4.6 (xAI)']
       ];
       for (var gi = 0; gi < grokModels.length; gi++) {
         var gOpt = document.createElement('option');
@@ -1372,6 +1375,12 @@
           : grokModels[gi][1];
         modelSelect.appendChild(gOpt);
       }
+      var keep = (prev && prev.indexOf('grok-') === 0) ? prev : (savedGrok || 'grok-4.3');
+      var found = false;
+      for (var oi = 0; oi < modelSelect.options.length; oi++) {
+        if (modelSelect.options[oi].value === keep) { found = true; break; }
+      }
+      modelSelect.value = found ? keep : 'grok-4.3';
     } else {
       var opt0b = document.createElement('option');
       opt0b.value = 'claude-sonnet-5';
@@ -1385,6 +1394,7 @@
       opt2.value = 'claude-opus-4-7';
       opt2.textContent = provider === 'auto' ? 'claude-opus-4-7 (Anthropic)' : 'claude-opus-4-7';
       modelSelect.appendChild(opt2);
+      if (prev && prev.indexOf('claude') === 0) modelSelect.value = prev;
     }
   }
 
@@ -1425,7 +1435,7 @@
     if (id.indexOf('grok-4.5') !== -1) return 'grok-4.5';
     if (id.indexOf('grok-4.3') !== -1) return 'grok-4.3';
     if (id.indexOf('grok') !== -1) return id;
-    return 'grok-4.5';
+    return 'grok-4.3';
   }
 
   function grokOnlyError() {
@@ -1574,32 +1584,67 @@
     return 'https://api.x.ai/v1/chat/completions';
   }
 
-  async function callGrokText(key, model, prompt, maxTokens, temperature) {
-    if (!key || !String(key).trim()) throw new Error(grokOnlyError());
+  var GROK_CLIENT_TIMEOUT_MS = 50000;
+
+  function grokRequestPayload(model, prompt, maxTokens, temperature) {
     var grokModel = resolveGrokModel(model);
-    var endpoint = grokEndpoint();
-    var body = JSON.stringify({
+    var payload = {
       model: grokModel,
       messages: [{ role: 'user', content: prompt }],
       max_tokens: maxTokens || 2000,
       temperature: temperature != null ? temperature : 0.9
-    });
+    };
+    // 4.6/4.5 default reasoning_effort is "high" — that thinking can outlive Vercel's 60s cap.
+    if (grokModel === 'grok-4.6' || grokModel === 'grok-4.5') {
+      payload.reasoning_effort = 'low';
+    }
+    return payload;
+  }
+
+  async function callGrokText(key, model, prompt, maxTokens, temperature) {
+    if (!key || !String(key).trim()) throw new Error(grokOnlyError());
+    var grokModel = resolveGrokModel(model);
+    var endpoint = grokEndpoint();
+    var body = JSON.stringify(grokRequestPayload(grokModel, prompt, maxTokens, temperature));
 
     async function once() {
-      var resp = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: body
-      });
+      var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = null;
+      if (controller) {
+        timer = setTimeout(function() { controller.abort(); }, GROK_CLIENT_TIMEOUT_MS);
+      }
+      var resp;
+      try {
+        var fetchOpts = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+          body: body
+        };
+        if (controller) fetchOpts.signal = controller.signal;
+        resp = await fetch(endpoint, fetchOpts);
+      } catch (fetchErr) {
+        if (timer) clearTimeout(timer);
+        if (fetchErr && fetchErr.name === 'AbortError') {
+          var timeoutErr = new Error(
+            grokModel + ' took too long (still thinking). Switch to grok-4.3 in Model — that one usually answers in seconds — then Generate again.'
+          );
+          timeoutErr.timeout = true;
+          throw timeoutErr;
+        }
+        throw fetchErr;
+      }
+      if (timer) clearTimeout(timer);
       var data = await resp.json().catch(function() { return {}; });
       if (!resp.ok) {
         var msg = (data.error && data.error.message) ? data.error.message : ('xAI API error (' + resp.status + ')');
         if (resp.status === 401 || resp.status === 403) {
           msg = 'xAI rejected your Grok key (' + resp.status + '). Re-save a valid key from console.x.ai.';
         } else if (resp.status === 404 || /model/i.test(msg)) {
-          msg = 'Grok model "' + grokModel + '" failed: ' + msg + ' Try grok-4.5 or grok-4.3 in the Model dropdown.';
+          msg = 'Grok model "' + grokModel + '" failed: ' + msg + ' Try grok-4.3 in the Model dropdown.';
         } else if (resp.status === 502) {
           msg = 'Grok proxy could not reach xAI. Try Generate again in a moment.';
+        } else if (resp.status === 504) {
+          msg = grokModel + ' timed out while thinking. Switch to grok-4.3 and Generate again.';
         }
         var err = new Error(msg);
         err.status = resp.status;
@@ -1620,6 +1665,7 @@
     try {
       return await once();
     } catch (firstErr) {
+      if (firstErr && firstErr.timeout) throw firstErr;
       if (!isFetchNetworkErr(firstErr)) throw firstErr;
       // One retry only — still Grok. Never Claude.
       try {
@@ -1636,9 +1682,9 @@
     }
   }
 
-  // Shared Unhinged-family entry: sync model list to Grok, require key, call Grok only.
+  // Shared Unhinged-family entry: require Grok key, call Grok only. Do not rebuild
+  // the model dropdown here — that used to snap Regen onto grok-4.6 after a 4.3 hit.
   async function runGrokOnly(model, prompt, maxTokens, temperature) {
-    updateModelOptions();
     var grokKey = getGrokKey();
     if (!grokKey) throw new Error(grokOnlyError());
     var grokModel = resolveGrokModel(model || getModel());
@@ -1784,7 +1830,8 @@
   function activeProviderName() {
     var provider = document.getElementById('providerSelect').value;
     var vibe = document.getElementById('vibe').value;
-    return shouldUseGrok(provider, vibe) ? 'Grok' : 'Claude';
+    if (!shouldUseGrok(provider, vibe)) return 'Claude';
+    return 'Grok ' + resolveGrokModel(getModel()).replace('grok-', '');
   }
 
   function setProviderLoadingText(textElId, action) {
@@ -4012,6 +4059,10 @@
 
   document.getElementById('vibe').addEventListener('change', updateModelOptions);
   document.getElementById('providerSelect').addEventListener('change', updateModelOptions);
+  document.getElementById('modelSelect').addEventListener('change', function() {
+    var val = this.value;
+    if (val && val.indexOf('grok-') === 0) safeSet('grok_model_pref', val);
+  });
   updateModelOptions();
 
   document.getElementById('generateBtn').addEventListener('click', doGenerate);
