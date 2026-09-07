@@ -911,6 +911,7 @@
     if (el) el.style.display = on ? 'flex' : 'none';
     if (shell) shell.classList.toggle('has-preview', !!on);
     if (on && el) el.scrollTop = 0;
+    if (window.__ptgFitPreviewPane) window.__ptgFitPreviewPane();
   }
 
   // ── MOOD SLIDER ──────────────────────────────────────────────
@@ -4848,6 +4849,10 @@
       var topOk = visibleIn(header, previewEl, 8);
       previewEl.scrollTop = previewEl.scrollHeight;
       void document.body.offsetHeight;
+      if (window.__ptgFitPreviewPane) window.__ptgFitPreviewPane();
+      void document.body.offsetHeight;
+      previewEl.scrollTop = previewEl.scrollHeight;
+      void document.body.offsetHeight;
       var bottom = {
         inputBar: visibleIn(inputBar, previewEl, 8),
         animate: visibleIn(animate, previewEl, 8),
@@ -5440,8 +5445,38 @@
   // Live-preview: switch to two-column layout only when a preview is visible
   var shell = document.getElementById('appShell');
   var preview = document.getElementById('previewSection');
-  function syncPreview(){ if(!shell||!preview) return; var vis = window.getComputedStyle(preview).display !== 'none'; shell.classList.toggle('has-preview', vis); }
+  var fitQueued = false;
+  function applyPreviewPaneFit(){
+    if (!preview) return;
+    if (!shell || !shell.classList.contains('has-preview') || window.innerWidth < 900) {
+      preview.style.height = '';
+      preview.style.maxHeight = '';
+      return;
+    }
+    var top = preview.getBoundingClientRect().top;
+    var room = Math.floor(window.innerHeight - top - 20);
+    if (room < 280) room = 280;
+    preview.style.height = room + 'px';
+    preview.style.maxHeight = room + 'px';
+  }
+  function fitPreviewPane(){
+    if (fitQueued) return;
+    fitQueued = true;
+    requestAnimationFrame(function(){
+      fitQueued = false;
+      applyPreviewPaneFit();
+    });
+  }
+  window.__ptgFitPreviewPane = applyPreviewPaneFit;
+  function syncPreview(){
+    if(!shell||!preview) return;
+    var vis = window.getComputedStyle(preview).display !== 'none';
+    shell.classList.toggle('has-preview', vis);
+    applyPreviewPaneFit();
+  }
   if (preview) { new MutationObserver(syncPreview).observe(preview, { attributes: true, attributeFilter: ['style','class'] }); }
+  window.addEventListener('scroll', fitPreviewPane, { passive: true });
+  window.addEventListener('resize', fitPreviewPane);
   syncPreview();
 
   // Collapse / expand Suno Campaign Presets (remembered; default closed)
