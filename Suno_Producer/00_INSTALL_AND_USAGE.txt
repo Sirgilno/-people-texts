@@ -45,9 +45,12 @@ DAILY WORKFLOW
 3. Open Gem OR Claude Project → paste / screenshot
 4. Copy **Style of Music** (plain text above the fence) → Suno Style field
 5. Copy the **lyrics code block** (lyrics only) → Suno Lyrics field → Create
-6. Use ASSETS captions/hashtags when posting (CAMPAIGN mode)
+6. Copy **ON-SCREEN CAPTIONS** (hook banners) into the video editor as top-of-frame overlays — not as the chat
+7. Copy **POST CAPTIONS** when posting (CAMPAIGN hashtags)
 
 Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If either puts Style inside the code block, re-paste updated 01_CORE_INSTRUCTIONS.txt into that home's Instructions (Gem and/or Claude Project) and re-upload 02.
+
+If Gemini omits hook banners, uses the chat as on-screen captions, or timestamps the conversation as overlays: re-paste 01_CORE (Gemini follows Instructions harder than Knowledge). Also re-upload 02.
 
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
@@ -67,3 +70,5 @@ WHAT CHANGED VS OLD MEGA-PROMPT
 - CAMPAIGN vs SPICY modes
 - Explicit Suno handoff language
 - Style of Music OUTSIDE the fence; lyrics-only code block (two separate Suno pastes)
+- On-screen captions = viral top-of-video hook banners (never chat lines / never skipped)
+- Post captions Option A + B required (copy-paste for TikTok/Reels)
