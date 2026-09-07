@@ -67,3 +67,6 @@ WHAT CHANGED VS OLD MEGA-PROMPT
 - CAMPAIGN vs SPICY modes
 - Explicit Suno handoff language
 - Style of Music OUTSIDE the fence; lyrics-only code block (two separate Suno pastes)
+- Genre: CORE bans the Amapiano + UK Drill autopilot pair; Knowledge 03 map is unordered (those two are not the top of the list)
+
+When this update lands: re-paste 01_CORE into the People Texts Gem Instructions AND re-upload 03 (and 02 if you refresh Knowledge). Gemini will keep defaulting until CORE is replaced in the Gem.
