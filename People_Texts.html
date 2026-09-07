@@ -905,13 +905,31 @@
     }
   }
 
+  function applyPreviewPaneFit() {
+    var el = document.getElementById('previewSection');
+    var shellEl = document.getElementById('appShell');
+    if (!el) return;
+    var wide = window.matchMedia('(min-width: 900px)').matches;
+    if (!shellEl || !shellEl.classList.contains('has-preview') || !wide) {
+      el.style.height = '';
+      el.style.maxHeight = '';
+      return;
+    }
+    var top = el.getBoundingClientRect().top;
+    var room = Math.floor(window.innerHeight - top - 20);
+    if (room < 280) room = 280;
+    el.style.height = room + 'px';
+    el.style.maxHeight = room + 'px';
+  }
+  window.__ptgFitPreviewPane = applyPreviewPaneFit;
+
   function setPreviewVisible(on) {
     var el = document.getElementById('previewSection');
     var shell = document.getElementById('appShell');
     if (el) el.style.display = on ? 'flex' : 'none';
     if (shell) shell.classList.toggle('has-preview', !!on);
     if (on && el) el.scrollTop = 0;
-    if (window.__ptgFitPreviewPane) window.__ptgFitPreviewPane();
+    applyPreviewPaneFit();
   }
 
   // ── MOOD SLIDER ──────────────────────────────────────────────
@@ -4842,14 +4860,12 @@
         var er = el.getBoundingClientRect();
         return er.width > 0 && er.height > 0 && er.top >= br.top - pad && er.bottom <= br.bottom + pad;
       }
-      var pcs = window.getComputedStyle(previewEl);
-      var wcs = wrap ? window.getComputedStyle(wrap) : null;
       previewEl.scrollTop = 0;
+      applyPreviewPaneFit();
       void document.body.offsetHeight;
       var topOk = visibleIn(header, previewEl, 8);
       previewEl.scrollTop = previewEl.scrollHeight;
-      void document.body.offsetHeight;
-      if (window.__ptgFitPreviewPane) window.__ptgFitPreviewPane();
+      applyPreviewPaneFit();
       void document.body.offsetHeight;
       previewEl.scrollTop = previewEl.scrollHeight;
       void document.body.offsetHeight;
@@ -4859,6 +4875,8 @@
         save: visibleIn(save, previewEl, 8),
         copy: visibleIn(copy, previewEl, 8)
       };
+      var pcs = window.getComputedStyle(previewEl);
+      var wcs = wrap ? window.getComputedStyle(wrap) : null;
       var overflowY = pcs.overflowY;
       var wrapOverflow = wcs ? wcs.overflowY : '';
       var canScroll = previewEl.scrollHeight > previewEl.clientHeight + 2;
@@ -5446,33 +5464,19 @@
   var shell = document.getElementById('appShell');
   var preview = document.getElementById('previewSection');
   var fitQueued = false;
-  function applyPreviewPaneFit(){
-    if (!preview) return;
-    if (!shell || !shell.classList.contains('has-preview') || window.innerWidth < 900) {
-      preview.style.height = '';
-      preview.style.maxHeight = '';
-      return;
-    }
-    var top = preview.getBoundingClientRect().top;
-    var room = Math.floor(window.innerHeight - top - 20);
-    if (room < 280) room = 280;
-    preview.style.height = room + 'px';
-    preview.style.maxHeight = room + 'px';
-  }
   function fitPreviewPane(){
     if (fitQueued) return;
     fitQueued = true;
     requestAnimationFrame(function(){
       fitQueued = false;
-      applyPreviewPaneFit();
+      if (window.__ptgFitPreviewPane) window.__ptgFitPreviewPane();
     });
   }
-  window.__ptgFitPreviewPane = applyPreviewPaneFit;
   function syncPreview(){
     if(!shell||!preview) return;
     var vis = window.getComputedStyle(preview).display !== 'none';
     shell.classList.toggle('has-preview', vis);
-    applyPreviewPaneFit();
+    if (window.__ptgFitPreviewPane) window.__ptgFitPreviewPane();
   }
   if (preview) { new MutationObserver(syncPreview).observe(preview, { attributes: true, attributeFilter: ['style','class'] }); }
   window.addEventListener('scroll', fitPreviewPane, { passive: true });
