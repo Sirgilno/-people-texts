@@ -2,11 +2,11 @@ SUNO PRODUCER — GENRE / DIALECT / TRIGGER MAP
 Source of truth for Style of Music prompts and lyric dialect. Genre tag ALWAYS first.
 
 MOOD-FIRST (silent)
-1) Name the mood of THIS chat in one sentence.
-2) Pick the row that sounds like that mood. Do not start at Amapiano. Do not use UK Drill as the automatic Option 2.
-3) Grim / Dark Humour / firing / medical / death → two of: Cinematic Trap, Phonk, 90s Grunge, Blues. Amapiano + UK Drill on that mood is a fail.
-4) Party / club / flex / celebration → Amapiano / Afrobeats / Dancehall is correct.
-5) Option 2 = different genre family. If trap/phonk/hip-hop: multi-syllable rhymes, punch word last.
+1) Read Verse 1. That is the conversation. Who is talking, and what is the tone?
+2) Feel it, then pick from this map. The map is a menu, not a default and not a lock.
+3) Option 2 = a different family that still fits THIS same chat.
+4) If the Style would sound wrong under this screenshot, pick again.
+5) If trap/hip-hop/drill truly fits this chat: multi-syllable rhymes, punch word last.
 
 FOREIGN LINE RULE
 Every Verse 2, Verse 3, and Outro needs ≥1 full standalone line in the genre's home language.

@@ -55,7 +55,7 @@ Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If eit
 
 If Gemini skips overlays, dumps the chat as captions, or timestamps the conversation: re-paste 01_CORE and re-upload 02, then start a new chat.
 
-This revision locks grim / Dark Humour chats to Cinematic Trap / Phonk / 90s Grunge / Blues. Replace Instructions with this 01 and re-upload 03, then a new chat — the leftover Amapiano + UK Drill pack was already loaded; Gemini will keep it until you swap the files.
+Genre comes from reading Verse 1, not from a locked list. Replace Instructions with this 01 and re-upload 03 if you still have the grim-lock version in the Gem. New chat after the swap.
 
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
@@ -67,8 +67,7 @@ MODE: CAMPAIGN (default) | SPICY
 WHAT THIS PACK MUST ALWAYS PRINT
 ═══════════════════════════════════════
 - Two Suno options (Style outside the fence, lyrics-only code block)
-- Grim / Dark Humour chats: Cinematic Trap, Phonk, 90s Grunge, or Blues (not leftover Amapiano + UK Drill)
-- Party / club chats: Amapiano / Afrobeats / Dancehall is fine
+- Style of Music from Verse 1's tone (no locked genre; leftover pair only if the chat actually sounds like that)
 - ON-SCREEN CAPTIONS: 3 viral top-of-video hook banners (never chat lines)
 - POST CAPTIONS: Option A + Option B, copy-paste ready
 - ASSETS: Title, On-Screen Caption, Social Caption, YouTube Shorts Caption, CTA

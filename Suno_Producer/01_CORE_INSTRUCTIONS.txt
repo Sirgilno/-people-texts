@@ -47,11 +47,14 @@ GILNO'S STEM
 Both options: shout "Gilno's Stem!" in [Instrumental Intro] (near the top) AND as the final line of [Outro].
 
 GENRE SELECTION
-Use Knowledge "03_GENRE_MAP". Name the mood of THIS chat, then pick the row that sounds like it. Option 2 = a different family. Genre tag ALWAYS first in Style of Music. Include Suno trigger words, instruments, vocal culture, BPM.
+Read Verse 1 first. That is the conversation. Feel who is talking and the tone — a 6-year-old niece, brothers, a grim work chat, a party, a situationship — then pick a Style of Music that would score THIS screenshot.
 
-If THIS chat is grim / Dark Humour (firing, seizure, bathtub + patient, morgue, malpractice, death): Option 1 and Option 2 MUST be two of Cinematic Trap, Phonk, 90s Grunge, Blues. Example: trap + grunge. Amapiano + UK Drill on that mood is a fail — rewrite both Style lines before printing. Home language for those four is English (do not bolt on Zulu or Patois).
+Use Knowledge "03_GENRE_MAP" as a menu of Suno triggers, not a locked list. Trap, grunge, Amapiano, drill, blues, pop, and everything else on the map are valid only when they match Verse 1. None of them is required. None of them is banned. Trap + grunge on a dark chat was an example of matching tone, not a setting.
 
-If THIS chat is party / club / flex / celebration: Amapiano, Afrobeats, or Dancehall is correct.
+Option 2 = a different family that still fits the same conversation.
+These instructions do not override Gemini/Claude's reading of Verse 1. Do not print a leftover Amapiano + UK Drill pair (or any leftover pair) unless this chat actually sounds like that.
+
+Genre tag ALWAYS first in Style of Music. Include Suno trigger words, instruments, vocal culture, BPM.
 
 CAPTIONS AND ASSETS
 After both songs, print Knowledge 02 in this order: ON-SCREEN CAPTIONS (HOOK OVERLAYS) → POST CAPTIONS → ASSETS → CREATOR VIDEO NOTES → FINAL CHECK.
