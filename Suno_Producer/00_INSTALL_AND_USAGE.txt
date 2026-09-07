@@ -1,6 +1,9 @@
-GILNO SUNO PRODUCER PACK
+GILNO SUNO PRODUCER PACK (People Texts)
 Works in Google Gemini Gems AND Claude Projects.
 Final music is always made in Suno (paste Style + lyrics).
+
+This pack is SEPARATE from Cash Cow. Do not paste Cash Cow files into this Gem.
+Daily mix: ~3 videos from Cash Cow, ~2 from People Texts.
 
 ═══════════════════════════════════════
 FILES
@@ -12,7 +15,7 @@ FILES
 ═══════════════════════════════════════
 GEMINI GEM SETUP
 ═══════════════════════════════════════
-1. gemini.google.com → Gems → New Gem (or Edit your song Gem)
+1. gemini.google.com → Gems → New Gem (or Edit your People / song Gem)
 2. Name: e.g. Gilno Suno Producer
 3. Instructions: paste ENTIRE contents of 01_CORE_INSTRUCTIONS.txt
 4. Knowledge → Add files:
@@ -23,7 +26,7 @@ GEMINI GEM SETUP
 
 Tip: Keep Instructions slim (CORE only). If you paste the genre map into Instructions too, Gemini may start ignoring rules.
 
-When this pack updates: Edit Gem → replace Instructions with the new 01_CORE → remove old Knowledge files → re-add 02 + 03 → Save. Gemini does NOT auto-pull from GitHub.
+When this pack updates: Edit Gem → replace Instructions with the new 01_CORE → remove old Knowledge files → re-add 02 + 03 → Save. Start a NEW Gemini chat. Gemini does NOT auto-pull from GitHub.
 
 ═══════════════════════════════════════
 CLAUDE PROJECT SETUP
@@ -42,17 +45,15 @@ DAILY WORKFLOW
 ═══════════════════════════════════════
 1. People Texts → generate chat (JoHo preset + Full Chaos + vibe)
 2. Copy conversation (optional header below)
-3. Open Gem OR Claude Project → paste / screenshot
+3. Open this Gem OR Claude Project → paste / screenshot
 4. Copy **Style of Music** (plain text above the fence) → Suno Style field
 5. Copy the **lyrics code block** (lyrics only) → Suno Lyrics field → Create
-6. Copy **ON-SCREEN CAPTIONS** (hook banners) into the video editor as top-of-frame overlays — not as the chat
-7. Copy **POST CAPTIONS** when posting (CAMPAIGN hashtags)
+6. Copy **ON-SCREEN CAPTIONS (HOOK OVERLAYS)** into the video editor as top-of-frame banners — not as the chat
+7. Copy **POST CAPTIONS** + **ASSETS** when posting (CAMPAIGN hashtags)
 
-Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If either puts Style inside the code block, re-paste updated 01_CORE_INSTRUCTIONS.txt into that home's Instructions (Gem and/or Claude Project) and re-upload 02.
+Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If either puts Style inside the code block, re-paste 01_CORE into that home's Instructions and re-upload 02.
 
-If Gemini omits hook banners, uses the chat as on-screen captions, or timestamps the conversation as overlays: re-paste 01_CORE (Gemini follows Instructions harder than Knowledge). Also re-upload 02.
-
-If Gemini uses leftover Amapiano + UK Drill on a grim / Dark Humour chat: replace Instructions with this 01 and re-upload 03. Captions do not pick Style of Music. Genre is mood-first (grim chats → trap / phonk / grunge / blues; party chats can still be Amapiano). New chat after the paste.
+If Gemini skips overlays, dumps the chat as captions, or timestamps the conversation: re-paste 01_CORE and re-upload 02, then start a new chat.
 
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
@@ -61,16 +62,11 @@ FORMAT values: bachelor_guys | bach_trip | realtor_starter | college_interior_br
 MODE: CAMPAIGN (default) | SPICY
 
 ═══════════════════════════════════════
-WHAT CHANGED VS OLD MEGA-PROMPT
+WHAT THIS PACK MUST ALWAYS PRINT
 ═══════════════════════════════════════
-- Split for Gem/Claude reliability (CORE + Knowledge)
-- Removed duplicate Option 2 template
-- JoHo formats: bachelor guys, realtor, college little-bro POV
-- Group chat awareness
-- Drama beats → Chorus/Outro
-- Hashtags aligned to audit: #sunopartner #sunoambassador #suno
-- CAMPAIGN vs SPICY modes
-- Explicit Suno handoff language
-- Style of Music OUTSIDE the fence; lyrics-only code block (two separate Suno pastes)
-- On-screen captions = viral top-of-video hook banners (never chat lines / never skipped)
-- Post captions Option A + B required (copy-paste for TikTok/Reels)
+- Two Suno options (Style outside the fence, lyrics-only code block)
+- Mood-first Style of Music from the genre map (rotate — do not default to UK Drill / Sea Shanty / Amapiano)
+- ON-SCREEN CAPTIONS: 3 viral top-of-video hook banners (never chat lines)
+- POST CAPTIONS: Option A + Option B, copy-paste ready
+- ASSETS: Title, On-Screen Caption, Social Caption, YouTube Shorts Caption, CTA
+- CREATOR VIDEO NOTES + FINAL CHECK

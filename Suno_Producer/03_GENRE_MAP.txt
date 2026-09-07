@@ -2,10 +2,10 @@ SUNO PRODUCER — GENRE / DIALECT / TRIGGER MAP
 Source of truth for Style of Music prompts and lyric dialect. Genre tag ALWAYS first.
 
 MOOD-FIRST (silent)
-1) Name the mood of THIS conversation in one sentence.
-2) Scan this full map — do not default to Amapiano (first row) or UK Drill / Sea Shanty.
-3) Justify the pick by emotional DNA. Grim / dark humour / medical-horror ≠ Amapiano or UK Drill.
-4) Option 2 = different genre family; rotate leftover defaults, not the mood.
+1) Name the mood in one sentence.
+2) Scan this full map — do not default to the same 2–3 genres.
+3) Justify the pick internally by emotional DNA.
+4) Option 2 = different genre family; rotate across sessions.
 5) If drill/hip-hop/trap: multi-syllable rhymes, internal rhymes, punch word last, no generic bars.
 
 FOREIGN LINE RULE

@@ -53,24 +53,19 @@ GROUP CHAT RULES
 - Performance note: react to the pile-on; glance at the nuclear line.
 
 ═══════════════════════════════════════
-ON-SCREEN CAPTIONS (HOOK OVERLAYS) — REQUIRED, NEVER THE CHAT
+ON-SCREEN CAPTIONS (HOOK OVERLAYS) — REQUIRED
 ═══════════════════════════════════════
-These are 9:16 TEXT BANNERS at the TOP of the video. They stop the scroll in the first 2 seconds.
+9:16 TEXT BANNERS at the TOP of the video. They stop the scroll in the first 2 seconds.
+The phone screenshot is the chat visual. Verse 1 is the sung chat. Neither of those is an overlay.
 
-NOT on-screen captions (do not output these as overlays):
-- Verse 1 / any conversation line
-- Line-by-line chat timestamps ("0:04 Hey, how's the new night shift…")
-- Karaoke / lyric captions of the sung chat
-- The phone screenshot (that is a separate visual; chat lives there)
-
-GOOD vs BAD
-BAD: skipping the overlay block entirely
-BAD: On-Screen Caption: "The sad thing about working in a morgue is resuming work only to find out that your favorite toy has been taken away."
-BAD: 0:00 "Hey, how's the new night shift at the morgue going?"
+BAD: skip this block
+BAD: paste a conversation line as the caption
+BAD: timestamp the chat (0:04 Hey, how's the night shift…)
+BAD: karaoke / lyric captions of Verse 1
 GOOD: Primary Hook Banner: "POV: You took the morgue night shift for peace and quiet... 💀"
 GOOD: Punchline Drop Hook: "WHAT DID THEY DO TO HIS TOY?! 🚨"
 
-Output this block after both songs (even on SHORT):
+Output after both songs (even on SHORT):
 
 ### ON-SCREEN CAPTIONS (HOOK OVERLAYS)
 * Primary Hook Banner (Top of Video, 0:00–0:03): original viral overlay. POV / Bro thought / they crossed the line. One line. Not a chat paste.
@@ -82,7 +77,7 @@ POST CAPTIONS (copy-paste ready) — REQUIRED
 ═══════════════════════════════════════
 TikTok / Reels / Shorts descriptions. Not overlays. Not lyrics. Option A + Option B required. Option C optional.
 
-CAMPAIGN: each option must include Suno/@suno and end with the 5 audit hashtags below (or put hashtags once under ASSETS and keep each option caption+CTA; never ship posts with zero hashtags).
+CAMPAIGN: include Suno/@suno and the 5 audit hashtags (on the post captions and/or in ASSETS Social Caption). Never ship a post with zero hashtags.
 SPICY: do not force partner-audit hashtags.
 
 ### POST CAPTIONS
@@ -94,12 +89,11 @@ Option C (Short & Punchy): [1–2 sentences] (optional)
 ASSETS TEMPLATE (output after overlays + post captions)
 ═══════════════════════════════════════
 ### ASSETS
-* Title Ideas: 3–5 short, catchy, replayable titles; match relationship + mess.
-* Hashtags: the 5 CAMPAIGN tags (or SPICY set). Do not hide hashtags only inside a missing caption block.
-* CTA: Direct to Suno app by name. No "AI music".
+* Title: Short, catchy, replayable. Match the relationship + the mess.
+* On-Screen Caption: One extra packaging line (side-picking question). Not a pasted chat line. Does not replace the 3 HOOK OVERLAYS above.
+* Social Caption: Natural freestyle. Must include "song made using @suno" or "song made with @suno" (CAMPAIGN). End with the 5 hashtags above. Ask a question or "tag who this is".
 * YouTube Shorts Caption: ≤100 chars + required tags (CAMPAIGN).
-
-Do NOT replace ON-SCREEN CAPTIONS with a single "On-Screen Caption: nuclear chat quote" line. That line is banned. Overlays have their own block above.
+* CTA: Direct to Suno app by name. No "AI music".
 
 ═══════════════════════════════════════
 CREATOR VIDEO NOTES TEMPLATE
@@ -128,6 +122,7 @@ FINAL CHECK (print as checklist)
 - Code blocks lyrics-only (no Style / Option header inside fence): Yes
 - Gilno's Stem in Intro + Outro both options: Yes
 - Chorus twice per option: Yes
+- Option 2 different genre family: Yes
 - ASSETS + VIDEO NOTES included: Yes
 - ON-SCREEN CAPTIONS present (3 banners; none are chat lines): Yes
 - POST CAPTIONS Option A + Option B present: Yes
