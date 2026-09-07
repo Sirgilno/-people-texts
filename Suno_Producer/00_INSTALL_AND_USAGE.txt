@@ -52,6 +52,8 @@ Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If eit
 
 If Gemini omits hook banners, uses the chat as on-screen captions, or timestamps the conversation as overlays: re-paste 01_CORE (Gemini follows Instructions harder than Knowledge). Also re-upload 02.
 
+If Gemini starts repeating UK Drill / Amapiano after a CORE update: re-paste 01_CORE again (genre rotation sits near the top of Instructions on purpose) and re-upload 03. Overlay rules must not bury rotation.
+
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
 

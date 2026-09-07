@@ -1,11 +1,14 @@
 SUNO PRODUCER — GENRE / DIALECT / TRIGGER MAP
 Source of truth for Style of Music prompts and lyric dialect. Genre tag ALWAYS first.
 
+ROTATION LOCK
+This list is a MENU. Order is filing, not priority. Amapiano is first in the file — that does NOT make it the default. UK Drill is not the default. Do not pick the same 2–3 families every paste.
+
 MOOD-FIRST (silent)
 1) Name the mood in one sentence.
-2) Scan this full map — do not default to the same 2–3 genres.
+2) Scan this full map — do not default to the same 2–3 genres (especially Amapiano, UK Drill, Sea Shanty, generic trap).
 3) Justify the pick internally by emotional DNA.
-4) Option 2 = different genre family; rotate across sessions.
+4) Option 2 = different genre family; rotate across sessions. Skip any family already used in this chat.
 5) If drill/hip-hop/trap: multi-syllable rhymes, internal rhymes, punch word last, no generic bars.
 
 FOREIGN LINE RULE
