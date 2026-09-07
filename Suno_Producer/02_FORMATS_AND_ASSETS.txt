@@ -131,7 +131,7 @@ FINAL CHECK (print as checklist)
 - ASSETS + VIDEO NOTES included: Yes
 - ON-SCREEN CAPTIONS present (3 banners; none are chat lines): Yes
 - POST CAPTIONS Option A + Option B present: Yes
-- Genres rotated (not lazy UK Drill / Amapiano / Sea Shanty default; Option 2 different family): Yes
+- Genres match the chat mood (Dark Humour ≠ dancehall/afrobeats/amapiano); Option 2 different family in the same lane: Yes
 - CAMPAIGN hashtags correct (or SPICY mode noted): Yes
 - Ready to paste into Suno (Style field + Lyrics field separately): Yes
 
