@@ -53,13 +53,46 @@ GROUP CHAT RULES
 - Performance note: react to the pile-on; glance at the nuclear line.
 
 ═══════════════════════════════════════
-ASSETS TEMPLATE (output after both songs)
+ON-SCREEN CAPTIONS (HOOK OVERLAYS) — REQUIRED
+═══════════════════════════════════════
+9:16 TEXT BANNERS at the TOP of the video. They stop the scroll in the first 2 seconds.
+The phone screenshot is the chat visual. Verse 1 is the sung chat. Neither of those is an overlay.
+
+BAD: skip this block
+BAD: paste a conversation line as the caption
+BAD: timestamp the chat (0:04 Hey, how's the night shift…)
+BAD: karaoke / lyric captions of Verse 1
+GOOD: Primary Hook Banner: "POV: You took the morgue night shift for peace and quiet... 💀"
+GOOD: Punchline Drop Hook: "WHAT DID THEY DO TO HIS TOY?! 🚨"
+
+Output after both songs (even on SHORT):
+
+### ON-SCREEN CAPTIONS (HOOK OVERLAYS)
+* Primary Hook Banner (Top of Video, 0:00–0:03): original viral overlay. POV / Bro thought / they crossed the line. One line. Not a chat paste.
+* Mid-Video Tension Hook: original banner that teases the mess.
+* Punchline Drop Hook: original bait banner in overlay-speak (shout the crime; do not paste the Verse 1 sentence).
+
+═══════════════════════════════════════
+POST CAPTIONS (copy-paste ready) — REQUIRED
+═══════════════════════════════════════
+TikTok / Reels / Shorts descriptions. Not overlays. Not lyrics. Option A + Option B required. Option C optional.
+
+CAMPAIGN: include Suno/@suno and the 5 audit hashtags (on the post captions and/or in ASSETS Social Caption). Never ship a post with zero hashtags.
+SPICY: do not force partner-audit hashtags.
+
+### POST CAPTIONS
+Option A (Shock / Comment-Bait): [2–4 sentences + question for comments]
+Option B (Deadpan / Relatable): [2–4 sentences]
+Option C (Short & Punchy): [1–2 sentences] (optional)
+
+═══════════════════════════════════════
+ASSETS TEMPLATE (output after overlays + post captions)
 ═══════════════════════════════════════
 ### ASSETS
-* Title: Short, catchy, replayable; match relationship + mess.
-* On-Screen Caption: Scroll-stopper. Prefer a side-picking question OR the nuclear chat quote.
-* Social Caption: Natural freestyle. Must include Suno/@suno (CAMPAIGN). End with the 5 hashtags above. Ask a question or "tag who this is" for engagement.
-* YouTube Shorts Caption: ≤100 chars + required tags.
+* Title: Short, catchy, replayable. Match the relationship + the mess.
+* On-Screen Caption: One extra packaging line (side-picking question). Not a pasted chat line. Does not replace the 3 HOOK OVERLAYS above.
+* Social Caption: Natural freestyle. Must include "song made using @suno" or "song made with @suno" (CAMPAIGN). End with the 5 hashtags above. Ask a question or "tag who this is".
+* YouTube Shorts Caption: ≤100 chars + required tags (CAMPAIGN).
 * CTA: Direct to Suno app by name. No "AI music".
 
 ═══════════════════════════════════════
@@ -69,7 +102,8 @@ CREATOR VIDEO NOTES TEMPLATE
 * Campaign Format Detected: [format name]
 * Opening Shot: Sell the premise in 1 second (relationship + crime).
 * CTA Placement: First half for text/comment formats.
-* Text Placement Note: Keep screenshot readable in safe zones while song plays.
+* Hook Overlay: Primary banner at TOP of 9:16 for 0:00–0:03. Chat screenshot is the visual, not the caption.
+* Text Placement Note: Keep screenshot readable in safe zones. Hook banners sit in the top overlay zone, never replace the chat with karaoke of Verse 1.
 * Performance Note: Face matches vibe — laugh / shock / guilt / "bro what".
 * Audio Export Note: Screen record Suno → editor → Overlay → add recording → volume up → drag overlay off screen. Skip only if organic "look what they sent me" skit.
 * Comment Bait: One sentence on what argument you want in comments.
@@ -88,7 +122,11 @@ FINAL CHECK (print as checklist)
 - Code blocks lyrics-only (no Style / Option header inside fence): Yes
 - Gilno's Stem in Intro + Outro both options: Yes
 - Chorus twice per option: Yes
+- Option 2 different genre family: Yes
+- Style of Music matches Verse 1's actual tone (who is talking + how the chat feels): Yes
 - ASSETS + VIDEO NOTES included: Yes
+- ON-SCREEN CAPTIONS present (3 banners; none are chat lines): Yes
+- POST CAPTIONS Option A + Option B present: Yes
 - CAMPAIGN hashtags correct (or SPICY mode noted): Yes
 - Ready to paste into Suno (Style field + Lyrics field separately): Yes
 
@@ -127,4 +165,15 @@ Gilno's Stem!
 
 ### Option 2: Alternative Style
 Same structure. Different genre family. Different jokes/hook. Same Verse 1 lines.
+
+### ON-SCREEN CAPTIONS (HOOK OVERLAYS)
+* Primary Hook Banner (Top of Video, 0:00–0:03): [original overlay, not a chat line]
+* Mid-Video Tension Hook: [original overlay]
+* Punchline Drop Hook: [original overlay-speak bait]
+
+### POST CAPTIONS
+Option A: [shock / comment-bait]
+Option B: [deadpan / relatable]
+(Option C optional)
+
 Then ASSETS + CREATOR VIDEO NOTES + FINAL CHECK.
