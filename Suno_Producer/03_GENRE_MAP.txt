@@ -2,11 +2,11 @@ SUNO PRODUCER — GENRE / DIALECT / TRIGGER MAP
 Source of truth for Style of Music prompts and lyric dialect. Genre tag ALWAYS first.
 
 MOOD-FIRST (silent)
-1) Name the mood in one sentence.
-2) Scan this full map — do not default to the same 2–3 genres.
-3) Justify the pick internally by emotional DNA.
-4) Option 2 = different genre family; rotate across sessions.
-5) If drill/hip-hop/trap: multi-syllable rhymes, internal rhymes, punch word last, no generic bars.
+1) Name the mood of THIS chat in one sentence.
+2) Pick the row that sounds like that mood. Do not start at Amapiano. Do not use UK Drill as the automatic Option 2.
+3) Grim / Dark Humour / firing / medical / death → two of: Cinematic Trap, Phonk, 90s Grunge, Blues. Amapiano + UK Drill on that mood is a fail.
+4) Party / club / flex / celebration → Amapiano / Afrobeats / Dancehall is correct.
+5) Option 2 = different genre family. If trap/phonk/hip-hop: multi-syllable rhymes, punch word last.
 
 FOREIGN LINE RULE
 Every Verse 2, Verse 3, and Outro needs ≥1 full standalone line in the genre's home language.
@@ -31,11 +31,14 @@ MAP
 - UK Drill / Grime → UK drill, sliding 808s, cold London vocals, 140-145 BPM. mandem, ting, wasteman, innit, bruv, peak. Hard multi-syllable bars.
 - Chicago / NY Drill → aggressive deadpan, trap hats, heavy 808, 140-150 BPM. Hard American drill bars.
 - Country / Bluegrass → Southern twang, acoustic, pedal steel, storytelling, 85-100 BPM.
-- Blues → Delta/slow blues, slide guitar, gritty vocals, 60-80 BPM.
+- Blues → Delta/slow blues, slide guitar, gritty vocals, 60-80 BPM. Home language: English.
+- Cinematic Trap → dark cinematic trap, minor-key piano, deep 808s, sparse hats, deadpan male vocals, horror-comedy atmosphere, 130-140 BPM. Home language: English. Hard original bars; punchlines last.
+- Phonk → phonk, cowbell, drifted 808s, dark bass, chopped vocal stabs, night-drive atmosphere, 130-140 BPM. Home language: English.
+- 90s Grunge → 90s grunge, distorted guitar, dropping drums, raw male vocals, 70-90 BPM. Home language: English.
 - Mariachi → brass, guitarron, vihuela, proud Mexican vocals, 100-120 BPM. One full Spanish line.
 - Gospel Pop → choir, organ, Southern belt, 80-100 BPM.
 - Soul / R&B → warm emotive vocals, groove, 75-95 BPM.
 - Stadium Anthem → crowd chant, massive choir, euphoric build, brass fanfare, 100-120 BPM. NO FIFA / World Cup / player names.
-- Trap / Hip-Hop / Rap variants → genre tag first; hard original bars; punchlines last; callbacks.
+- Trap / Hip-Hop / Rap variants → genre tag first; hard original bars; punchlines last; callbacks. Home language: English.
 
 If genre not listed: infer home culture, specific instruments, BPM, vocal delivery; same specificity standard.

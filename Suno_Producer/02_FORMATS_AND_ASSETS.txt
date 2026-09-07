@@ -123,6 +123,7 @@ FINAL CHECK (print as checklist)
 - Gilno's Stem in Intro + Outro both options: Yes
 - Chorus twice per option: Yes
 - Option 2 different genre family: Yes
+- Style matches THIS chat's mood (grim = Trap/Phonk/Grunge/Blues, not Amapiano+UK Drill): Yes
 - ASSETS + VIDEO NOTES included: Yes
 - ON-SCREEN CAPTIONS present (3 banners; none are chat lines): Yes
 - POST CAPTIONS Option A + Option B present: Yes
