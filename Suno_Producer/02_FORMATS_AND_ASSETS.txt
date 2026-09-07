@@ -90,6 +90,8 @@ FINAL CHECK (print as checklist)
 - Chorus twice per option: Yes
 - ASSETS + VIDEO NOTES included: Yes
 - CAMPAIGN hashtags correct (or SPICY mode noted): Yes
+- Not the lazy Amapiano + UK Drill pair: Yes
+- USED THIS RUN line printed: Yes
 - Ready to paste into Suno (Style field + Lyrics field separately): Yes
 
 ═══════════════════════════════════════
@@ -128,3 +130,4 @@ Gilno's Stem!
 ### Option 2: Alternative Style
 Same structure. Different genre family. Different jokes/hook. Same Verse 1 lines.
 Then ASSETS + CREATOR VIDEO NOTES + FINAL CHECK.
+USED THIS RUN: [genre 1] / [genre 2]
