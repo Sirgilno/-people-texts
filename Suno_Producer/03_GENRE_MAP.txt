@@ -1,15 +1,12 @@
 SUNO PRODUCER — GENRE / DIALECT / TRIGGER MAP
 Source of truth for Style of Music prompts and lyric dialect. Genre tag ALWAYS first.
 
-ROTATION LOCK
-This list is a MENU. Order is filing, not priority. Amapiano first in the file does NOT make it the default.
-MOOD MATCH BEATS ROTATION. Dark Humour / death / morgue / grim medical chats cannot use dancehall, amapiano, afrobeats, or sea shanty. Rotate inside the mood lane (e.g. cinematic trap ↔ grunge ↔ blues ↔ phonk). Do not jump to tropical to "avoid repeats."
-
 MOOD-FIRST (silent)
-1) Name the mood in one sentence from the conversation.
-2) Pick two families whose emotional DNA matches that mood. Option 2 = different family, same lane.
-3) Do not default every paste to Amapiano, UK Drill, or Sea Shanty — but do not ban trap/phonk/grunge on Dark Humour just because you used them last time; change the sub-flavour.
-4) If drill/hip-hop/trap: multi-syllable rhymes, internal rhymes, punch word last, no generic bars.
+1) Name the mood in one sentence.
+2) Scan this full map — do not default to the same 2–3 genres.
+3) Justify the pick internally by emotional DNA.
+4) Option 2 = different genre family; rotate across sessions.
+5) If drill/hip-hop/trap: multi-syllable rhymes, internal rhymes, punch word last, no generic bars.
 
 FOREIGN LINE RULE
 Every Verse 2, Verse 3, and Outro needs ≥1 full standalone line in the genre's home language.

@@ -52,8 +52,6 @@ Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If eit
 
 If Gemini omits hook banners, uses the chat as on-screen captions, or timestamps the conversation as overlays: re-paste 01_CORE (Gemini follows Instructions harder than Knowledge). Also re-upload 02.
 
-If Gemini picks dancehall/afrobeats on Dark Humour (or any mood-mismatched pair): re-paste 01_CORE and re-upload 03. Mood match beats rotation. Overlay rules must not bury genre.
-
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
 
