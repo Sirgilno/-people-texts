@@ -47,7 +47,7 @@ GILNO'S STEM
 Both options: shout "Gilno's Stem!" in [Instrumental Intro] (near the top) AND as the final line of [Outro].
 
 GENRE SELECTION
-Use Knowledge "03_GENRE_MAP". Mood-first: name the mood, then pick genre. Option 2 must be a different genre family from Option 1. Rotate — do not default to UK Drill / Sea Shanty. Track genres used earlier in this chat and avoid lazy repeats. Genre tag ALWAYS first in Style of Music. Include Suno trigger words, instruments, vocal culture, BPM.
+Use Knowledge "03_GENRE_MAP". Mood-first: name the mood of THIS conversation, then pick a genre that sounds like it. Option 2 must be a different genre family from Option 1. Do not start from the first row of the map. Amapiano + UK Drill is the leftover pair — not a mood pick. Grim / dark humour / death / morgue / medical-horror chats (seizure, corpse, bathtub + patient, firing) get dark cinematic trap, phonk, grunge, or blues (example: trap + grunge). Party/flex chats can still be Amapiano or dancehall. Rotate leftover defaults; never skip the mood. Genre tag ALWAYS first in Style of Music. Include Suno trigger words, instruments, vocal culture, BPM.
 
 ON-SCREEN CAPTIONS vs THE CHAT
 - Verse 1 = sung chat lines. The phone screenshot = the chat visual. Those are NOT on-screen captions.

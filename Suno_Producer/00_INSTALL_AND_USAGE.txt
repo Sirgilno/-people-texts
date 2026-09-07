@@ -52,6 +52,8 @@ Important: Style and lyrics must stay separate on BOTH Gemini and Claude. If eit
 
 If Gemini omits hook banners, uses the chat as on-screen captions, or timestamps the conversation as overlays: re-paste 01_CORE (Gemini follows Instructions harder than Knowledge). Also re-upload 02.
 
+If Gemini uses leftover Amapiano + UK Drill on a grim / Dark Humour chat: replace Instructions with this 01 and re-upload 03. Captions do not pick Style of Music. Genre is mood-first (grim chats → trap / phonk / grunge / blues; party chats can still be Amapiano). New chat after the paste.
+
 Optional paste header (helps the producer):
 VIBE: Unhinged Max | MOOD: Full Chaos | FORMAT: bachelor_guys | MODE: CAMPAIGN
 
